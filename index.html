@@ -909,6 +909,18 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
 .pl-apercu td.pl-apercu-erreur { color: var(--rouge); font-weight: 600; background: color-mix(in srgb, var(--rouge) 7%, var(--blanc)); }
 #pl-details-coller summary { cursor: pointer; margin: 4px 0; }
 
+.pl-zone-import {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center;
+  margin: 18px 0 6px; padding: 44px 24px; border: 2px dashed color-mix(in srgb, var(--accent) 40%, var(--bord-fort));
+  border-radius: var(--r-l, 0); background: var(--accent-doux, var(--fond)); cursor: pointer; transition: background .15s, border-color .15s;
+}
+.pl-zone-import:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--blanc)); }
+.pl-zone-import .icone { width: 40px; height: 40px; color: var(--accent); }
+.pl-zone-import strong { font-size: 16px; }
+.pl-zone-import .doux { max-width: 460px; line-height: 1.45; }
+.pl-alerte .bouton.petit-bouton { height: 26px; margin: 0 6px 0 4px; vertical-align: middle; }
+html[data-theme="sombre"] .pl-zone-import .icone { color: color-mix(in srgb, var(--accent) 45%, #fff); }
+
 /* impression du planning de caisse */
 @media print {
   html.impression-planning, html.impression-planning body { height: auto; overflow: visible; background: #fff; }
@@ -1235,60 +1247,42 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
           </div>
           <div class="groupe">
             <div class="commandes"><span class="choix" data-choix="vue-planning">
-              <button data-valeur="presences" class="actif">Présences</button><button data-valeur="caisse">Caisse</button><button data-valeur="reglages">Réglages</button>
+              <button data-valeur="caisse" class="actif">Planning de caisse</button><button data-valeur="reglages">Réglages</button>
             </span></div>
             <span class="legende">Affichage</span>
           </div>
-          <div class="groupe pl-outils" data-pour="presences">
+          <div class="groupe pl-outils" data-pour="caisse">
             <div class="commandes">
               <button class="gros principal-doux pl-importer-pdf"><span class="icone" data-icone="importer"></span>Importer le planning PDF</button>
-              <button id="pl-coller" class="gros"><span class="icone" data-icone="coller"></span>Coller depuis Excel</button>
-              <button id="pl-reprendre" class="gros"><span class="icone" data-icone="copier"></span>Reprendre la sem. préc.</button>
-              <button id="pl-vider" class="gros"><span class="icone" data-icone="effacer"></span>Vider</button>
-              <button class="gros pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
-            </div>
-            <span class="legende">Présences</span>
-          </div>
-          <div class="groupe pl-outils" data-pour="caisse" hidden>
-            <div class="commandes">
-              <button class="gros pl-importer-pdf"><span class="icone" data-icone="importer"></span>Importer le planning PDF</button>
               <button id="pl-generer" class="gros"><span class="icone" data-icone="generer"></span>Créer le planning de caisse</button>
               <button id="pl-autre" class="gros"><span class="icone" data-icone="melanger"></span>Autre proposition</button>
-              <button class="gros principal-doux pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
+              <button class="gros pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
             </div>
             <span class="legende">Planning de caisse</span>
           </div>
           <input type="file" id="pl-fichier-pdf" accept="application/pdf,.pdf" hidden>
-          <div class="ruban-info doux" id="pl-info">Écris les horaires comme <strong>9h-12h 14h-19h</strong>.<br>Tu peux aussi coller directement un tableau Excel dans la grille.</div>
+          <div class="ruban-info doux" id="pl-info">Importe le planning de la semaine (PDF) :<br>le planning de caisse se crée tout seul.</div>
         </div>
 
         <div class="feuille-defilante">
-          <!-- Présences -->
-          <div class="feuille pl-vue" data-vue="presences">
-            <h2 id="pl-titre-presences">Planning de la semaine</h2>
-            <p class="doux explication">Une case par jour : <strong>9h-19h</strong>, avec la pause <strong>9h-19h pause 12h-13h</strong> (ou <strong>9h-12h 13h-19h</strong>).
-              Laisse vide (ou écris <em>repos</em>, <em>CP</em>…) un jour non travaillé. Clique dans une case et colle (⌘V / Ctrl+V) un bloc copié dans Excel : il se répartit dans la grille.</p>
-            <p id="pl-etat-enregistrement" class="doux petit"></p>
-            <div class="defilement-horizontal">
-              <table class="tableau-office pl-grille">
-                <thead id="pl-entete-presences"></thead>
-                <tbody id="pl-lignes-presences"></tbody>
-                <tfoot id="pl-pied-presences"></tfoot>
-              </table>
-            </div>
-          </div>
-
           <!-- Caisse -->
-          <div class="feuille pl-vue" data-vue="caisse" hidden>
+          <div class="feuille pl-vue" data-vue="caisse">
             <h2 id="pl-titre-caisse">Planning de caisse</h2>
             <p class="doux explication" id="pl-explication-caisse"></p>
+            <p id="pl-etat-enregistrement" class="doux petit"></p>
+            <div id="pl-depot" class="pl-zone-import" hidden>
+              <span class="icone" data-icone="importer"></span>
+              <strong>Importe le planning de la semaine</strong>
+              <span class="doux">Le PDF exporté depuis Excel, avec les noms et les horaires de chacun. Clique ici ou glisse le fichier sur la page.</span>
+            </div>
+            <div id="pl-contenu-caisse">
             <div id="pl-chiffres" class="chiffres compacts"></div>
             <div id="pl-alertes"></div>
             <div class="pl-legende">
               <span><i class="pl-cle-rush"></i>Créneau de rush</span>
               <span><i class="pl-cle-manque"></i>Pas assez de monde présent</span>
               <span><i class="pl-cle-hors"></i>Personne absente à ce moment-là</span>
-              <span><i class="pl-cle-change"></i>Mis à jour d'après les présences</span>
+              <span><i class="pl-cle-change"></i>Mis à jour d'après le planning</span>
               <span><i class="pl-cle-maintenant"></i>En ce moment</span>
             </div>
             <div class="defilement-horizontal">
@@ -1298,11 +1292,12 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
               </table>
             </div>
             <h3 class="espace-haut">Équité de la semaine</h3>
-            <p class="doux petit">La cible de chacun est calculée d'après le temps où il peut tenir la caisse (présent, hors pause, sans exception ce jour-là). L'écart se lit en heures. Après beaucoup de changements, « Optimiser toute la semaine » rééquilibre tout.</p>
+            <p class="doux petit">La cible de chacun est calculée d'après le temps où il peut tenir la caisse (présent pendant l'ouverture, hors pause, sans exception ce jour-là). L'écart se lit en heures. « Max / jour » : sa plus longue journée de caisse.</p>
             <table class="tableau-office compact pl-equite">
-              <thead><tr><th>Conseiller</th><th class="nombre">Présence</th><th class="nombre">Temps caisse</th><th class="nombre">Cible</th><th class="nombre">Écart</th><th class="barre-col">Part de son temps</th><th class="nombre">Rush</th><th class="nombre">Cible rush</th><th class="nombre">Créneaux</th></tr></thead>
+              <thead><tr><th>Conseiller</th><th class="nombre">Planifié</th><th class="nombre">Temps caisse</th><th class="nombre">Cible</th><th class="nombre">Écart</th><th class="barre-col">Part de son temps</th><th class="nombre">Rush</th><th class="nombre">Cible rush</th><th class="nombre">Max / jour</th></tr></thead>
               <tbody id="pl-lignes-equite"></tbody>
             </table>
+            </div>
           </div>
 
           <!-- Réglages -->
@@ -1314,9 +1309,13 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
               <label>Durée d'un passage en caisse<select id="pl-duree">
                 <option value="1">1 heure</option><option value="1.5">1 h 30</option><option value="2">2 heures</option>
                 <option value="2.5">2 h 30</option><option value="3">3 heures</option><option value="4">4 heures</option></select></label>
+              <label>Maximum de caisse par personne et par jour<select id="pl-max-jour">
+                <option value="0">Pas de limite</option><option value="2">2 heures</option><option value="3">3 heures</option>
+                <option value="4">4 heures</option><option value="5">5 heures</option><option value="6">6 heures</option></select></label>
             </div>
+            <p class="doux petit">La limite n'est dépassée que s'il n'y a personne d'autre pour tenir la caisse ; le dépassement est alors signalé.</p>
             <h3 class="espace-haut">Horaires d'ouverture</h3>
-            <p class="doux petit">Les créneaux de caisse commencent à l'ouverture. Décoche un jour pour le marquer fermé.</p>
+            <p class="doux petit">La caisse n'est tenue que pendant ces heures, même si l'équipe arrive plus tôt pour la mise en rayon. Les créneaux commencent à l'ouverture. Décoche un jour pour le marquer fermé.</p>
             <table class="tableau-office compact pl-horaires"><tbody id="pl-lignes-horaires"></tbody></table>
             <h3 class="espace-haut">Créneaux de rush</h3>
             <p class="doux petit">Clique sur un créneau pour le marquer (ou non) comme rush : les rushs sont partagés entre tout le monde, pas toujours aux mêmes.</p>
@@ -1472,21 +1471,6 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
       </div>
     </div>
   </div>
-  <!-- Collage d'un planning Excel complet -->
-  <div id="pl-dialogue-coller" class="voile" hidden>
-    <div class="boite pl-boite-coller" role="dialog" aria-modal="true" aria-labelledby="pl-coller-titre">
-      <h3 id="pl-coller-titre">Coller le planning depuis Excel</h3>
-      <p class="doux petit" id="pl-aide-coller"></p>
-      <div id="pl-apercu-coller" class="pl-apercu" hidden></div>
-      <details id="pl-details-coller" open><summary class="doux petit">Texte lu (modifiable)</summary>
-      <textarea id="pl-texte-coller" rows="8" spellcheck="false" placeholder="Sarah	9h-12h 14h-19h	9h-19h	repos	…"></textarea></details>
-      <p id="pl-resume-coller" class="doux petit"></p>
-      <div class="boutons-dialogue">
-        <button class="bouton" data-coller="non">Annuler</button>
-        <button class="bouton principal" data-coller="oui">Remplir la grille</button>
-      </div>
-    </div>
-  </div>
   <div id="infobulle" class="infobulle" hidden></div>
   <div id="notification" hidden></div>
   <script>
@@ -1527,8 +1511,9 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
   //   horaires  : ouverture du magasin, du lundi au dimanche ([début, fin] ou null = fermé)
   //   rush      : créneaux à fort passage, « jour-heure de début » (0 = lundi), ex. « 5-09:00 »
   //   exclusions: par conseiller, les jours où il ne fait PAS la caisse (7 cases, true = pas de caisse)
+  //   max_jour  : temps de caisse maximum par personne et par jour, en heures (0 = pas de limite)
   const PLANNING_PAR_DEFAUT = {
-    caisses: 1, creneau: 2,
+    caisses: 1, creneau: 2, max_jour: 4,
     horaires: [["09:00", "19:00"], ["09:00", "19:00"], ["09:00", "19:00"], ["09:00", "19:00"], ["09:00", "19:00"], ["09:00", "19:00"], null],
     rush: ["0-17:00", "1-17:00", "2-13:00", "2-15:00", "2-17:00", "3-17:00", "4-17:00", "5-09:00", "5-11:00", "5-13:00", "5-15:00", "5-17:00"],
     exclusions: {},
@@ -1842,6 +1827,7 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
     return {
       caisses: Math.min(6, Math.max(1, parseInt(p.caisses, 10) || d.caisses)),
       creneau: [1, 1.5, 2, 2.5, 3, 4].includes(Number(p.creneau)) ? Number(p.creneau) : d.creneau,
+      max_jour: [0, 2, 3, 4, 5, 6].includes(Number(p.max_jour)) ? Number(p.max_jour) : d.max_jour,
       horaires,
       rush: Array.isArray(p.rush) ? p.rush.filter((r) => typeof r === "string") : d.rush,
       exclusions: p.exclusions && typeof p.exclusions === "object" ? p.exclusions : {},
@@ -3504,9 +3490,8 @@ window.addEventListener("pywebviewready", async () => {
 </script>
   <script>
 // =====================================================================
-//  PLANNING : présences de la semaine + planning de caisse équitable.
-//  - Présences : une case par conseiller et par jour (« 9h-12h 14h-19h »),
-//    remplie à la main ou collée depuis Excel.
+//  PLANNING DE CAISSE équitable, créé à partir du planning de la semaine
+//  importé en PDF (export Excel : un nom par ligne, un jour par colonne).
 //  - Caisse : créneaux de N heures à partir de l'ouverture, X personnes
 //    en même temps. Pendant une pause, la caisse passe en relais.
 //    Le planning se crée et se met à jour tout seul quand les présences changent.
@@ -3718,8 +3703,15 @@ function plRepartiteur(presences, reglages, noms, graine, places) {
   const tirage = Object.fromEntries(noms.map((n) => [n, aleatoire()]));
   const temps = Object.fromEntries(noms.map((n) => [n, 0]));
   const rush = Object.fromEntries(noms.map((n) => [n, 0]));
+  const parJour = Object.fromEntries(noms.map((n) => [n, Array(7).fill(0)]));
+  const maxJour = (reglages.max_jour || 0) * 60;   // 0 = pas de limite
   // places : Map cle -> [relais par caisse]
-  const ajouter = (c, s, signe) => { if (!(s.nom in temps)) return; temps[s.nom] += signe * (s.fin - s.debut); if (c.rush) rush[s.nom] += signe * (s.fin - s.debut); };
+  const ajouter = (c, s, signe) => {
+    if (!(s.nom in temps)) return;
+    const d = signe * (s.fin - s.debut);
+    temps[s.nom] += d; parJour[s.nom][c.jour] += d;
+    if (c.rush) rush[s.nom] += d;
+  };
   creneaux.forEach((c) => places.get(c.cle).forEach((relais) => relais.forEach((s) => ajouter(c, s, 1))));
   const estDans = (c, n) => places.get(c.cle).some((relais) => relais.some((s) => s.nom === n));
   const enchaines = (n) => {
@@ -3727,7 +3719,10 @@ function plRepartiteur(presences, reglages, noms, graine, places) {
     for (let i = 0; i + 1 < creneaux.length; i++) if (creneaux[i].jour === creneaux[i + 1].jour && estDans(creneaux[i], n) && estDans(creneaux[i + 1], n)) total++;
     return total;
   };
-  const cout = (n) => ((temps[n] - cibles.cible[n]) / 60) ** 2 + 1.5 * ((rush[n] - cibles.cibleRush[n]) / 60) ** 2 + 0.6 * enchaines(n);
+  // coût d'une personne : écart à sa cible + rushs + créneaux enchaînés + caisse concentrée sur un même jour
+  // (+ très cher au-delà de la limite par jour : on ne la dépasse que s'il n'y a personne d'autre)
+  const cout = (n) => ((temps[n] - cibles.cible[n]) / 60) ** 2 + 1.5 * ((rush[n] - cibles.cibleRush[n]) / 60) ** 2 + 0.6 * enchaines(n)
+    + parJour[n].reduce((s, m) => s + 0.12 * (m / 60) ** 2 + (maxJour && m > maxJour ? 25 * (m - maxJour) / 60 : 0), 0);
   // n est-il déjà sur une AUTRE caisse entre a et b ?
   const occupe = (c, k, n, a, b) => places.get(c.cle).some((relais, i) => i !== k && relais.some((s) => s.nom === n && s.debut < b && s.fin > a));
 
@@ -3742,8 +3737,14 @@ function plRepartiteur(presences, reglages, noms, graine, places) {
         if (jusqua === null) continue;
         let fin = Math.min(a, jusqua);
         for (const autre of places.get(c.cle)) if (autre !== relais) for (const s of autre) if (s.nom === n && s.fin > t && s.debut < fin) fin = s.debut <= t ? t : Math.min(fin, s.debut);
-        if (fin > t) candidats.push({ n, fin });
+        let depasse = false;
+        if (maxJour) {   // limite par jour : on s'arrête à la limite (si ça laisse au moins 30 min), sinon on la dépasse
+          const reste = maxJour - parJour[n][c.jour];
+          if (reste >= 30) fin = Math.min(fin, t + reste); else depasse = true;
+        }
+        if (fin > t) candidats.push({ n, fin, depasse });
       }
+      if (candidats.some((x) => !x.depasse)) candidats.splice(0, candidats.length, ...candidats.filter((x) => !x.depasse));
       if (!candidats.length) {
         // personne : on laisse un trou jusqu'à la prochaine arrivée
         const prochaine = noms.flatMap((n) => dispo[n][c.jour].map(([d]) => d)).filter((d) => d > t && d < a).sort((x, y) => x - y)[0];
@@ -3789,7 +3790,7 @@ function plRepartiteur(presences, reglages, noms, graine, places) {
       if (!mieux) break;
     }
   }
-  return { creneaux, dispo, cibles, remplir, ameliorer, temps };
+  return { creneaux, dispo, cibles, remplir, ameliorer, temps, parJour };
 }
 
 const plVersCaisse = (places, creneaux, graine) => ({
@@ -3835,6 +3836,20 @@ function plMettreAJour(caisse, presences, reglages, noms) {
     }
     places.set(c.cle, gardees);
   }
+  // la limite par jour s'applique aussi à ce qui est gardé : au-delà, le reste de la journée est redonné à d'autres
+  const maxJour = (reglages.max_jour || 0) * 60;
+  if (maxJour) {
+    const cumul = {};
+    for (const c of creneaux) {
+      places.set(c.cle, places.get(c.cle).map((relais) => relais.flatMap((s) => {
+        const cle = `${s.nom}|${c.jour}`, deja = cumul[cle] || 0, reste = maxJour - deja;
+        if (reste <= 0) return [];
+        const fin = Math.min(s.fin, s.debut + reste);
+        cumul[cle] = deja + (fin - s.debut);
+        return fin - s.debut >= 15 ? [{ ...s, fin }] : [];
+      })));
+    }
+  }
   const avant = JSON.stringify(Object.fromEntries(creneaux.map((c) => [c.cle, plPlaces(caisse, c, reglages.caisses)])));
   const r = plRepartiteur(presences, reglages, noms, caisse?.graine || 1, places);
   for (const c of creneaux) {
@@ -3851,7 +3866,7 @@ function plBilan(presences, reglages, noms, caisse) {
   const creneaux = plCreneaux(reglages);
   const dispo = plDisponibilites(presences, reglages, noms);
   const cibles = plCibles(creneaux, dispo, noms, reglages.caisses);
-  const parNom = Object.fromEntries(noms.map((n) => [n, { temps: 0, rush: 0, creneaux: 0, relais: 0, presence: 0 }]));
+  const parNom = Object.fromEntries(noms.map((n) => [n, { temps: 0, rush: 0, creneaux: 0, relais: 0, presence: 0, jours: Array(7).fill(0) }]));
   noms.forEach((n) => { parNom[n].presence = (presences[n] || []).reduce((s, t) => s + plMinutesTravaillees(t), 0); });
   let couvert = 0;
   const hors = [], trous = [];
@@ -3865,6 +3880,7 @@ function plBilan(presences, reglages, noms, caisse) {
         couvert += s.fin - s.debut;
         if (!parNom[s.nom]) return;
         parNom[s.nom].temps += s.fin - s.debut;
+        parNom[s.nom].jours[c.jour] += s.fin - s.debut;
         if (c.rush) parNom[s.nom].rush += s.fin - s.debut;
         if (!vus.has(s.nom)) { parNom[s.nom].creneaux++; vus.add(s.nom); }
         if (relais.length > 1) parNom[s.nom].relais++;
@@ -3873,7 +3889,9 @@ function plBilan(presences, reglages, noms, caisse) {
       if (caisse) for (const [a, b] of plTrous(relais, c)) trous.push({ c, k, debut: a, fin: b });
     });
   }
-  return { creneaux, dispo, cibles, parNom, couvert, manques: cibles.manques, hors, trous, places };
+  const max = (reglages.max_jour || 0) * 60;
+  const depassements = max ? noms.flatMap((n) => parNom[n].jours.map((m, j) => ({ nom: n, jour: j, minutes: m })).filter((x) => x.minutes > max)) : [];
+  return { creneaux, dispo, cibles, parNom, couvert, manques: cibles.manques, hors, trous, places, depassements };
 }
 
 // ------------------------------------------------------------ page
@@ -3909,7 +3927,7 @@ async function plAbandonnerModifs() {
 async function plCharger(semaine) {
   const r = await api().planning_lire(semaine);
   if (r.erreur) return notifier(r.erreur, true);
-  PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1, signatureCaisse: null, changements: new Set() };
+  PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1, signatureCaisse: null, changements: new Set(), importPdf: null };
   $("#pl-date").value = plIso(plLundi(semaine));
   const lundi = plLundi(semaine), dimanche = plDateJour(semaine, 6);
   $("#pl-titre-semaine").textContent = `Semaine ${Number(semaine.split("-S")[1])}`;
@@ -3931,203 +3949,44 @@ function plAfficher() {
   $$(".pl-outils").forEach((g) => (g.hidden = g.dataset.pour !== vue));
   $("#pl-enregistrer").closest(".groupe").hidden = vue === "reglages";
   $("#pl-info").innerHTML = {
-    presences: "Écris <strong>9h-19h pause 12h-13h</strong> ou <strong>9h-12h 14h-19h</strong>.<br>Tu peux aussi coller directement un tableau Excel dans la grille.",
-    caisse: "Se met à jour tout seul quand les présences changent.<br>Choisis un nom dans une case pour retoucher.",
-    reglages: "Réglages communs à toute l'équipe.<br>Ils s'appliquent aux prochains plannings créés.",
+    caisse: "Importe le planning de la semaine (PDF) :<br>le planning de caisse se crée tout seul.",
+    reglages: "Réglages communs à toute l'équipe.<br>Le planning de caisse s'y adapte tout seul.",
   }[vue];
-  if (vue === "presences") plAfficherPresences();
   if (vue === "caisse") plAfficherCaisse();
   if (vue === "reglages") plAfficherReglages();
 }
 
-// ------------------------------------------------------------ vue Présences
-function plAfficherPresences() {
-  const noms = plNoms();
-  $("#pl-titre-presences").textContent = `Présences · ${PL.libelle}`;
-  $("#pl-entete-presences").innerHTML = `<tr><th>Conseiller</th>${PL_JOURS.map((j, i) => {
-    const ferme = !PL.reglages.horaires[i];
-    return `<th class="${ferme ? "pl-ferme" : ""}">${j} <span class="doux">${plTexteDate(plDateJour(PL.semaine, i))}</span></th>`;
-  }).join("")}<th class="nombre">Total</th></tr>`;
-  $("#pl-lignes-presences").innerHTML = noms.length ? noms.map((nom) => {
-    const jours = PL.presences[nom] || [];
-    return `<tr data-nom="${echapper(nom)}"><td class="nom">${pastille(nom)}${echapper(nom)}</td>${PL_JOURS.map((_, i) =>
-      `<td class="${!PL.reglages.horaires[i] ? "pl-ferme" : ""}"><input type="text" class="pl-case" data-jour="${i}" value="${echapper(jours[i] || "")}" placeholder="—" spellcheck="false" autocomplete="off"></td>`).join("")}
-      <td class="nombre pl-total"></td></tr>`;
-  }).join("") : `<tr class="vide-ligne"><td colspan="9">Ajoute d'abord tes conseillers dans la page Équipe.</td></tr>`;
-  $("#pl-lignes-presences").dataset.semaine = PL.semaine;
-  plTotauxPresences();
-}
+// Les présences ne viennent plus que du PDF importé (plus de grille à remplir)
+function plLirePresencesDeLaGrille() {}
 
-function plTotauxPresences() {
-  const parJour = Array(7).fill(0), heuresJour = Array(7).fill(0);
-  let total = 0;
-  $$("#pl-lignes-presences tr[data-nom]").forEach((tr) => {
-    let ligne = 0;
-    $$(".pl-case", tr).forEach((champ) => {
-      const r = plLirePlages(champ.value);
-      champ.classList.toggle("invalide", r.invalide);
-      champ.classList.toggle("pl-repos", r.repos && !!champ.value.trim());
-      champ.title = r.invalide ? "Horaire illisible : écris par exemple 9h-12h 14h-19h" : "";
-      const min = r.invalide ? 0 : r.plages.reduce((s, [d, f]) => s + f - d, 0);
-      if (min) { parJour[champ.dataset.jour]++; heuresJour[champ.dataset.jour] += min; }
-      ligne += min;
-    });
-    $(".pl-total", tr).textContent = plDuree(ligne);
-    total += ligne;
-  });
-  $("#pl-pied-presences").innerHTML = `<tr><td>Présents</td>${parJour.map((n, i) =>
-    `<td class="${!PL.reglages.horaires[i] ? "pl-ferme" : ""}">${n ? `${n} pers. · ${plDuree(heuresJour[i])}` : "—"}</td>`).join("")}<td class="nombre">${plDuree(total)}</td></tr>`;
-}
 
-function plLirePresencesDeLaGrille() {
-  // la grille peut encore montrer une autre semaine (affichée avant un changement de semaine) : on l'ignore alors
-  if ($("#pl-lignes-presences").dataset.semaine !== PL.semaine) return;
-  $$("#pl-lignes-presences tr[data-nom]").forEach((tr) => {
-    const valeurs = $$(".pl-case", tr).map((c) => c.value.trim());
-    if (valeurs.some(Boolean)) PL.presences[tr.dataset.nom] = valeurs;
-    else delete PL.presences[tr.dataset.nom];
-  });
-}
+
 
 // Découpe un texte copié dans Excel (tabulations, retours à la ligne, cellules entre guillemets)
-function plDecouperTableau(texte) {
-  const lignes = [[]];
-  let cellule = "", guillemets = false;
-  for (let i = 0; i < texte.length; i++) {
-    const c = texte[i];
-    if (guillemets) {
-      if (c === '"' && texte[i + 1] === '"') { cellule += '"'; i++; }
-      else if (c === '"') guillemets = false;
-      else cellule += c === "\n" || c === "\r" ? " " : c;
-    } else if (c === '"' && cellule === "") guillemets = true;
-    else if (c === "\t") { lignes[lignes.length - 1].push(cellule); cellule = ""; }
-    else if (c === "\n") { lignes[lignes.length - 1].push(cellule); cellule = ""; lignes.push([]); }
-    else if (c !== "\r") cellule += c;
-  }
-  lignes[lignes.length - 1].push(cellule);
-  while (lignes.length && lignes[lignes.length - 1].every((x) => !x.trim())) lignes.pop();
-  return lignes.map((l) => l.map((x) => x.trim()));
-}
 
 // Cellules d'un jour : une case « 9h-19h », ou des heures seules en colonnes (début, fin, [début, fin])
-function plGrouperJours(cellules) {
-  const heureSeule = (x) => plLireHeure(x) !== null && !/-/.test(x);
-  const nbHeuresSeules = cellules.filter(heureSeule).length;
-  const largeur = nbHeuresSeules >= 20 || cellules.length >= 28 ? 4 : nbHeuresSeules >= 8 || cellules.length >= 14 ? 2 : 1;
-  const jours = [];
-  for (let i = 0; i < 7; i++) {
-    const groupe = cellules.slice(i * largeur, (i + 1) * largeur).filter(Boolean);
-    if (largeur === 1 || !groupe.every(heureSeule)) { jours.push(plTexteNormalise(groupe.join(" "))); continue; }
-    const heures = groupe.map(plLireHeure), plages = [];
-    for (let k = 0; k + 1 < heures.length; k += 2) plages.push(`${plTexteHeure(heures[k])}-${plTexteHeure(heures[k + 1])}`);
-    jours.push(plTexteNormalise(plages.join(" ")));
-  }
-  return jours;
-}
 
 const plSansAccent = (t) => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 function plTrouverNom(texte, noms) {
-  const t = plSansAccent(texte);
-  if (!t) return null;
-  return noms.find((n) => plSansAccent(n) === t)
-    || noms.find((n) => t.split(/[\s.,-]+/).includes(plSansAccent(n)) || plSansAccent(n).split(/\s+/)[0] === t.split(/\s+/)[0])
+  const mots = (x) => plSansAccent(x).replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
+  const t = mots(texte);
+  if (!t.length) return null;
+  const contient = (n) => { const m = mots(n); return m.length && t.some((_, i) => m.every((x, k) => t[i + k] === x)); };
+  return noms.find((n) => mots(n).join(" ") === t.join(" "))
+    || noms.filter(contient).sort((a, b) => mots(b).length - mots(a).length)[0]   // le nom le plus complet d'abord
     || null;
 }
 
 // Tableau complet avec prénoms -> { remplis: {nom: [7]}, ignores: [textes] }
-function plAnalyserCollage(texte) {
-  const noms = plNoms().concat(PL.conseillers.map((c) => c.nom)).filter((n, i, l) => l.indexOf(n) === i);
-  const remplis = {}, ignores = [];
-  for (const ligne of plDecouperTableau(texte)) {
-    const iNom = ligne.findIndex((x) => x && !/\d/.test(x));
-    if (iNom < 0) continue;
-    const nom = plTrouverNom(ligne[iNom], noms);
-    if (!nom) { if (ligne.slice(iNom + 1).some((x) => /\d/.test(x))) ignores.push(ligne[iNom]); continue; }
-    remplis[nom] = plGrouperJours(ligne.slice(iNom + 1));
-  }
-  return { remplis, ignores };
-}
 
-const PL_AIDE_COLLER = "Dans Excel, sélectionne le tableau <strong>avec la colonne des prénoms</strong> (du lundi au dimanche), copie-le, puis colle-le ci-dessous. Les prénoms sont reconnus automatiquement ; les lignes sans prénom connu sont ignorées.";
-function plOuvrirCollage({ titre = "Coller le planning depuis Excel", aide = PL_AIDE_COLLER, texte = "", apresRemplissage = null } = {}) {
-  const voile = $("#pl-dialogue-coller");
-  $("#pl-coller-titre").textContent = titre;
-  $("#pl-aide-coller").innerHTML = aide;
-  $("#pl-texte-coller").value = texte;
-  $("#pl-resume-coller").textContent = "";
-  voile.hidden = false;
-  setTimeout(() => $("#pl-texte-coller").focus(), 50);
-  const fermer = () => { voile.hidden = true; voile.onclick = null; document.removeEventListener("keydown", clavier); };
-  const clavier = (e) => { if (e.key === "Escape") fermer(); };
-  document.addEventListener("keydown", clavier);
-  voile.onclick = (e) => {
-    if (e.target === voile) return fermer();
-    const r = e.target.closest("[data-coller]")?.dataset.coller;
-    if (r === "non") return fermer();
-    if (r !== "oui") return;
-    const { remplis, ignores } = plAnalyserCollage($("#pl-texte-coller").value);
-    const nb = Object.keys(remplis).length;
-    if (!nb) { $("#pl-resume-coller").textContent = "Aucun prénom reconnu. Vérifie que la colonne des prénoms est bien copiée."; return; }
-    plLirePresencesDeLaGrille();
-    Object.assign(PL.presences, remplis);
-    fermer();
-    plAfficherPresences();
-    plMarquer();
-    notifier(`Planning rempli pour ${nb} conseiller${nb > 1 ? "s" : ""}.` + (ignores.length ? ` Ignoré : ${ignores.slice(0, 4).join(", ")}${ignores.length > 4 ? "…" : ""}.` : ""));
-    if (apresRemplissage) apresRemplissage();
-  };
-  $("#pl-details-coller").open = !texte;
-  $("#pl-texte-coller").oninput = () => {
-    const { remplis, ignores } = plAnalyserCollage($("#pl-texte-coller").value);
-    const nb = Object.keys(remplis).length;
-    // aperçu en tableau, plus lisible que le texte
-    $("#pl-apercu-coller").hidden = !nb;
-    $("#pl-apercu-coller").innerHTML = nb ? `<table class="tableau-office compact"><thead><tr><th>Conseiller</th>${PL_JOURS_COURTS.map((j, i) =>
-      `<th>${j} ${plTexteDate(plDateJour(PL.semaine, i))}</th>`).join("")}</tr></thead><tbody>${Object.entries(remplis).map(([n, jours]) =>
-      `<tr><td>${pastille(n)}${echapper(n)}</td>${jours.map((v) => {
-        const r = plLirePlages(v);
-        return `<td class="${r.invalide ? "pl-apercu-erreur" : r.repos ? "doux" : ""}" title="${r.invalide ? "Horaire illisible : corrige-le dans le texte" : ""}">${echapper(v || "—")}</td>`;
-      }).join("")}</tr>`).join("")}</tbody></table>` : "";
-    $("#pl-resume-coller").textContent = $("#pl-texte-coller").value.trim()
-      ? `${nb} conseiller${nb > 1 ? "s" : ""} reconnu${nb > 1 ? "s" : ""}${nb ? ` : ${Object.keys(remplis).join(", ")}` : ""}.${ignores.length ? ` Non reconnus : ${ignores.join(", ")}.` : ""}`
-      : "";
-  };
-  if (texte) $("#pl-texte-coller").oninput();
-}
 
 // Collage d'un bloc dans la grille, à partir de la case cliquée (comme dans un tableur)
-function plCollerDansGrille(e) {
-  const champ = e.target.closest(".pl-case");
-  const texte = e.clipboardData?.getData("text/plain") || "";
-  if (!champ || !/[\t\n]/.test(texte.trim())) return;   // simple texte : collage normal
-  e.preventDefault();
-  let lignes = plDecouperTableau(texte);
-  const noms = plNoms();
-  // si la 1re colonne contient des prénoms connus, on se sert des prénoms
-  if (lignes.some((l) => plTrouverNom(l[0], noms) && !/\d/.test(l[0]))) {
-    plLirePresencesDeLaGrille();
-    const { remplis } = plAnalyserCollage(texte);
-    Object.assign(PL.presences, remplis);
-    plAfficherPresences(); plMarquer();
-    return notifier(`Planning collé pour ${Object.keys(remplis).length} conseiller(s).`);
-  }
-  const rangees = $$("#pl-lignes-presences tr[data-nom]");
-  const r0 = rangees.indexOf(champ.closest("tr")), j0 = Number(champ.dataset.jour);
-  const largeurGroupe = lignes[0].length > 7 - j0 ? (lignes[0].length >= 14 ? 2 : 1) : 1;
-  lignes.forEach((ligne, i) => {
-    const tr = rangees[r0 + i];
-    if (!tr) return;
-    const jours = largeurGroupe > 1 ? plGrouperJours(ligne) : ligne.map(plTexteNormalise);
-    jours.forEach((v, k) => { const c = $(`.pl-case[data-jour="${j0 + k}"]`, tr); if (c && j0 + k < 7) c.value = v; });
-  });
-  plTotauxPresences(); plMarquer();
-}
 
 // ------------------------------------------------------------ vue Caisse
 // Empreinte de ce dont dépend le planning de caisse : s'il change, le planning se met à jour tout seul
 function plSignature(noms) {
-  const { caisses, creneau, horaires, rush, exclusions } = PL.reglages;
-  return JSON.stringify({ n: noms, p: noms.map((n) => (PL.presences[n] || []).map((t) => plTextePlages(plLirePlages(t).plages))), caisses, creneau, horaires, rush, exclusions });
+  const { caisses, creneau, horaires, rush, exclusions, max_jour } = PL.reglages;
+  return JSON.stringify({ n: noms, p: noms.map((n) => (PL.presences[n] || []).map((t) => plTextePlages(plLirePlages(t).plages))), caisses, creneau, horaires, rush, exclusions, max_jour });
 }
 const plPresencesPretes = (noms) => noms.some((n) => (PL.presences[n] || []).some((t) => plMinutesTravaillees(t) > 0));
 const plIllisibles = (noms) => noms.filter((n) => (PL.presences[n] || []).some((t) => plLirePlages(t).invalide));
@@ -4144,14 +4003,14 @@ function plSynchroniserCaisse() {
     PL.caisse = plGenerer(PL.presences, PL.reglages, noms, PL.graine || 1);
     PL.changements = new Set();
     plMarquer();
-    return "Planning de caisse créé automatiquement d'après les présences.";
+    return "Planning de caisse créé d'après le planning de la semaine.";
   }
   const { caisse, changes } = plMettreAJour(PL.caisse, PL.presences, PL.reglages, noms);
   if (!changes.length) return "";
   PL.caisse = caisse;
   PL.changements = new Set(changes);
   plMarquer();
-  return `Planning de caisse mis à jour d'après les présences : ${changes.length} créneau${changes.length > 1 ? "x" : ""} ajusté${changes.length > 1 ? "s" : ""}.`;
+  return `Planning de caisse mis à jour d'après le planning : ${changes.length} créneau${changes.length > 1 ? "x" : ""} ajusté${changes.length > 1 ? "s" : ""}.`;
 }
 
 // Le créneau en cours, si la semaine affichée est celle d'aujourd'hui
@@ -4170,11 +4029,18 @@ function plAfficherCaisse() {
   const illisibles = plIllisibles(noms);
   const maintenant = plMaintenant();
   $("#pl-titre-caisse").textContent = `Planning de caisse · ${PL.libelle}`;
-  $("#pl-explication-caisse").innerHTML = !plPresencesPretes(noms)
-    ? "Remplis les <strong>présences</strong> de la semaine : le planning de caisse se crée tout seul."
-    : `${reglages.caisses} personne${reglages.caisses > 1 ? "s" : ""} en caisse, par créneaux de ${texteHeures(reglages.creneau)}.
-       Il <strong>se met à jour tout seul</strong> quand une présence ou une pause change ; tes retouches sont gardées tant qu'elles restent possibles.
-       Pendant une pause, la caisse passe en <strong>relais</strong> à quelqu'un d'autre.`;
+  const vide = !plPresencesPretes(noms);
+  $("#pl-depot").hidden = !vide;
+  $("#pl-contenu-caisse").hidden = vide;
+  const ouverture = reglages.horaires.find(Boolean);
+  $("#pl-explication-caisse").innerHTML = vide
+    ? "Aucun planning importé pour cette semaine."
+    : `${reglages.caisses} personne${reglages.caisses > 1 ? "s" : ""} en caisse${ouverture ? ` de ${plTexteHeure(plMinutes(ouverture[0]))} à ${plTexteHeure(plMinutes(ouverture[1]))}` : ""}, par créneaux de ${texteHeures(reglages.creneau)}${reglages.max_jour ? `, ${reglages.max_jour} h de caisse maximum par personne et par jour` : ""}.
+       Pendant une pause, la caisse passe en <strong>relais</strong>. Si tu réimportes un planning corrigé, tes retouches sont gardées tant qu'elles restent possibles.`
+      + (PL.importPdf ? `<br><span class="petit">Importé depuis « ${echapper(PL.importPdf.fichier)} ».</span>` : "");
+  $("#pl-generer").disabled = vide;
+  $$(".pl-pdf").forEach((b) => (b.disabled = vide));
+  if (vide) { $("#pl-alertes").innerHTML = ""; $("#pl-autre").disabled = true; $("#pl-explication-caisse").textContent = ""; return; }
 
   // grille : une colonne par jour ouvert, une ligne par créneau
   const jours = [...new Set(creneaux.map((c) => c.jour))];
@@ -4231,7 +4097,15 @@ function plAfficherCaisse() {
 
   // alertes
   const alertes = [];
-  if (illisibles.length) alertes.push(`<strong>Horaire illisible</strong> pour ${illisibles.join(", ")} : corrige-le dans Présences pour que le planning de caisse se mette à jour.`);
+  if (illisibles.length) alertes.push(`<strong>Horaire illisible</strong> pour ${illisibles.join(", ")} dans le PDF : ces personnes ne sont pas placées en caisse.`);
+  const inconnus = Object.entries(PL.importPdf?.inconnus || {});
+  if (inconnus.length) {
+    alertes.push(`<strong>Pas dans ton équipe :</strong> ${inconnus.map(([libelle]) => `${echapper(libelle)} <button class="bouton petit-bouton" data-ajouter="${echapper(libelle)}">Ajouter ${echapper(plPrenom(libelle))} à l'équipe</button>`).join(" ")}<br>Ces personnes sont dans le PDF mais pas dans la page Équipe : elles ne sont pas placées en caisse.`);
+  }
+  if (bilan.depassements.length) {
+    alertes.push(`<strong>Plus de ${reglages.max_jour} h de caisse dans la journée</strong> (pas assez de monde pour faire autrement) : `
+      + bilan.depassements.map((d) => `${echapper(d.nom)} ${PL_JOURS[d.jour].toLowerCase()} (${plDuree(d.minutes)})`).join(", ") + ".");
+  }
   if (bilan.manques.length) {
     alertes.push(`<strong>Pas assez de monde présent</strong> pour tenir ${reglages.caisses > 1 ? `${reglages.caisses} caisses` : "la caisse"} : ` +
       bilan.manques.slice(0, 8).map((m) => `${PL_JOURS_COURTS[m.jour]} ${plTexteHeure(m.debut)}-${plTexteHeure(m.fin)}`).join(", ") + (bilan.manques.length > 8 ? "…" : "") + ".");
@@ -4255,7 +4129,7 @@ function plAfficherCaisse() {
       <td class="nombre ${classe}">${PL.caisse && !exclu ? (Math.abs(ecart) < 1 ? "=" : `${ecart > 0 ? "+" : "−"}${plDuree(Math.round(Math.abs(ecart)))}`) : "—"}</td>
       <td class="barre-col">${PL.caisse ? `<span class="pl-barre"><i style="width:${Math.round(part / maxPart * 100)}%;${fondBarre(n)}"></i></span><span class="doux petit">${Math.round(part * 100)} %</span>` : ""}</td>
       <td class="nombre">${PL.caisse ? plDuree(p.rush) : "—"}</td><td class="nombre doux">${plDuree(Math.round(cibles.cibleRush[n]))}</td>
-      <td class="nombre">${PL.caisse ? p.creneaux : "—"}</td></tr>`;
+      <td class="nombre ${bilan.depassements.some((d) => d.nom === n) ? "pl-moins" : ""}">${PL.caisse ? plDuree(Math.max(...p.jours)) : "—"}</td></tr>`;
   }).join("") : `<tr class="vide-ligne"><td colspan="9">Aucune présence saisie pour cette semaine.</td></tr>`;
 
   $("#pl-generer").innerHTML = `<span class="icone" data-icone="generer"></span>${PL.caisse ? "Optimiser toute la semaine" : "Créer le planning de caisse"}`;
@@ -4266,9 +4140,9 @@ function plAfficherCaisse() {
 async function plCreerCaisse(autre = false) {
   plLirePresencesDeLaGrille();
   const noms = plNoms();
-  if (!plPresencesPretes(noms)) return notifier("Remplis d'abord les présences de la semaine.", true);
+  if (!plPresencesPretes(noms)) return notifier("Importe d'abord le planning PDF de la semaine.", true);
   const illisibles = plIllisibles(noms);
-  if (illisibles.length) return notifier(`Horaire illisible pour ${illisibles.join(", ")} : corrige-le dans Présences.`, true);
+  if (illisibles.length) return notifier(`Horaire illisible pour ${illisibles.join(", ")} dans le PDF importé.`, true);
   if (PL.caisse && !autre && PL.caisse.retouche) {
     const { ok } = await demander({ titre: "Optimiser toute la semaine ?", bouton: "Optimiser",
       texte: "Toute la semaine est répartie de nouveau, de la façon la plus équitable : tes retouches à la main seront remplacées." });
@@ -4336,7 +4210,7 @@ async function plExporterPdf() {
   const noms = plNoms();
   const message = plSynchroniserCaisse();
   if (message) notifier(message);
-  if (!plPresencesPretes(noms)) return notifier("Remplis d'abord les présences de la semaine.", true);
+  if (!plPresencesPretes(noms)) return notifier("Importe d'abord le planning PDF de la semaine.", true);
   const boutons = $$(".pl-pdf");
   boutons.forEach((b) => (b.disabled = true));
   let jsPDF;
@@ -4404,7 +4278,7 @@ async function plExporterPdf() {
       head: [jours.map((j) => `${PL_JOURS[j]} ${plTexteDate(plDateJour(PL.semaine, j))}`)],
       body: corps,
       styles: { font: "helvetica", fontSize: 9, cellPadding: { top: 2.4, right: 2.6, bottom: 2.2, left: 2.6 }, lineColor: trait, lineWidth: 0.25, textColor: noir, valign: "top",
-        minCellHeight: Math.max(14, Math.min(34, (H - 31 - 9 - 36) / Math.max(1, nbLignes))) },   // la grille remplit la page
+        minCellHeight: Math.max(14, Math.min(34, (H - 31 - 9 - 58) / Math.max(1, nbLignes))) },   // la grille remplit la page
       headStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 8.5, lineColor: trait, minCellHeight: 0, cellPadding: 2.6 },
       didParseCell: (d) => {
         if (d.section !== "body") return;
@@ -4453,34 +4327,19 @@ async function plExporterPdf() {
       }
     }
 
-    // ---- page 2 : présences et temps de caisse
-    doc.addPage();
-    entete(`Présences et temps de caisse · semaine ${numero}`, periode);
-    const lignesPresence = noms.filter((n) => parNom[n].presence || parNom[n].temps);
-    doc.autoTable({
-      startY: 31, margin: { left: M, right: M, bottom: 16 }, theme: "grid",
-      head: [["Conseiller", ...PL_JOURS.map((j, i) => `${PL_JOURS_COURTS[i]} ${plTexteDate(plDateJour(PL.semaine, i))}`), "Présence", "Caisse", "Rush"]],
-      body: lignesPresence.map((n) => [n, ...PL_JOURS.map((_, i) => {
-        const r = plLirePlages(PL.presences[n]?.[i]);
-        if (r.repos) return String(PL.presences[n]?.[i] || "").trim() || "—";
-        return plTextePlages(r.travail) + (r.pauses.length ? `\npause ${plTextePlages(r.pauses)}` : "");
-      }), plDuree(parNom[n].presence), plDuree(parNom[n].temps), plDuree(parNom[n].rush)]),
-      foot: [["Présents", ...PL_JOURS.map((_, i) => { const nb = lignesPresence.filter((n) => plMinutesTravaillees(PL.presences[n]?.[i]) > 0).length; return nb ? `${nb} pers.` : "—"; }),
-        plDuree(lignesPresence.reduce((s, n) => s + parNom[n].presence, 0)), plDuree(lignesPresence.reduce((s, n) => s + parNom[n].temps, 0)), ""]],
-      styles: { font: "helvetica", fontSize: 8.6, cellPadding: { top: 2.4, right: 2.2, bottom: 2.4, left: 2.2 }, lineColor: trait, lineWidth: 0.25, textColor: noir, valign: "middle" },
-      headStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 8 },
-      footStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 8 },
-      columnStyles: { 0: { cellWidth: 34, fontStyle: "bold", cellPadding: { top: 2.4, right: 2.2, bottom: 2.4, left: 6 } }, 8: { halign: "right", cellWidth: 19 }, 9: { halign: "right", cellWidth: 19, fontStyle: "bold" }, 10: { halign: "right", cellWidth: 16 } },
-      didParseCell: (d) => {
-        const i = d.column.index - 1;
-        if (i >= 0 && i < 7 && !reglages.horaires[i]) d.cell.styles.fillColor = [245, 245, 245];
-        if (d.section === "body" && i >= 0 && i < 7) {
-          const r = plLirePlages(PL.presences[lignesPresence[d.row.index]]?.[i]);
-          if (r.repos) { d.cell.styles.textColor = gris; d.cell.styles.fontStyle = "italic"; }
-        }
-      },
-      didDrawCell: (d) => { if (d.section === "body" && d.column.index === 0) pastillePdf(lignesPresence[d.row.index], d.cell.x + 3, d.cell.y + d.cell.height / 2); },
-    });
+    // résumé : temps de caisse de chacun sur la semaine
+    const enCaisse = noms.filter((n) => parNom[n].temps > 0).sort((a, b) => parNom[b].temps - parNom[a].temps);
+    if (enCaisse.length) {
+      doc.autoTable({
+        startY: Math.min(doc.lastAutoTable.finalY + 11, H - 34), margin: { left: M, right: M, bottom: 16 }, theme: "grid",
+        head: [["Temps de caisse", ...enCaisse]],
+        body: [["Semaine", ...enCaisse.map((n) => plDuree(parNom[n].temps))], ["Dont rush", ...enCaisse.map((n) => plDuree(parNom[n].rush))]],
+        styles: { font: "helvetica", fontSize: 7.8, cellPadding: 1.6, lineColor: trait, lineWidth: 0.2, textColor: noir, halign: "center" },
+        headStyles: { fillColor: [248, 249, 251], textColor: noir, fontStyle: "bold" },
+        columnStyles: { 0: { halign: "left", textColor: gris, fontStyle: "bold", cellWidth: 28 } },
+        didDrawCell: (d) => { if (d.section === "head" && d.column.index > 0) pastillePdf(enCaisse[d.column.index - 1], d.cell.x + 2.6, d.cell.y + d.cell.height / 2); },
+      });
+    }
 
     // pied de page
     const total = doc.getNumberOfPages();
@@ -4506,6 +4365,7 @@ function plAfficherReglages() {
   const r = PL_REGLAGES;
   $("#pl-nb-caisses").value = r.caisses;
   $("#pl-duree").value = String(r.creneau);
+  $("#pl-max-jour").value = String(r.max_jour ?? 4);
   $("#pl-lignes-horaires").innerHTML = PL_JOURS.map((j, i) => {
     const h = r.horaires[i];
     return `<tr data-jour="${i}"><td><label class="case"><input type="checkbox" class="pl-ouvert" ${h ? "checked" : ""}> ${j}</label></td>
@@ -4544,6 +4404,7 @@ function plLireReglages() {
   const r = PL_REGLAGES;
   r.caisses = Math.min(6, Math.max(1, parseInt($("#pl-nb-caisses").value, 10) || 1));
   r.creneau = Number($("#pl-duree").value) || 2;
+  r.max_jour = Number($("#pl-max-jour").value) || 0;
   $$("#pl-lignes-horaires tr").forEach((tr) => {
     const i = Number(tr.dataset.jour);
     const ouvert = $(".pl-ouvert", tr).checked;
@@ -4574,7 +4435,7 @@ async function plEnregistrer() {
   plLirePresencesDeLaGrille();
   const noms = Object.keys(PL.presences);
   const invalides = noms.filter((n) => (PL.presences[n] || []).some((t) => plLirePlages(t).invalide));
-  if (invalides.length) return notifier(`Horaire illisible pour ${invalides.join(", ")}. Écris par exemple 9h-12h 14h-19h.`, true);
+  if (invalides.length) return notifier(`Horaire illisible pour ${invalides.join(", ")} dans le PDF importé.`, true);
   const presences = Object.fromEntries(noms.map((n) => [n, PL.presences[n].map(plTexteNormalise)]));
   const miseAJour = plSynchroniserCaisse();   // la caisse enregistrée suit toujours les dernières présences
   const r = await api().planning_enregistrer(PL.semaine, presences, PL.caisse);
@@ -4584,7 +4445,6 @@ async function plEnregistrer() {
   PL.saisi_par = (ETAT?.utilisateur || "").split("@")[0];
   plMarquer(false);
   notifier(r.ok + (miseAJour ? ` ${miseAJour}` : ""));
-  if (plVue() === "presences") plAfficherPresences();
   if (plVue() === "caisse") plAfficherCaisse();
 }
 
@@ -4593,34 +4453,13 @@ async function plAller(semaine) {
   await plCharger(semaine);
 }
 
-async function plReprendre() {
-  const precedente = plDecaler(PL.semaine, -1);
-  const r = await api().planning_lire(precedente);
-  if (r.erreur) return notifier(r.erreur, true);
-  if (!Object.keys(r.presences || {}).length) return notifier("Pas de présences enregistrées la semaine précédente.", true);
-  plLirePresencesDeLaGrille();
-  if (Object.keys(PL.presences).length) {
-    const { ok } = await demander({ titre: "Reprendre la semaine précédente ?", bouton: "Remplacer",
-      texte: "Les horaires déjà écrits pour cette semaine seront remplacés par ceux de la semaine précédente." });
-    if (!ok) return;
-  }
-  PL.presences = JSON.parse(JSON.stringify(r.presences));
-  plAfficherPresences(); plMarquer();
-  notifier("Horaires de la semaine précédente repris : ajuste ce qui change.");
-}
 
-async function plVider() {
-  const { ok } = await demander({ titre: "Vider les présences ?", bouton: "Vider", danger: true,
-    texte: "Toutes les cases de la semaine seront effacées (rien n'est perdu tant que tu n'enregistres pas)." });
-  if (!ok) return;
-  PL.presences = {};
-  plAfficherPresences(); plMarquer();
-}
 
 // ------------------------------------------------------------ import du planning général en PDF
 // Le PDF est lu dans le navigateur (pdf.js) : rien n'est envoyé ailleurs.
-// On repère les colonnes des jours (Lundi… ou Lun… ou les dates), les prénoms de l'équipe,
-// puis les horaires de chaque case. Le résultat est montré pour vérification avant de remplir la grille.
+// On repère les colonnes des jours (« Lun. 19 oct. », « Lundi », ou les dates), les noms en
+// première colonne, puis les horaires de chaque case. Une 2e plage comprise dans la 1re est
+// une pause (« 10:00 - 17:30 » au-dessus de « 13:30 - 14:30 »).
 const PL_PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js";
 const PL_PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 async function plPdfJs() {
@@ -4630,10 +4469,25 @@ async function plPdfJs() {
 }
 
 const PL_ENTETES_JOURS = [/^lun/, /^mar/, /^mer/, /^jeu/, /^ven/, /^sam/, /^dim/];
+const PL_MOIS_PDF = ["jan", "fev", "mar", "avr", "mai", "juin", "juil", "aou", "sep", "oct", "nov", "dec"];
 const plJourEntete = (texte) => {
   const t = plSansAccent(texte).replace(/[^a-z]/g, "");
-  if (t.length < 2 || t.length > 9) return -1;
+  if (t.length < 2 || t.length > 12) return -1;
   return PL_ENTETES_JOURS.findIndex((r) => r.test(t));
+};
+// « 19 oct. », « 19/10 », « 19-10-2026 » -> [jour, mois] ou null
+function plDateTexte(texte) {
+  const t = plSansAccent(texte);
+  let m = t.match(/(\d{1,2})[/.-](\d{1,2})/);
+  if (m) return [Number(m[1]), Number(m[2])];
+  m = t.match(/(\d{1,2})\s*(janv|jan|fevr|fev|mars|mar|avr|mai|juin|juil|aout|aou|sept|sep|oct|nov|dec)/);
+  if (m) return [Number(m[1]), PL_MOIS_PDF.findIndex((x) => m[2].startsWith(x)) + 1];
+  return null;
+}
+// « CLAIRE GERSCHHEIMER » -> « Claire » (le prénom, comme dans la page Équipe)
+const plPrenom = (texte) => {
+  const mot = String(texte).trim().split(/\s+/)[0] || "";
+  return mot.toLowerCase().replace(/(^|[-'])(\p{L})/gu, (_, a, b) => a + b.toUpperCase());
 };
 
 // Les morceaux de texte d'une page : { texte, x, y (depuis le haut), l (largeur), h }
@@ -4647,19 +4501,17 @@ async function plMorceauxPdf(page) {
   });
 }
 
-// Une page -> { lignes: {nom: [7 textes]}, lundi: "JJ/MM" ou null }
+// Une page -> { lignes: {nom: [7 textes]}, inconnus: {libellé: [7 textes]}, lundi: [j, m] ou null }
 function plAnalyserPagePdf(morceaux, noms) {
-  // 1) les en-têtes de jours (sur la même ligne, de gauche à droite)
+  // 1) les en-têtes de jours, alignés sur une même ligne
   const entetes = morceaux.map((m) => ({ ...m, jour: plJourEntete(m.texte) })).filter((m) => m.jour >= 0);
   let colonnes = null;
   for (const e of entetes) {
-    const ligne = entetes.filter((x) => Math.abs(x.y - e.y) < Math.max(4, e.h));
     const parJour = new Map();
-    ligne.forEach((x) => { if (!parJour.has(x.jour)) parJour.set(x.jour, x); });
+    entetes.filter((x) => Math.abs(x.y - e.y) < Math.max(4, e.h)).forEach((x) => { if (!parJour.has(x.jour)) parJour.set(x.jour, x); });
     if (parJour.size >= 5 && (!colonnes || parJour.size > colonnes.size)) colonnes = parJour;
   }
-  // sinon : les dates « 12/10 » alignées sur une ligne
-  if (!colonnes) {
+  if (!colonnes) {   // sinon : des dates alignées
     const dates = morceaux.filter((m) => /^\d{1,2}[/.-]\d{1,2}([/.-]\d{2,4})?$/.test(m.texte));
     for (const d of dates) {
       const ligne = dates.filter((x) => Math.abs(x.y - d.y) < 4).sort((a, b) => a.x - b.x);
@@ -4672,33 +4524,24 @@ function plAnalyserPagePdf(morceaux, noms) {
   const ecart = centres.length > 1 ? (centres[centres.length - 1].x - centres[0].x) / (centres[centres.length - 1].jour - centres[0].jour) : 80;
   const yEntete = Math.max(...jours.map((j) => j.y));
 
-  // date du lundi, si elle est écrite près de l'en-tête
+  // date du lundi (dans l'en-tête « Lun. 19 oct. » ou juste au-dessus / en dessous)
   let lundi = null;
-  const premier = centres.find((c) => c.jour === 0);
-  if (premier) {
-    const date = morceaux.find((m) => Math.abs(m.x + m.l / 2 - premier.x) < ecart / 2 && m.y >= yEntete - 20 && m.y <= yEntete + 20 && /\d{1,2}[/.-]\d{1,2}/.test(m.texte));
-    if (date) lundi = date.texte.match(/(\d{1,2})[/.-](\d{1,2})/).slice(1, 3).map(Number);
-  }
+  const premier = centres.find((c) => c.jour === 0) || centres[0];
+  const textesLundi = morceaux.filter((m) => Math.abs(m.x + m.l / 2 - premier.x) < ecart / 2 && Math.abs(m.y - yEntete) < 22).map((m) => m.texte).join(" ");
+  const date = plDateTexte(textesLundi);
+  if (date && date[1] >= 1) lundi = premier.jour === 0 ? date : null;
 
-  // 2) les prénoms (à gauche du lundi, sous l'en-tête)
+  // 2) la colonne des noms : chaque nom (connu ou pas) délimite une ligne du tableau
   const gauche = Math.min(...centres.map((c) => c.x)) - ecart / 2;
-  const personnes = [];
-  for (const m of morceaux) {
-    if (m.y <= yEntete + 2 || m.x > gauche + 4 || /\d/.test(m.texte)) continue;
-    const nom = plTrouverNom(m.texte, noms) || m.texte.split(/\s+/).map((mot) => plTrouverNom(mot, noms)).find(Boolean);
-    if (nom && !personnes.some((p) => p.nom === nom)) personnes.push({ nom, y: m.y, h: m.h });
-  }
-  personnes.sort((a, b) => a.y - b.y);
-  // des noms avec des horaires, mais qui ne sont pas dans l'équipe
-  const inconnus = morceaux.filter((m) => m.y > yEntete + 2 && m.x <= gauche + 4 && !/\d/.test(m.texte) && m.texte.length >= 3
-    && !personnes.some((p) => Math.abs(p.y - m.y) < Math.max(3, m.h * 0.6))
-    && morceaux.some((x) => x.x > gauche && Math.abs(x.y - m.y) < Math.max(4, m.h) && /\d/.test(x.texte))).map((m) => m.texte);
+  const lignesNoms = morceaux.filter((m) => m.y > yEntete + 2 && m.x + m.l <= gauche + 6 && !/\d/.test(m.texte) && m.texte.replace(/[^\p{L}]/gu, "").length >= 3)
+    .map((m) => ({ texte: m.texte, y: m.y, h: m.h, nom: plTrouverNom(m.texte, noms) }))
+    .sort((a, b) => a.y - b.y);
 
   // 3) chaque horaire va à la personne de sa ligne et au jour de sa colonne
-  const lignes = {};
-  personnes.forEach((p, i) => {
-    const haut = i ? (personnes[i - 1].y + p.y) / 2 : p.y - Math.max(12, p.h * 1.5);
-    const bas = i < personnes.length - 1 ? (p.y + personnes[i + 1].y) / 2 : p.y + Math.max(14, p.h * 2);
+  const lignes = {}, inconnus = {};
+  lignesNoms.forEach((p, i) => {
+    const haut = i ? (lignesNoms[i - 1].y + p.y) / 2 : p.y - Math.max(14, p.h * 1.6);
+    const bas = i < lignesNoms.length - 1 ? (p.y + lignesNoms[i + 1].y) / 2 : p.y + Math.max(16, p.h * 2);
     const cases = Array.from({ length: 7 }, () => []);
     for (const m of morceaux) {
       if (m.y < haut || m.y >= bas || m.x < gauche) continue;
@@ -4707,28 +4550,44 @@ function plAnalyserPagePdf(morceaux, noms) {
       if (Math.abs(col.x - milieu) > ecart * 0.55) continue;   // colonne « total », etc.
       cases[col.jour].push(m);
     }
-    lignes[p.nom] = cases.map((morceauxCase) => plTexteCase(morceauxCase.sort((a, b) => a.y - b.y || a.x - b.x).map((m) => m.texte)));
+    const textes = cases.map((morceauxCase) => plTexteCase(morceauxCase.sort((a, b) => a.y - b.y || a.x - b.x).map((m) => m.texte)));
+    if (p.nom) lignes[p.nom] = lignes[p.nom] ? lignes[p.nom].map((v, j) => v || textes[j]) : textes;
+    else if (textes.some((t) => plMinutesTravaillees(t) > 0)) inconnus[p.texte] = textes;
   });
-  return { lignes, lundi, inconnus };
+  return { lignes, inconnus, lundi };
 }
 
-// Le texte d'une case : « 09:00 - 13:00 », « 09:00 / 13:00 », « 9h 13h 14h 19h », « Repos »…
+// Le texte d'une case -> « 10h-17h30 pause 13h30-14h30 », « 9h-12h30 13h30-16h30 », « Repos »…
 function plTexteCase(textes) {
-  let t = textes.join(" ").replace(/\s+/g, " ").trim();
+  // on retire les totaux (« 5h 30m », « 7h ») et les tirets seuls
+  let t = textes.join(" ").replace(/\b\d{1,2}\s*h\s*\d{1,2}\s*m(in)?\b/gi, " ").replace(/\s+/g, " ").trim();
+  t = t.split(" ").filter((mot, i, mots) => !/^[-–—]$/.test(mot) || (/\d/.test(mots[i - 1] || "") && /\d/.test(mots[i + 1] || "")))
+    .filter((mot, i, mots) => !/^\d{1,2}h$/i.test(mot) || /^[-–—]$/.test(mots[i - 1] || "") || /^[-–—]$/.test(mots[i + 1] || ""))
+    .join(" ").trim();
   if (!t) return "";
   if (plLirePlages(t).repos) return t;
-  const lu = plLirePlages(t);
-  if (!lu.invalide) return plTexteNormalise(t);
+  // les plages, dans l'ordre : une plage comprise dans une autre est une pause
+  const plages = [...t.matchAll(PL_MOTIF_PLAGE)].map((m) => [plLireHeure(m[1]), plLireHeure(m[2])]).filter(([d, f]) => d !== null && f !== null && f > d);
+  if (plages.length) {
+    const travail = [], pauses = [];
+    plages.forEach((p, i) => {
+      const dans = plages.some((q, j) => j !== i && q[0] <= p[0] && q[1] >= p[1] && (q[1] - q[0]) > (p[1] - p[0]));
+      (dans ? pauses : travail).push(p);
+    });
+    const autresPauses = plLirePlages(t).pauses;   // « pause 12h-13h » écrit en toutes lettres
+    const texte = plTextePlages(travail.sort((a, b) => a[0] - b[0])) + ([...pauses, ...autresPauses].length ? ` pause ${plTextePlages([...pauses, ...autresPauses].filter((p, i, l) => l.findIndex((q) => q[0] === p[0] && q[1] === p[1]) === i))}` : "");
+    if (!plLirePlages(texte).invalide) return texte;
+  }
   // heures seules : on les assemble deux par deux (début, fin), en gardant la pause à part
-  const pauses = [];
-  const reste = t.replace(/\(?\b(?:pause|pse|p)\b\.?\s*:?\s*(\d{1,2}(?:[h:.]\d{0,2})?\s*-\s*\d{1,2}(?:[h:.]\d{0,2})?)\)?/gi, (_, plage) => { pauses.push(plage); return " "; });
+  const pausesEcrites = [];
+  const reste = t.replace(/\(?\b(?:pause|pse|p)\b\.?\s*:?\s*(\d{1,2}(?:[h:.]\d{0,2})?\s*-\s*\d{1,2}(?:[h:.]\d{0,2})?)\)?/gi, (_, plage) => { pausesEcrites.push(plage); return " "; });
   const heures = reste.split(/[\s/|;,]+/).map(plLireHeure).filter((h) => h !== null);
   if (heures.length >= 2 && heures.length % 2 === 0) {
-    const plages = [];
-    for (let k = 0; k < heures.length; k += 2) if (heures[k + 1] > heures[k]) plages.push(`${plTexteHeure(heures[k])}-${plTexteHeure(heures[k + 1])}`);
-    if (plages.length) return plTexteNormalise(plages.join(" ") + (pauses.length ? ` pause ${pauses.join(" ")}` : ""));
+    const morceaux = [];
+    for (let k = 0; k < heures.length; k += 2) if (heures[k + 1] > heures[k]) morceaux.push(`${plTexteHeure(heures[k])}-${plTexteHeure(heures[k + 1])}`);
+    if (morceaux.length) return plTexteNormalise(morceaux.join(" ") + (pausesEcrites.length ? ` pause ${pausesEcrites.join(" ")}` : ""));
   }
-  // mots qui disent « absent » (CP, RTT, maladie…) au milieu d'un autre texte
+  // un mot d'absence (École, CP, RTT…) au milieu d'un autre texte
   const mot = t.split(/\s+/).find((x) => PL_REPOS.test(x.replace(/[.\s]/g, "")));
   return mot || t;
 }
@@ -4736,7 +4595,7 @@ function plTexteCase(textes) {
 async function plImporterPdf(fichier) {
   if (!fichier) return;
   if (!/pdf$/i.test(fichier.type) && !/\.pdf$/i.test(fichier.name)) return notifier("Choisis un fichier PDF.", true);
-  notifier("Lecture du PDF…");
+  notifier("Lecture du planning…");
   let pdfjs;
   try { pdfjs = await plPdfJs(); }
   catch (e) { return notifier("Impossible de charger le lecteur de PDF (connexion internet ?). Réessaie dans un instant.", true); }
@@ -4744,51 +4603,61 @@ async function plImporterPdf(fichier) {
   try { pdf = await pdfjs.getDocument({ data: await fichier.arrayBuffer() }).promise; }
   catch (e) { return notifier("Ce fichier PDF n'a pas pu être ouvert (protégé par mot de passe ou abîmé ?).", true); }
   const noms = PL.conseillers.map((c) => c.nom);
-  const lignes = {};
+  const lignes = {}, inconnus = {};
   let lundi = null, texteTrouve = false;
-  const inconnus = new Set();
   for (let n = 1; n <= pdf.numPages; n++) {
     const morceaux = await plMorceauxPdf(await pdf.getPage(n));
     if (morceaux.length > 5) texteTrouve = true;
     const r = plAnalyserPagePdf(morceaux, noms);
     if (!r) continue;
     lundi = lundi || r.lundi;
-    r.inconnus.forEach((n) => inconnus.add(n));
-    for (const [nom, jours] of Object.entries(r.lignes)) {
-      lignes[nom] = (lignes[nom] || Array(7).fill("")).map((v, i) => v || jours[i]);
-    }
+    for (const [nom, jours] of Object.entries(r.lignes)) lignes[nom] = (lignes[nom] || Array(7).fill("")).map((v, i) => v || jours[i]);
+    Object.assign(inconnus, r.inconnus);
   }
-  if (!texteTrouve) {
-    return notifier("Ce PDF est une image (scan ou photo) : il n'y a pas de texte à lire. Utilise le PDF exporté par le logiciel de planning.", true);
-  }
-  if (!Object.keys(lignes).length) {
-    return notifier("Je n'ai pas trouvé le tableau : il faut les jours (Lundi, Mardi… ou les dates) en en-tête et les prénoms de l'équipe en première colonne.", true);
+  if (!texteTrouve) return notifier("Ce PDF est une image (scan ou photo) : il n'y a pas de texte à lire. Utilise le PDF exporté depuis Excel.", true);
+  if (!Object.keys(lignes).length && !Object.keys(inconnus).length) {
+    return notifier("Je n'ai pas trouvé le tableau : il faut les jours (Lun., Mar.… ou les dates) en en-tête et les noms en première colonne.", true);
   }
 
-  // semaine du PDF : si elle diffère de celle affichée, on s'y rend
+  // la semaine du PDF : on s'y rend directement
   if (lundi) {
     const [annee] = PL.semaine.split("-S").map(Number);
-    const candidats = [annee - 1, annee, annee + 1].map((a) => new Date(Date.UTC(a, lundi[1] - 1, lundi[0])));
-    const proche = candidats.sort((a, b) => Math.abs(a - plLundi(PL.semaine)) - Math.abs(b - plLundi(PL.semaine)))[0];
+    const proche = [annee - 1, annee, annee + 1].map((a) => new Date(Date.UTC(a, lundi[1] - 1, lundi[0])))
+      .sort((a, b) => Math.abs(a - plLundi(PL.semaine)) - Math.abs(b - plLundi(PL.semaine)))[0];
     const semainePdf = plSemaineDe(plIso(proche));
-    if (semainePdf !== PL.semaine && !Number.isNaN(proche.getTime())) {
-      const { ok } = await demander({ titre: `Le PDF concerne la semaine ${Number(semainePdf.split("-S")[1])}`, bouton: "Aller à cette semaine",
-        texte: `Le planning importé commence le ${proche.getUTCDate()}/${String(proche.getUTCMonth() + 1).padStart(2, "0")}. Aller à cette semaine pour le remplir ? (Annuler = le mettre dans la semaine affichée.)` });
-      if (ok) { if (!(await plAbandonnerModifs())) return; await plCharger(semainePdf); }
+    if (semainePdf !== PL.semaine) {
+      if (!(await plAbandonnerModifs())) return;
+      await plCharger(semainePdf);
     }
   }
+  const remplace = !!PL.caisse && Object.keys(PL.presences).length;
+  PL.presences = lignes;
+  PL.importPdf = { fichier: fichier.name, le: new Date().toISOString(), inconnus };
+  PL.signatureCaisse = null;
+  plMarquer();
+  plAfficher();
+  const nb = Object.keys(lignes).length, nbInconnus = Object.keys(inconnus).length;
+  notifier(`Planning importé (${nb} personne${nb > 1 ? "s" : ""})${remplace ? " : la caisse a été mise à jour" : " : planning de caisse créé"}.`
+    + (nbInconnus ? ` ${nbInconnus} hors équipe, voir l'encadré.` : " Pense à enregistrer."));
+}
 
-  // vérification avant de remplir : le tableau lu, modifiable
-  const tsv = Object.entries(lignes).map(([nom, jours]) => [nom, ...jours].join("\t")).join("\n");
-  plOuvrirCollage({
-    titre: `Planning lu dans « ${fichier.name} »`,
-    aide: `${Object.keys(lignes).length} conseiller${Object.keys(lignes).length > 1 ? "s" : ""} trouvé${Object.keys(lignes).length > 1 ? "s" : ""}. Vérifie les horaires (une ligne par personne, une colonne par jour, du lundi au dimanche) puis remplis la grille : le planning de caisse se crée tout seul.`
-      + (inconnus.size ? `<br><strong>Pas dans ton équipe :</strong> ${[...inconnus].map(echapper).join(", ")}. Ajoute-les dans la page Équipe (même prénom) puis réimporte le PDF pour les inclure.` : ""),
-    texte: tsv, apresRemplissage: () => {
-      $$('[data-choix="vue-planning"] button').forEach((b) => b.classList.toggle("actif", b.dataset.valeur === "caisse"));
-      plAfficher();
-    },
-  });
+// Ajoute à l'équipe une personne du PDF qui n'y était pas, et la met tout de suite dans la caisse
+async function plAjouterInconnu(libelle) {
+  const jours = PL.importPdf?.inconnus?.[libelle];
+  if (!jours) return;
+  const prenom = plPrenom(libelle);
+  const r = await api().ajouter_conseiller(prenom);
+  if (r.erreur && !/déjà/.test(r.erreur)) return notifier(r.erreur, true);
+  await rafraichirEtat();
+  PL.conseillers = ETAT.conseillers;
+  const nom = plTrouverNom(prenom, PL.conseillers.map((c) => c.nom)) || prenom;
+  PL.presences[nom] = jours;
+  delete PL.importPdf.inconnus[libelle];
+  // une nouvelle personne : on répartit de nouveau la semaine pour lui donner sa part (sauf retouches à la main)
+  if (PL.caisse && !PL.caisse.retouche) { PL.caisse = null; PL.signatureCaisse = null; }
+  plMarquer();
+  plAfficherCaisse();
+  notifier(`${nom} a rejoint l'équipe et le planning de caisse.`);
 }
 
 // ------------------------------------------------------------ branchement
@@ -4806,7 +4675,6 @@ function plBrancher() {
 
   brancherChoix("vue-planning", () => {
     if (plVue() !== "reglages" && PL_REGLAGES && plReglagesModifies()) notifier("Réglages non enregistrés : clique sur « Enregistrer les réglages » pour les garder.", true);
-    if (plVue() !== "presences") plLirePresencesDeLaGrille();
     plAfficher();
   });
   $("#pl-enregistrer").addEventListener("click", plEnregistrer);
@@ -4815,8 +4683,8 @@ function plBrancher() {
   $("#pl-cette-semaine").addEventListener("click", () => plAller(plSemaineDe(ETAT.aujourd_hui)));
   $("#pl-date").addEventListener("change", (e) => { if (e.target.value) plAller(plSemaineDe(e.target.value)); });
 
-  $("#pl-coller").addEventListener("click", () => plOuvrirCollage());
-  $$(".pl-importer-pdf").forEach((b) => b.addEventListener("click", () => $("#pl-fichier-pdf").click()));
+  $$(".pl-importer-pdf, #pl-depot").forEach((b) => b.addEventListener("click", () => $("#pl-fichier-pdf").click()));
+  $("#pl-alertes").addEventListener("click", (e) => { const b = e.target.closest("[data-ajouter]"); if (b) plAjouterInconnu(b.dataset.ajouter); });
   $("#pl-fichier-pdf").addEventListener("change", async (e) => {
     const fichier = e.target.files[0];
     e.target.value = "";   // pour pouvoir réimporter le même fichier
@@ -4831,24 +4699,6 @@ function plBrancher() {
     e.preventDefault(); $("#page-planning").classList.remove("pl-depot");
     plImporterPdf(fichier);
   });
-  $("#pl-reprendre").addEventListener("click", plReprendre);
-  $("#pl-vider").addEventListener("click", plVider);
-  $("#pl-lignes-presences").addEventListener("input", () => { plTotauxPresences(); plMarquer(); });
-  $("#pl-lignes-presences").addEventListener("paste", plCollerDansGrille);
-  $("#pl-lignes-presences").addEventListener("focusout", (e) => {
-    if (!e.target.matches(".pl-case")) return;
-    const propre = plTexteNormalise(e.target.value);
-    if (propre !== e.target.value) { e.target.value = propre; plTotauxPresences(); }
-  });
-  // Entrée = case du dessous, Tab = case de droite (comme dans Excel)
-  $("#pl-lignes-presences").addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" || !e.target.matches(".pl-case")) return;
-    e.preventDefault();
-    const tr = e.target.closest("tr").nextElementSibling;
-    const suivant = tr && $(`.pl-case[data-jour="${e.target.dataset.jour}"]`, tr);
-    if (suivant) { suivant.focus(); suivant.select(); }
-  });
-
   $("#pl-generer").addEventListener("click", () => plCreerCaisse(false));
   $("#pl-autre").addEventListener("click", () => plCreerCaisse(true));
   $$(".pl-pdf").forEach((b) => b.addEventListener("click", plExporterPdf));
@@ -4858,6 +4708,7 @@ function plBrancher() {
   const reglageChange = () => { plLireReglages(); plAfficherReglages(); };
   $("#pl-nb-caisses").addEventListener("change", reglageChange);
   $("#pl-duree").addEventListener("change", reglageChange);
+  $("#pl-max-jour").addEventListener("change", reglageChange);
   $("#pl-lignes-horaires").addEventListener("change", reglageChange);
   $("#pl-lignes-exceptions").addEventListener("change", reglageChange);
   $("#pl-grille-rush").addEventListener("click", (e) => {
@@ -4876,7 +4727,7 @@ function plBrancher() {
 
 // Toutes les 30 s : si quelqu'un d'autre a enregistré le planning, on le recharge (sauf si tu es en train de le modifier)
 async function plActualiser() {
-  if (afficher.page !== "planning" || !PL || document.hidden || !$("#dialogue").hidden || !$("#pl-dialogue-coller").hidden) return;
+  if (afficher.page !== "planning" || !PL || document.hidden || !$("#dialogue").hidden) return;
   if (document.activeElement?.matches("input, select, textarea")) return;
   if (!PL.modifie) {
     let r;
@@ -4884,7 +4735,7 @@ async function plActualiser() {
     if (!r || r.erreur || r.__erreur__ || r.semaine !== PL.semaine) return;
     if ((r.modifie_le || "") !== (PL.modifie_le || "") || JSON.stringify(r.reglages) !== JSON.stringify(PL.reglages)) {
       const parQui = r.saisi_par && r.modifie_le !== PL.modifie_le ? ` par ${r.saisi_par}` : "";
-      PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1, signatureCaisse: null, changements: new Set() };
+      PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1, signatureCaisse: null, changements: new Set(), importPdf: null };
       plMarquer(false);
       plAfficher();
       return notifier(`Planning mis à jour${parQui}.`);
@@ -4900,7 +4751,7 @@ window.addEventListener("pywebviewready", () => {
 });
 
 // pour les tests
-window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plAnalyserCollage, plDecouperTableau, plGrouperJours, plTexteNormalise, plAnalyserPagePdf, plTexteCase };
+window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plTexteNormalise, plAnalyserPagePdf, plTexteCase, plTrouverNom };
 
 </script>
 </body>
