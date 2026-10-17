@@ -829,7 +829,8 @@ html[data-theme="sombre"] .planning td.place.vide:hover::after { color: color-mi
 .pl-creneau.pl-manque { background: color-mix(in srgb, var(--statut-critique) 7%, var(--blanc)); box-shadow: inset 3px 0 0 var(--statut-critique); }
 .pl-heure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; margin: 2px 2px 6px; font-size: 12px; }
 .pl-heure strong { font-size: 12.5px; font-variant-numeric: tabular-nums; }
-.pl-heure { flex-wrap: nowrap; }
+.pl-heure { flex-wrap: wrap; }
+.pl-heure strong { white-space: nowrap; }
 .pl-dispo { margin-left: auto; font-size: 11px; color: var(--doux); white-space: nowrap; }
 .pl-dispo::after { content: " dispo"; }
 #page-planning .feuille { max-width: 1320px; }
@@ -880,6 +881,25 @@ html[data-theme="sombre"] .planning td.place.vide:hover::after { color: color-mi
 html[data-theme="sombre"] .pl-badge-rush, html[data-theme="sombre"] .pl-bascule-rush.actif { color: #F5C451; }
 html[data-theme="sombre"] .pl-equite .pl-plus { color: #F5C451; }
 html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, var(--statut-attention) 12%, var(--blanc)); }
+
+
+/* relais pendant les pauses, mises à jour automatiques, créneau en cours */
+.pl-relais { display: grid; gap: 3px; margin-top: 4px; padding: 3px; border: 1px dashed var(--bord-fort); border-radius: var(--r-s, 0); background: color-mix(in srgb, var(--blanc) 70%, transparent); }
+.pl-relais + .pl-relais, .pl-relais + .pl-choix, .pl-choix + .pl-relais { margin-top: 5px; }
+.pl-relais-ligne { display: grid; grid-template-columns: 62px 1fr; align-items: center; gap: 4px; }
+.pl-relais-heure { font-size: 10.5px; color: var(--doux); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pl-relais .pl-choix { margin-top: 0; height: 26px; font-size: 12px; }
+.pl-relais-ligne.pl-actuel .pl-relais-heure { color: var(--accent); font-weight: 700; }
+.pl-creneau.pl-change { animation: pl-surligne 2.4s ease-out; outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: -2px; }
+@keyframes pl-surligne { from { background-color: color-mix(in srgb, var(--accent) 22%, var(--blanc)); } }
+.pl-creneau.pl-maintenant { box-shadow: inset 0 0 0 2px var(--accent); }
+.pl-badge-maintenant { font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 99px; background: var(--accent); color: var(--sur-accent); }
+.pl-caisse th.pl-aujourdhui { color: var(--accent); }
+.pl-cle-change { background: var(--blanc); border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent) !important; }
+.pl-cle-maintenant { background: var(--blanc); border: 2px solid var(--accent) !important; }
+.gros.principal-doux { background: var(--accent-doux, var(--survol)); border-color: color-mix(in srgb, var(--accent) 22%, var(--bord)); }
+.gros.principal-doux:hover { filter: brightness(.97); }
+html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"] .pl-relais-ligne.pl-actuel .pl-relais-heure { color: color-mix(in srgb, var(--accent) 40%, #fff); }
 
 /* impression du planning de caisse */
 @media print {
@@ -1216,6 +1236,7 @@ html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, v
               <button id="pl-coller" class="gros"><span class="icone" data-icone="coller"></span>Coller depuis Excel</button>
               <button id="pl-reprendre" class="gros"><span class="icone" data-icone="copier"></span>Reprendre la sem. préc.</button>
               <button id="pl-vider" class="gros"><span class="icone" data-icone="effacer"></span>Vider</button>
+              <button class="gros pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
             </div>
             <span class="legende">Présences</span>
           </div>
@@ -1223,9 +1244,9 @@ html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, v
             <div class="commandes">
               <button id="pl-generer" class="gros"><span class="icone" data-icone="generer"></span>Créer le planning de caisse</button>
               <button id="pl-autre" class="gros"><span class="icone" data-icone="melanger"></span>Autre proposition</button>
-              <button id="pl-imprimer" class="gros"><span class="icone" data-icone="imprimer"></span>Imprimer</button>
+              <button class="gros principal-doux pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
             </div>
-            <span class="legende">Caisse</span>
+            <span class="legende">Planning de caisse</span>
           </div>
           <div class="ruban-info doux" id="pl-info">Écris les horaires comme <strong>9h-12h 14h-19h</strong>.<br>Tu peux aussi coller directement un tableau Excel dans la grille.</div>
         </div>
@@ -1234,7 +1255,7 @@ html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, v
           <!-- Présences -->
           <div class="feuille pl-vue" data-vue="presences">
             <h2 id="pl-titre-presences">Planning de la semaine</h2>
-            <p class="doux explication">Une case par jour : <strong>9h-19h</strong>, ou deux plages avec la pause <strong>9h-12h30 14h-19h</strong>.
+            <p class="doux explication">Une case par jour : <strong>9h-19h</strong>, avec la pause <strong>9h-19h pause 12h-13h</strong> (ou <strong>9h-12h 13h-19h</strong>).
               Laisse vide (ou écris <em>repos</em>, <em>CP</em>…) un jour non travaillé. Clique dans une case et colle (⌘V / Ctrl+V) un bloc copié dans Excel : il se répartit dans la grille.</p>
             <p id="pl-etat-enregistrement" class="doux petit"></p>
             <div class="defilement-horizontal">
@@ -1255,7 +1276,9 @@ html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, v
             <div class="pl-legende">
               <span><i class="pl-cle-rush"></i>Créneau de rush</span>
               <span><i class="pl-cle-manque"></i>Pas assez de monde présent</span>
-              <span><i class="pl-cle-hors"></i>Personne absente sur ce créneau</span>
+              <span><i class="pl-cle-hors"></i>Personne absente à ce moment-là</span>
+              <span><i class="pl-cle-change"></i>Mis à jour d'après les présences</span>
+              <span><i class="pl-cle-maintenant"></i>En ce moment</span>
             </div>
             <div class="defilement-horizontal">
               <table class="tableau-office pl-caisse">
@@ -1264,7 +1287,7 @@ html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, v
               </table>
             </div>
             <h3 class="espace-haut">Équité de la semaine</h3>
-            <p class="doux petit">La cible de chacun est calculée d'après le temps où il peut tenir la caisse (présent sur le créneau et pas d'exception ce jour-là). L'écart se lit en heures.</p>
+            <p class="doux petit">La cible de chacun est calculée d'après le temps où il peut tenir la caisse (présent, hors pause, sans exception ce jour-là). L'écart se lit en heures. Après beaucoup de changements, « Optimiser toute la semaine » rééquilibre tout.</p>
             <table class="tableau-office compact pl-equite">
               <thead><tr><th>Conseiller</th><th class="nombre">Présence</th><th class="nombre">Temps caisse</th><th class="nombre">Cible</th><th class="nombre">Écart</th><th class="barre-col">Part de son temps</th><th class="nombre">Rush</th><th class="nombre">Cible rush</th><th class="nombre">Créneaux</th></tr></thead>
               <tbody id="pl-lignes-equite"></tbody>
@@ -3472,7 +3495,9 @@ window.addEventListener("pywebviewready", async () => {
 //  - Présences : une case par conseiller et par jour (« 9h-12h 14h-19h »),
 //    remplie à la main ou collée depuis Excel.
 //  - Caisse : créneaux de N heures à partir de l'ouverture, X personnes
-//    en même temps. La répartition vise :
+//    en même temps. Pendant une pause, la caisse passe en relais.
+//    Le planning se crée et se met à jour tout seul quand les présences changent.
+//    La répartition vise :
 //      1) un temps de caisse proportionnel au temps où chacun peut la tenir,
 //      2) des rushs partagés entre tout le monde,
 //      3) le respect des exceptions (jours sans caisse),
@@ -3486,13 +3511,13 @@ ICONES.coller = '<path d="M8 4h8v3H8zM6 5H4v16h16V5h-2M8 12h8M8 16h5"/>';
 ICONES.copier = '<path d="M8 8h12v12H8zM4 16V4h12"/>';
 ICONES.generer = '<path d="M4 6h16M4 12h10M4 18h7M17 13l2 2 3-4M15 18l2 2 4-5"/>';
 ICONES.melanger = '<path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/>';
-ICONES.imprimer = '<path d="M6 9V3h12v6M6 17H3V9h18v8h-3M6 14h12v7H6z"/>';
+ICONES.pdf = '<path d="M5 3h10l4 4v14H5zM15 3v4h4M8 12h8M8 16h5"/><path d="M12 9v9M9 15l3 3 3-3"/>';
 
 const PL_JOURS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 const PL_JOURS_COURTS = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."];
 const PL_REPOS = /^(repos|r|rh|cp|conges?|congé|off|abs|absent|absente|maladie|mal|ferie|férié|f|x|-|—|\/|ecole|école|formation|rtt|rc)$/i;
 
-let PL = null;   // { semaine, libelle, presences, caisse, reglages, conseillers, semaines, modifie, graine }
+let PL = null;   // { semaine, libelle, presences, caisse, reglages, conseillers, semaines, modifie, graine, signatureCaisse, changements }
 let PL_REGLAGES = null;   // copie modifiable des réglages (vue Réglages)
 
 // ------------------------------------------------------------ heures
@@ -3509,29 +3534,47 @@ function plLireHeure(t) {
   return h <= 24 && min < 60 && h * 60 + min <= 24 * 60 ? h * 60 + min : null;
 }
 
-// Une case du planning -> { plages: [[début, fin] en minutes], repos, invalide }
+// Une case du planning -> { plages: [[début, fin] en minutes], pauses, repos, invalide }
+// Formes acceptées : « 9h-19h », « 9h-12h30 14h-19h », « 9h-19h pause 12h-13h » (la pause est retirée)
+const PL_MOTIF_PLAGE = /(\d{1,2}(?:[h:.]\d{0,2}(?::\d{2})?)?)\s*-\s*(\d{1,2}(?:[h:.]\d{0,2}(?::\d{2})?)?)/g;
 function plLirePlages(texte) {
   const brut = String(texte ?? "").trim();
-  if (!brut || PL_REPOS.test(brut.replace(/[.\s]/g, ""))) return { plages: [], repos: true, invalide: false };
-  const t = brut.toLowerCase().replace(/\s+(?:à|a)\s+/g, "-").replace(/[–—]/g, "-").replace(/(\d)\s+h/g, "$1h");
-  const motif = /(\d{1,2}(?:[h:.]\d{0,2}(?::\d{2})?)?)\s*-\s*(\d{1,2}(?:[h:.]\d{0,2}(?::\d{2})?)?)/g;
-  const plages = [];
-  let invalide = false, m;
-  while ((m = motif.exec(t))) {
-    const d = plLireHeure(m[1]), f = plLireHeure(m[2]);
-    if (d === null || f === null || f <= d) invalide = true; else plages.push([d, f]);
+  if (!brut || PL_REPOS.test(brut.replace(/[.\s]/g, ""))) return { plages: [], travail: [], pauses: [], repos: true, invalide: false };
+  let t = brut.toLowerCase().replace(/\s+(?:à|a)\s+/g, "-").replace(/[–—]/g, "-").replace(/(\d)\s+h/g, "$1h");
+  let invalide = false;
+  const lire = (morceau) => {
+    const r = [];
+    for (const m of morceau.matchAll(PL_MOTIF_PLAGE)) {
+      const d = plLireHeure(m[1]), f = plLireHeure(m[2]);
+      if (d === null || f === null || f <= d) invalide = true; else r.push([d, f]);
+    }
+    return r;
+  };
+  // les pauses : « pause 12h-13h », « p 12-13 », « (pause 12h-13h) »
+  const pauses = [];
+  t = t.replace(/\(?\b(?:pause|pse|p)\b\.?\s*:?\s*(\d{1,2}(?:[h:.]\d{0,2})?\s*-\s*\d{1,2}(?:[h:.]\d{0,2})?)\)?/g, (_, plage) => {
+    pauses.push(...lire(plage));
+    return " ";
+  });
+  const travail = lire(t);
+  if (/\d/.test(t.replace(PL_MOTIF_PLAGE, ""))) invalide = true;   // un chiffre qui n'appartient à aucune plage
+  if (!travail.length) invalide = true;
+  travail.sort((a, b) => a[0] - b[0]);
+  for (let i = 1; i < travail.length; i++) if (travail[i][0] < travail[i - 1][1]) invalide = true;   // plages qui se chevauchent
+  // on retire les pauses des plages de travail
+  let plages = travail.map((p) => [...p]);
+  for (const [pd, pf] of pauses) {
+    if (!travail.some(([d, f]) => pd >= d && pf <= f)) invalide = true;   // pause en dehors des heures de travail
+    plages = plages.flatMap(([d, f]) => (pf <= d || pd >= f ? [[d, f]] : [[d, Math.min(f, pd)], [Math.max(d, pf), f]].filter(([a, b]) => b > a)));
   }
-  if (/\d/.test(t.replace(motif, ""))) invalide = true;   // un chiffre qui n'appartient à aucune plage
-  if (!plages.length) invalide = true;
-  plages.sort((a, b) => a[0] - b[0]);
-  for (let i = 1; i < plages.length; i++) if (plages[i][0] < plages[i - 1][1]) invalide = true;   // plages qui se chevauchent
-  return { plages, repos: false, invalide };
+  return { plages, travail, pauses, repos: false, invalide };
 }
 const plMinutesTravaillees = (texte) => { const r = plLirePlages(texte); return r.invalide ? 0 : r.plages.reduce((s, [d, f]) => s + f - d, 0); };
+const plTextePlages = (plages) => plages.map(([d, f]) => `${plTexteHeure(d)}-${plTexteHeure(f)}`).join(" ");
 const plTexteNormalise = (texte) => {
   const r = plLirePlages(texte);
   if (r.invalide || r.repos) return String(texte ?? "").trim();
-  return r.plages.map(([d, f]) => `${plTexteHeure(d)}-${plTexteHeure(f)}`).join(" ");
+  return plTextePlages(r.travail) + (r.pauses.length ? ` pause ${plTextePlages(r.pauses)}` : "");
 };
 
 // ------------------------------------------------------------ semaines
@@ -3561,36 +3604,54 @@ function plCreneaux(reglages) {
     }
   });
   const rush = new Set(reglages.rush);
-  creneaux.forEach((c) => { c.rush = rush.has(c.cle); });
+  creneaux.forEach((c, i) => { c.rush = rush.has(c.cle); c.index = i; });
   return creneaux;
 }
 
-// Qui peut tenir ce créneau : présent du début à la fin, et pas d'exception ce jour-là
-function plPeutTenir(nom, creneau, presences, reglages) {
-  if (reglages.exclusions?.[nom]?.[creneau.jour]) return false;
-  const { plages, invalide } = plLirePlages(presences[nom]?.[creneau.jour]);
-  return !invalide && plages.some(([d, f]) => d <= creneau.debut && f >= creneau.fin);
+// ------------------------------------------------------------ disponibilités
+// Les plages pendant lesquelles chacun peut tenir la caisse, jour par jour (pauses retirées, exceptions appliquées)
+function plDisponibilites(presences, reglages, noms) {
+  const dispo = {};
+  for (const n of noms) {
+    dispo[n] = PL_JOURS.map((_, j) => {
+      if (reglages.exclusions?.[n]?.[j]) return [];
+      const r = plLirePlages(presences[n]?.[j]);
+      return r.invalide ? [] : r.plages;
+    });
+  }
+  return dispo;
+}
+const plCouvre = (dispo, n, jour, a, b) => (dispo[n]?.[jour] || []).some(([d, f]) => d <= a && f >= b);
+const plJusqua = (dispo, n, jour, t) => { const p = (dispo[n]?.[jour] || []).find(([d, f]) => d <= t && t < f); return p ? p[1] : null; };
+
+// Découpe un créneau là où quelqu'un arrive, part ou fait sa pause : [{debut, fin, presents}]
+function plMorceaux(c, dispo, noms) {
+  const points = new Set([c.debut, c.fin]);
+  for (const n of noms) for (const [d, f] of dispo[n][c.jour]) { if (d > c.debut && d < c.fin) points.add(d); if (f > c.debut && f < c.fin) points.add(f); }
+  const liste = [...points].sort((a, b) => a - b);
+  return liste.slice(0, -1).map((debut, i) => ({ debut, fin: liste[i + 1], presents: noms.filter((n) => plCouvre(dispo, n, c.jour, debut, liste[i + 1])) }));
 }
 
-// ------------------------------------------------------------ répartition équitable
-function plAleatoire(graine) {   // générateur reproductible (mulberry32)
-  let a = graine >>> 0;
-  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-}
-
-// Cibles : le temps de caisse à couvrir est partagé au prorata du temps où chacun PEUT la tenir.
-// Même calcul, séparément, pour les créneaux de rush.
-function plCibles(creneaux, eligibles, noms, caisses) {
+// Cibles : le temps de caisse à tenir est partagé au prorata du temps où chacun PEUT la tenir.
+// Même calcul, séparément, pour les créneaux de rush. Un créneau peut être tenu en relais (pauses).
+function plCibles(creneaux, dispo, noms, caisses) {
   const possible = {}, possibleRush = {};
   noms.forEach((n) => { possible[n] = 0; possibleRush[n] = 0; });
   let aCouvrir = 0, aCouvrirRush = 0;
-  creneaux.forEach((c) => {
-    const liste = eligibles.get(c.cle);
-    const besoin = Math.min(caisses, liste.length) * c.duree;
-    aCouvrir += besoin;
-    if (c.rush) aCouvrirRush += besoin;
-    liste.forEach((n) => { possible[n] += c.duree; if (c.rush) possibleRush[n] += c.duree; });
-  });
+  const manques = [];
+  for (const c of creneaux) {
+    for (const m of plMorceaux(c, dispo, noms)) {
+      const duree = m.fin - m.debut, besoin = Math.min(caisses, m.presents.length) * duree;
+      aCouvrir += besoin;
+      if (c.rush) aCouvrirRush += besoin;
+      m.presents.forEach((n) => { possible[n] += duree; if (c.rush) possibleRush[n] += duree; });
+      if (m.presents.length < caisses) {
+        const dernier = manques[manques.length - 1];
+        if (dernier && dernier.jour === c.jour && dernier.fin === m.debut) dernier.fin = m.fin;
+        else manques.push({ jour: c.jour, debut: m.debut, fin: m.fin, presents: m.presents.length });
+      }
+    }
+  }
   const total = Object.values(possible).reduce((a, b) => a + b, 0);
   const totalRush = Object.values(possibleRush).reduce((a, b) => a + b, 0);
   const cible = {}, cibleRush = {};
@@ -3598,95 +3659,207 @@ function plCibles(creneaux, eligibles, noms, caisses) {
     cible[n] = total ? aCouvrir * possible[n] / total : 0;
     cibleRush[n] = totalRush ? aCouvrirRush * possibleRush[n] / totalRush : 0;
   });
-  return { possible, possibleRush, cible, cibleRush, aCouvrir, aCouvrirRush };
+  return { possible, possibleRush, cible, cibleRush, aCouvrir, aCouvrirRush, manques };
 }
 
-function plGenerer(presences, reglages, noms, graine = 1) {
-  const creneaux = plCreneaux(reglages);
-  const eligibles = new Map(creneaux.map((c) => [c.cle, noms.filter((n) => plPeutTenir(n, c, presences, reglages))]));
-  const { cible, cibleRush } = plCibles(creneaux, eligibles, noms, reglages.caisses);
-  const aleatoire = plAleatoire(graine);
-  const tirage = Object.fromEntries(noms.map((n) => [n, aleatoire()]));   // départage les égalités
+// ------------------------------------------------------------ affectations
+// affectations[cle] = une liste par caisse ; chaque liste = des relais [{nom, debut, fin}] (un seul si personne ne bouge)
+// Ancien format (un simple prénom par caisse) : converti en un relais qui couvre tout le créneau.
+function plPlaces(caisse, c, nbCaisses) {
+  const brut = caisse?.affectations?.[c.cle] || [];
+  return Array.from({ length: nbCaisses }, (_, k) => {
+    const p = brut[k];
+    if (!p) return [];
+    if (typeof p === "string") return [{ nom: p, debut: c.debut, fin: c.fin }];
+    return p.filter((s) => s && s.nom && s.fin > s.debut)
+      .map((s) => ({ nom: s.nom, debut: Math.max(c.debut, s.debut), fin: Math.min(c.fin, s.fin) }))
+      .filter((s) => s.fin > s.debut).sort((a, b) => a.debut - b.debut);
+  });
+}
+const plFusionner = (relais) => relais.sort((a, b) => a.debut - b.debut).reduce((r, s) => {
+  const dernier = r[r.length - 1];
+  if (dernier && dernier.nom === s.nom && dernier.fin === s.debut) dernier.fin = s.fin; else r.push({ ...s });
+  return r;
+}, []);
+// Les trous d'une caisse (moments où personne ne la tient)
+function plTrous(relais, c) {
+  const trous = [];
+  let t = c.debut;
+  for (const s of [...relais].sort((a, b) => a.debut - b.debut)) { if (s.debut > t) trous.push([t, s.debut]); t = Math.max(t, s.fin); }
+  if (t < c.fin) trous.push([t, c.fin]);
+  return trous;
+}
 
+function plAleatoire(graine) {   // générateur reproductible (mulberry32)
+  let a = graine >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+
+// Le « répartiteur » : garde le compte du temps de chacun et choisit la personne la plus juste
+function plRepartiteur(presences, reglages, noms, graine, places) {
+  const creneaux = plCreneaux(reglages);
+  const dispo = plDisponibilites(presences, reglages, noms);
+  const cibles = plCibles(creneaux, dispo, noms, reglages.caisses);
+  const aleatoire = plAleatoire(graine);
+  const tirage = Object.fromEntries(noms.map((n) => [n, aleatoire()]));
   const temps = Object.fromEntries(noms.map((n) => [n, 0]));
   const rush = Object.fromEntries(noms.map((n) => [n, 0]));
-  const affectations = Object.fromEntries(creneaux.map((c) => [c.cle, []]));
-
-  // coût d'une personne : écart à sa cible (en heures, au carré) + rushs + créneaux enchaînés
-  const enchaines = (nom) => {
-    let n = 0;
-    creneaux.forEach((c, i) => {
-      const suivant = creneaux[i + 1];
-      if (suivant && suivant.jour === c.jour && affectations[c.cle].includes(nom) && affectations[suivant.cle].includes(nom)) n++;
-    });
-    return n;
+  // places : Map cle -> [relais par caisse]
+  const ajouter = (c, s, signe) => { if (!(s.nom in temps)) return; temps[s.nom] += signe * (s.fin - s.debut); if (c.rush) rush[s.nom] += signe * (s.fin - s.debut); };
+  creneaux.forEach((c) => places.get(c.cle).forEach((relais) => relais.forEach((s) => ajouter(c, s, 1))));
+  const estDans = (c, n) => places.get(c.cle).some((relais) => relais.some((s) => s.nom === n));
+  const enchaines = (n) => {
+    let total = 0;
+    for (let i = 0; i + 1 < creneaux.length; i++) if (creneaux[i].jour === creneaux[i + 1].jour && estDans(creneaux[i], n) && estDans(creneaux[i + 1], n)) total++;
+    return total;
   };
-  const cout = (nom) => ((temps[nom] - cible[nom]) / 60) ** 2 + 1.5 * ((rush[nom] - cibleRush[nom]) / 60) ** 2 + 0.6 * enchaines(nom);
-  const ajouter = (c, nom, signe) => { temps[nom] += signe * c.duree; if (c.rush) rush[nom] += signe * c.duree; };
+  const cout = (n) => ((temps[n] - cibles.cible[n]) / 60) ** 2 + 1.5 * ((rush[n] - cibles.cibleRush[n]) / 60) ** 2 + 0.6 * enchaines(n);
+  // n est-il déjà sur une AUTRE caisse entre a et b ?
+  const occupe = (c, k, n, a, b) => places.get(c.cle).some((relais, i) => i !== k && relais.some((s) => s.nom === n && s.debut < b && s.fin > a));
 
-  // 1) première répartition : les créneaux où peu de monde est disponible d'abord
-  const ordre = [...creneaux].sort((a, b) => eligibles.get(a.cle).length - eligibles.get(b.cle).length || (b.rush - a.rush) || aleatoire() - 0.5);
-  for (const c of ordre) {
-    const candidats = [...eligibles.get(c.cle)];
-    for (let place = 0; place < Math.min(reglages.caisses, candidats.length); place++) {
+  // Tient la caisse k du créneau c entre de et a : une seule personne si possible, sinon des relais
+  function remplir(c, k, de, a) {
+    const relais = places.get(c.cle)[k];
+    let t = de;
+    while (t < a) {
+      const candidats = [];
+      for (const n of noms) {
+        const jusqua = plJusqua(dispo, n, c.jour, t);
+        if (jusqua === null) continue;
+        let fin = Math.min(a, jusqua);
+        for (const autre of places.get(c.cle)) if (autre !== relais) for (const s of autre) if (s.nom === n && s.fin > t && s.debut < fin) fin = s.debut <= t ? t : Math.min(fin, s.debut);
+        if (fin > t) candidats.push({ n, fin });
+      }
+      if (!candidats.length) {
+        // personne : on laisse un trou jusqu'à la prochaine arrivée
+        const prochaine = noms.flatMap((n) => dispo[n][c.jour].map(([d]) => d)).filter((d) => d > t && d < a).sort((x, y) => x - y)[0];
+        t = prochaine ?? a;
+        continue;
+      }
+      const plusLoin = Math.max(...candidats.map((x) => x.fin));
+      const pool = candidats.filter((x) => x.fin === plusLoin);   // ceux qui peuvent tenir le plus longtemps
       let meilleur = null, meilleurGain = Infinity;
-      for (const nom of candidats) {
-        if (affectations[c.cle].includes(nom)) continue;
-        const avant = cout(nom);
-        ajouter(c, nom, 1); affectations[c.cle].push(nom);
-        const gain = cout(nom) - avant;
-        ajouter(c, nom, -1); affectations[c.cle].pop();
-        if (gain < meilleurGain - 1e-9 || (Math.abs(gain - meilleurGain) <= 1e-9 && tirage[nom] < tirage[meilleur])) { meilleur = nom; meilleurGain = gain; }
+      for (const { n } of pool) {
+        const s = { nom: n, debut: t, fin: plusLoin };
+        const avant = cout(n);
+        relais.push(s); ajouter(c, s, 1);
+        const gain = cout(n) - avant;
+        relais.pop(); ajouter(c, s, -1);
+        if (gain < meilleurGain - 1e-9 || (Math.abs(gain - meilleurGain) <= 1e-9 && tirage[n] < tirage[meilleur])) { meilleur = n; meilleurGain = gain; }
       }
-      ajouter(c, meilleur, 1); affectations[c.cle].push(meilleur);
+      const s = { nom: meilleur, debut: t, fin: plusLoin };
+      relais.push(s); ajouter(c, s, 1);
+      t = plusLoin;
     }
+    places.get(c.cle)[k] = plFusionner(relais);
   }
 
-  // 2) améliorations : on échange une personne contre une autre tant que c'est plus équitable
-  for (let tour = 0; tour < 60; tour++) {
-    let ameliore = false;
-    for (const c of creneaux) {
-      for (const a of [...affectations[c.cle]]) {
-        for (const b of eligibles.get(c.cle)) {
-          if (affectations[c.cle].includes(b)) continue;
-          const avant = cout(a) + cout(b);
-          const i = affectations[c.cle].indexOf(a);
-          affectations[c.cle][i] = b; ajouter(c, a, -1); ajouter(c, b, 1);
-          if (cout(a) + cout(b) < avant - 1e-6) { ameliore = true; break; }
-          affectations[c.cle][i] = a; ajouter(c, b, -1); ajouter(c, a, 1);
-        }
-        if (!affectations[c.cle].includes(a)) break;
+  // Améliorations : on remplace une personne par une autre tant que c'est plus équitable
+  function ameliorer(tours = 60) {
+    for (let tour = 0; tour < tours; tour++) {
+      let mieux = false;
+      for (const c of creneaux) {
+        places.get(c.cle).forEach((relais, k) => {
+          relais.forEach((s) => {
+            for (const b of noms) {
+              if (b === s.nom || !plCouvre(dispo, b, c.jour, s.debut, s.fin) || occupe(c, k, b, s.debut, s.fin)) continue;
+              const a = s.nom, avant = cout(a) + cout(b);
+              ajouter(c, s, -1); s.nom = b; ajouter(c, s, 1);
+              if (cout(a) + cout(b) < avant - 1e-6) { mieux = true; break; }
+              ajouter(c, s, -1); s.nom = a; ajouter(c, s, 1);
+            }
+          });
+          places.get(c.cle)[k] = plFusionner(relais);
+        });
       }
+      if (!mieux) break;
     }
-    if (!ameliore) break;
   }
-  // ordre d'affichage stable dans chaque créneau
-  Object.values(affectations).forEach((l) => l.sort((x, y) => noms.indexOf(x) - noms.indexOf(y)));
-  return { affectations, graine, cree_le: new Date().toISOString(), reglages: { caisses: reglages.caisses, creneau: reglages.creneau } };
+  return { creneaux, dispo, cibles, remplir, ameliorer, temps };
 }
 
-// Bilan d'un planning de caisse (généré ou retouché à la main)
+const plVersCaisse = (places, creneaux, graine) => ({
+  version: 2, graine, cree_le: new Date().toISOString(),
+  affectations: Object.fromEntries(creneaux.map((c) => [c.cle, places.get(c.cle).map((r) => r.map(({ nom, debut, fin }) => ({ nom, debut, fin })))])),
+});
+
+// Planning complet, optimisé
+function plGenerer(presences, reglages, noms, graine = 1) {
+  const creneaux = plCreneaux(reglages);
+  const places = new Map(creneaux.map((c) => [c.cle, Array.from({ length: reglages.caisses }, () => [])]));
+  const r = plRepartiteur(presences, reglages, noms, graine, places);
+  const aleatoire = plAleatoire(graine + 7);
+  // les créneaux où peu de monde peut tenir toute la durée passent d'abord
+  const entiers = (c) => noms.filter((n) => plCouvre(r.dispo, n, c.jour, c.debut, c.fin)).length;
+  const ordre = [...creneaux].sort((a, b) => entiers(a) - entiers(b) || (b.rush - a.rush) || aleatoire() - 0.5);
+  for (const c of ordre) for (let k = 0; k < reglages.caisses; k++) r.remplir(c, k, c.debut, c.fin);
+  r.ameliorer();
+  return plVersCaisse(places, creneaux, graine);
+}
+
+// Mise à jour automatique : garde tout ce qui est encore possible (y compris tes retouches),
+// coupe ce qui tombe sur une pause ou une absence, et complète les trous de la façon la plus juste.
+function plMettreAJour(caisse, presences, reglages, noms) {
+  const creneaux = plCreneaux(reglages);
+  const dispo = plDisponibilites(presences, reglages, noms);
+  const places = new Map();
+  for (const c of creneaux) {
+    const gardees = [];
+    for (const relais of plPlaces(caisse, c, reglages.caisses)) {
+      const garde = [];
+      for (const s of relais) {
+        if (!noms.includes(s.nom)) continue;
+        // la partie du relais pendant laquelle la personne est encore là
+        for (const [d, f] of dispo[s.nom][c.jour]) {
+          const debut = Math.max(d, s.debut), fin = Math.min(f, s.fin);
+          if (fin <= debut) continue;
+          const doublon = gardees.some((r) => r.some((x) => x.nom === s.nom && x.debut < fin && x.fin > debut));
+          if (!doublon) garde.push({ nom: s.nom, debut, fin });
+        }
+      }
+      gardees.push(plFusionner(garde));
+    }
+    places.set(c.cle, gardees);
+  }
+  const avant = JSON.stringify(Object.fromEntries(creneaux.map((c) => [c.cle, plPlaces(caisse, c, reglages.caisses)])));
+  const r = plRepartiteur(presences, reglages, noms, caisse?.graine || 1, places);
+  for (const c of creneaux) {
+    places.get(c.cle).forEach((relais, k) => { for (const [a, b] of plTrous(relais, c)) r.remplir(c, k, a, b); });
+  }
+  const nouvelle = { ...plVersCaisse(places, creneaux, caisse?.graine || 1), cree_le: caisse?.cree_le || new Date().toISOString() };
+  const ancien = JSON.parse(avant);
+  const changes = creneaux.filter((c) => JSON.stringify(ancien[c.cle]) !== JSON.stringify(nouvelle.affectations[c.cle])).map((c) => c.cle);
+  return { caisse: nouvelle, changes };
+}
+
+// Bilan d'un planning de caisse (généré, mis à jour ou retouché à la main)
 function plBilan(presences, reglages, noms, caisse) {
   const creneaux = plCreneaux(reglages);
-  const eligibles = new Map(creneaux.map((c) => [c.cle, noms.filter((n) => plPeutTenir(n, c, presences, reglages))]));
-  const cibles = plCibles(creneaux, eligibles, noms, reglages.caisses);
-  const affectations = caisse?.affectations || {};
-  const parNom = Object.fromEntries(noms.map((n) => [n, { temps: 0, rush: 0, creneaux: 0, presence: 0 }]));
+  const dispo = plDisponibilites(presences, reglages, noms);
+  const cibles = plCibles(creneaux, dispo, noms, reglages.caisses);
+  const parNom = Object.fromEntries(noms.map((n) => [n, { temps: 0, rush: 0, creneaux: 0, relais: 0, presence: 0 }]));
   noms.forEach((n) => { parNom[n].presence = (presences[n] || []).reduce((s, t) => s + plMinutesTravaillees(t), 0); });
-  let couvert = 0, manques = [], hors = [];
-  creneaux.forEach((c) => {
-    const places = (affectations[c.cle] || []).filter(Boolean);
-    const besoin = Math.min(reglages.caisses, eligibles.get(c.cle).length);
-    places.forEach((n) => {
-      if (!parNom[n]) return;
-      parNom[n].temps += c.duree; parNom[n].creneaux++;
-      if (c.rush) parNom[n].rush += c.duree;
-      if (!eligibles.get(c.cle).includes(n)) hors.push({ c, nom: n });
+  let couvert = 0;
+  const hors = [], trous = [];
+  const places = new Map();
+  for (const c of creneaux) {
+    const p = plPlaces(caisse, c, reglages.caisses);
+    places.set(c.cle, p);
+    const vus = new Set();
+    p.forEach((relais, k) => {
+      relais.forEach((s) => {
+        couvert += s.fin - s.debut;
+        if (!parNom[s.nom]) return;
+        parNom[s.nom].temps += s.fin - s.debut;
+        if (c.rush) parNom[s.nom].rush += s.fin - s.debut;
+        if (!vus.has(s.nom)) { parNom[s.nom].creneaux++; vus.add(s.nom); }
+        if (relais.length > 1) parNom[s.nom].relais++;
+        if (!plCouvre(dispo, s.nom, c.jour, s.debut, s.fin)) hors.push({ c, s });
+      });
+      if (caisse) for (const [a, b] of plTrous(relais, c)) trous.push({ c, k, debut: a, fin: b });
     });
-    couvert += Math.min(places.length, reglages.caisses) * c.duree;
-    if (eligibles.get(c.cle).length < reglages.caisses) manques.push(c);
-  });
-  return { creneaux, eligibles, cibles, parNom, couvert, manques, hors };
+  }
+  return { creneaux, dispo, cibles, parNom, couvert, manques: cibles.manques, hors, trous, places };
 }
 
 // ------------------------------------------------------------ page
@@ -3722,7 +3895,7 @@ async function plAbandonnerModifs() {
 async function plCharger(semaine) {
   const r = await api().planning_lire(semaine);
   if (r.erreur) return notifier(r.erreur, true);
-  PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1 };
+  PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1, signatureCaisse: null, changements: new Set() };
   $("#pl-date").value = plIso(plLundi(semaine));
   const lundi = plLundi(semaine), dimanche = plDateJour(semaine, 6);
   $("#pl-titre-semaine").textContent = `Semaine ${Number(semaine.split("-S")[1])}`;
@@ -3744,8 +3917,8 @@ function plAfficher() {
   $$(".pl-outils").forEach((g) => (g.hidden = g.dataset.pour !== vue));
   $("#pl-enregistrer").closest(".groupe").hidden = vue === "reglages";
   $("#pl-info").innerHTML = {
-    presences: "Écris les horaires comme <strong>9h-12h 14h-19h</strong>.<br>Tu peux aussi coller directement un tableau Excel dans la grille.",
-    caisse: "Choisis une personne dans une case pour retoucher le planning.<br>L'équité se recalcule tout de suite.",
+    presences: "Écris <strong>9h-19h pause 12h-13h</strong> ou <strong>9h-12h 14h-19h</strong>.<br>Tu peux aussi coller directement un tableau Excel dans la grille.",
+    caisse: "Se met à jour tout seul quand les présences changent.<br>Choisis un nom dans une case pour retoucher.",
     reglages: "Réglages communs à toute l'équipe.<br>Ils s'appliquent aux prochains plannings créés.",
   }[vue];
   if (vue === "presences") plAfficherPresences();
@@ -3923,45 +4096,97 @@ function plCollerDansGrille(e) {
 }
 
 // ------------------------------------------------------------ vue Caisse
-function plAfficherCaisse() {
+// Empreinte de ce dont dépend le planning de caisse : s'il change, le planning se met à jour tout seul
+function plSignature(noms) {
+  const { caisses, creneau, horaires, rush, exclusions } = PL.reglages;
+  return JSON.stringify({ n: noms, p: noms.map((n) => (PL.presences[n] || []).map((t) => plTextePlages(plLirePlages(t).plages))), caisses, creneau, horaires, rush, exclusions });
+}
+const plPresencesPretes = (noms) => noms.some((n) => (PL.presences[n] || []).some((t) => plMinutesTravaillees(t) > 0));
+const plIllisibles = (noms) => noms.filter((n) => (PL.presences[n] || []).some((t) => plLirePlages(t).invalide));
+
+// Crée ou met à jour le planning de caisse d'après les présences et les réglages. Renvoie un message (ou "").
+function plSynchroniserCaisse() {
   plLirePresencesDeLaGrille();
+  const noms = plNoms();
+  if (!plPresencesPretes(noms) || plIllisibles(noms).length) return "";
+  const signature = plSignature(noms);
+  if (signature === PL.signatureCaisse) return "";
+  PL.signatureCaisse = signature;
+  if (!PL.caisse) {
+    PL.caisse = plGenerer(PL.presences, PL.reglages, noms, PL.graine || 1);
+    PL.changements = new Set();
+    plMarquer();
+    return "Planning de caisse créé automatiquement d'après les présences.";
+  }
+  const { caisse, changes } = plMettreAJour(PL.caisse, PL.presences, PL.reglages, noms);
+  if (!changes.length) return "";
+  PL.caisse = caisse;
+  PL.changements = new Set(changes);
+  plMarquer();
+  return `Planning de caisse mis à jour d'après les présences : ${changes.length} créneau${changes.length > 1 ? "x" : ""} ajusté${changes.length > 1 ? "s" : ""}.`;
+}
+
+// Le créneau en cours, si la semaine affichée est celle d'aujourd'hui
+function plMaintenant() {
+  if (!ETAT || PL.semaine !== plSemaineDe(ETAT.aujourd_hui)) return null;
+  const d = new Date();
+  return { jour: (d.getDay() + 6) % 7, minute: d.getHours() * 60 + d.getMinutes() };
+}
+
+function plAfficherCaisse() {
+  const message = plSynchroniserCaisse();
+  if (message) notifier(message);
   const noms = plNoms(), reglages = PL.reglages;
   const bilan = plBilan(PL.presences, reglages, noms, PL.caisse);
-  const { creneaux, eligibles, cibles, parNom } = bilan;
-  const aucunePresence = !noms.some((n) => parNom[n].presence > 0);
+  const { creneaux, dispo, cibles, parNom, places } = bilan;
+  const illisibles = plIllisibles(noms);
+  const maintenant = plMaintenant();
   $("#pl-titre-caisse").textContent = `Planning de caisse · ${PL.libelle}`;
-  $("#pl-explication-caisse").innerHTML = aucunePresence
-    ? "Remplis d'abord les <strong>présences</strong> de la semaine, puis clique sur « Créer le planning de caisse »."
-    : PL.caisse
-      ? `${reglages.caisses} personne${reglages.caisses > 1 ? "s" : ""} en caisse, par créneaux de ${texteHeures(reglages.creneau)}. Choisis un nom dans une case pour retoucher : l'équité se recalcule.`
-      : "Les présences sont prêtes : clique sur <strong>Créer le planning de caisse</strong> dans le ruban.";
+  $("#pl-explication-caisse").innerHTML = !plPresencesPretes(noms)
+    ? "Remplis les <strong>présences</strong> de la semaine : le planning de caisse se crée tout seul."
+    : `${reglages.caisses} personne${reglages.caisses > 1 ? "s" : ""} en caisse, par créneaux de ${texteHeures(reglages.creneau)}.
+       Il <strong>se met à jour tout seul</strong> quand une présence ou une pause change ; tes retouches sont gardées tant qu'elles restent possibles.
+       Pendant une pause, la caisse passe en <strong>relais</strong> à quelqu'un d'autre.`;
 
   // grille : une colonne par jour ouvert, une ligne par créneau
   const jours = [...new Set(creneaux.map((c) => c.jour))];
   const lignes = Math.max(0, ...jours.map((j) => creneaux.filter((c) => c.jour === j).length));
-  $("#pl-entete-caisse").innerHTML = `<tr>${jours.map((j) => `<th>${PL_JOURS[j]} <span class="doux">${plTexteDate(plDateJour(PL.semaine, j))}</span></th>`).join("")}</tr>`;
-  const affectations = PL.caisse?.affectations || {};
+  $("#pl-entete-caisse").innerHTML = `<tr>${jours.map((j) => `<th class="${maintenant?.jour === j ? "pl-aujourdhui" : ""}">${PL_JOURS[j]} <span class="doux">${plTexteDate(plDateJour(PL.semaine, j))}</span></th>`).join("")}</tr>`;
+  const options = (liste, choisi) => `<option value="">${liste.length ? "— personne —" : "— personne de dispo —"}</option>` +
+    [...liste, ...(choisi && !liste.includes(choisi) ? [choisi] : [])].map((n) =>
+      `<option value="${echapper(n)}" ${n === choisi ? "selected" : ""}>${echapper(n)}${liste.includes(n) ? "" : " (absent)"}</option>`).join("");
+  const select = (c, k, debut, fin, choisi, liste) => {
+    const hors = choisi && !liste.includes(choisi);
+    return `<select class="pl-choix ${hors ? "pl-hors" : ""} ${choisi ? "" : "pl-libre"}" data-cle="${c.cle}" data-place="${k}" data-debut="${debut}" data-fin="${fin}"
+      ${PL.caisse ? "" : "disabled"} ${choisi ? `style="--teinte:${couleur(choisi)}"` : ""}
+      title="${hors ? `${echapper(choisi)} n'est pas disponible à ce moment-là` : ""}">${options(liste, choisi)}</select>`;
+  };
+  const peuvent = (c, a, b) => noms.filter((n) => plCouvre(dispo, n, c.jour, a, b));
+
   let corps = "";
   for (let i = 0; i < lignes; i++) {
     corps += "<tr>" + jours.map((j) => {
       const c = creneaux.filter((x) => x.jour === j)[i];
       if (!c) return "<td class=\"pl-vide\"></td>";
-      const liste = eligibles.get(c.cle);
-      const places = affectations[c.cle] || [];
-      const manque = liste.length < reglages.caisses;
-      const selects = Array.from({ length: reglages.caisses }, (_, k) => {
-        const choisi = places[k] || "";
-        const hors = choisi && !liste.includes(choisi);
-        const options = [...liste, ...(hors ? [choisi] : [])];
-        return `<select class="pl-choix ${hors ? "pl-hors" : ""} ${choisi ? "" : "pl-libre"}" data-cle="${c.cle}" data-place="${k}" ${PL.caisse ? "" : "disabled"}
-          ${choisi ? `style="--teinte:${couleur(choisi)}"` : ""} title="${hors ? `${echapper(choisi)} n'est pas disponible sur ce créneau` : ""}">
-          <option value="">${liste.length ? "— personne —" : "— personne de dispo —"}</option>
-          ${options.map((n) => `<option value="${echapper(n)}" ${n === choisi ? "selected" : ""}>${echapper(n)}${!liste.includes(n) ? " (absent)" : ""}</option>`).join("")}</select>`;
+      const entiers = peuvent(c, c.debut, c.fin);
+      const manque = bilan.manques.some((m) => m.jour === c.jour && m.debut < c.fin && m.fin > c.debut);
+      const enCours = maintenant && maintenant.jour === c.jour && maintenant.minute >= c.debut && maintenant.minute < c.fin;
+      const caissesHtml = places.get(c.cle).map((relais, k) => {
+        const unSeul = relais.length === 1 && relais[0].debut === c.debut && relais[0].fin === c.fin;
+        if (unSeul || (!relais.length && (entiers.length || !PL.caisse))) {
+          return select(c, k, c.debut, c.fin, relais[0]?.nom || "", entiers);
+        }
+        // relais : une ligne par personne, et une par moment non couvert
+        const morceaux = [...relais.map((s) => ({ ...s })), ...plTrous(relais, c).map(([debut, fin]) => ({ nom: "", debut, fin }))].sort((a, b) => a.debut - b.debut);
+        return `<div class="pl-relais">${morceaux.map((s) => {
+          const actuel = enCours && maintenant.minute >= s.debut && maintenant.minute < s.fin;
+          return `<div class="pl-relais-ligne ${actuel ? "pl-actuel" : ""}"><span class="pl-relais-heure">${plTexteHeure(s.debut)}–${plTexteHeure(s.fin)}</span>${select(c, k, s.debut, s.fin, s.nom, peuvent(c, s.debut, s.fin))}</div>`;
+        }).join("")}</div>`;
       }).join("");
-      const dispo = `${liste.length} personne${liste.length > 1 ? "s" : ""} disponible${liste.length > 1 ? "s" : ""}${liste.length ? ` : ${liste.join(", ")}` : ""}`;
-      return `<td class="pl-creneau ${c.rush ? "pl-rush" : ""} ${manque ? "pl-manque" : ""}" title="${echapper(dispo)}">
-        <div class="pl-heure"><strong>${plTexteHeure(c.debut)} – ${plTexteHeure(c.fin)}</strong>${c.rush ? '<span class="pl-badge-rush">Rush</span>' : ""}
-          <span class="pl-dispo">${liste.length}<span class="icone-personne"></span></span></div>${selects}</td>`;
+      const titre = `${entiers.length} personne${entiers.length > 1 ? "s" : ""} présente${entiers.length > 1 ? "s" : ""} sur tout le créneau${entiers.length ? ` : ${entiers.join(", ")}` : ""}`;
+      return `<td class="pl-creneau ${c.rush ? "pl-rush" : ""} ${manque ? "pl-manque" : ""} ${PL.changements?.has(c.cle) ? "pl-change" : ""} ${enCours ? "pl-maintenant" : ""}" title="${echapper(titre)}">
+        <div class="pl-heure"><strong>${plTexteHeure(c.debut)} – ${plTexteHeure(c.fin)}</strong>${c.rush ? '<span class="pl-badge-rush">Rush</span>' : ""}${enCours ? '<span class="pl-badge-maintenant">Maintenant</span>' : ""}
+          <span class="pl-dispo">${entiers.length}</span></div>${caissesHtml}</td>`;
     }).join("") + "</tr>";
   }
   $("#pl-lignes-caisse").innerHTML = corps || `<tr class="vide-ligne"><td>Aucun jour d'ouverture : vérifie les horaires dans Réglages.</td></tr>`;
@@ -3969,21 +4194,22 @@ function plAfficherCaisse() {
   // chiffres
   const enCaisse = noms.filter((n) => cibles.possible[n] > 0);
   const ecartMax = PL.caisse && enCaisse.length ? Math.max(...enCaisse.map((n) => Math.abs(parNom[n].temps - cibles.cible[n]))) : null;
+  const relaisTotal = [...places.values()].reduce((s, p) => s + p.filter((r) => r.length > 1).length, 0);
   $("#pl-chiffres").innerHTML = `
     <div class="chiffre"><span class="etiquette">Temps de caisse à tenir</span><strong>${plDuree(creneaux.reduce((s, c) => s + c.duree * reglages.caisses, 0))}</strong><span class="comparaison">${creneaux.length} créneaux × ${reglages.caisses} pers.</span></div>
-    <div class="chiffre"><span class="etiquette">Couvert</span><strong>${PL.caisse ? plDuree(bilan.couvert) : "—"}</strong><span class="comparaison">${bilan.manques.length ? `${bilan.manques.length} créneau${bilan.manques.length > 1 ? "x" : ""} sans assez de monde` : "tous les créneaux ont du monde"}</span></div>
-    <div class="chiffre"><span class="etiquette">Plus grand écart à la cible</span><strong>${ecartMax === null ? "—" : plDuree(Math.round(ecartMax))}</strong><span class="comparaison">${ecartMax === null ? "" : ecartMax <= reglages.creneau * 30 ? "réparti équitablement" : "écart dû aux présences"}</span></div>
-    <div class="chiffre"><span class="etiquette">En caisse cette semaine</span><strong>${PL.caisse ? noms.filter((n) => parNom[n].temps).length : "—"}</strong><span class="comparaison">sur ${enCaisse.length} disponible${enCaisse.length > 1 ? "s" : ""}</span></div>`;
+    <div class="chiffre"><span class="etiquette">Couvert</span><strong>${PL.caisse ? plDuree(bilan.couvert) : "—"}</strong><span class="comparaison">${bilan.manques.length ? `${bilan.manques.length} moment${bilan.manques.length > 1 ? "s" : ""} sans assez de monde` : "tous les créneaux ont du monde"}</span></div>
+    <div class="chiffre"><span class="etiquette">Plus grand écart à la cible</span><strong>${ecartMax === null ? "—" : plDuree(Math.round(ecartMax))}</strong><span class="comparaison">${ecartMax === null ? "" : ecartMax <= reglages.creneau * 30 ? "réparti équitablement" : "clique sur Optimiser pour rééquilibrer"}</span></div>
+    <div class="chiffre"><span class="etiquette">Relais pendant les pauses</span><strong>${PL.caisse ? relaisTotal : "—"}</strong><span class="comparaison">créneau${relaisTotal > 1 ? "x" : ""} tenu${relaisTotal > 1 ? "s" : ""} à plusieurs</span></div>`;
 
   // alertes
   const alertes = [];
+  if (illisibles.length) alertes.push(`<strong>Horaire illisible</strong> pour ${illisibles.join(", ")} : corrige-le dans Présences pour que le planning de caisse se mette à jour.`);
   if (bilan.manques.length) {
     alertes.push(`<strong>Pas assez de monde présent</strong> pour tenir ${reglages.caisses > 1 ? `${reglages.caisses} caisses` : "la caisse"} : ` +
-      bilan.manques.slice(0, 8).map((c) => `${PL_JOURS_COURTS[c.jour]} ${plTexteHeure(c.debut)}-${plTexteHeure(c.fin)}`).join(", ") + (bilan.manques.length > 8 ? "…" : "") +
-      ". Seules les personnes présentes du début à la fin du créneau sont proposées.");
+      bilan.manques.slice(0, 8).map((m) => `${PL_JOURS_COURTS[m.jour]} ${plTexteHeure(m.debut)}-${plTexteHeure(m.fin)}`).join(", ") + (bilan.manques.length > 8 ? "…" : "") + ".");
   }
   if (bilan.hors.length) {
-    alertes.push(`<strong>Planning à revoir :</strong> ${[...new Set(bilan.hors.map((h) => h.nom))].join(", ")} ${bilan.hors.length > 1 ? "sont placés" : "est placé"} sur un créneau où ${bilan.hors.length > 1 ? "ils ne sont" : "il n'est"} plus disponible (présences ou exceptions modifiées). Clique sur « Créer le planning de caisse » pour tout refaire.`);
+    alertes.push(`<strong>À revoir :</strong> ${[...new Set(bilan.hors.map((h) => h.s.nom))].join(", ")} ${bilan.hors.length > 1 ? "sont placés" : "est placé"} à un moment où ${bilan.hors.length > 1 ? "ils ne sont" : "il n'est"} pas disponible.`);
   }
   $("#pl-alertes").innerHTML = alertes.map((a) => `<p class="attente pl-alerte">${a}</p>`).join("");
 
@@ -4004,43 +4230,246 @@ function plAfficherCaisse() {
       <td class="nombre">${PL.caisse ? p.creneaux : "—"}</td></tr>`;
   }).join("") : `<tr class="vide-ligne"><td colspan="9">Aucune présence saisie pour cette semaine.</td></tr>`;
 
-  $("#pl-generer").innerHTML = `<span class="icone" data-icone="generer"></span>${PL.caisse ? "Refaire le planning de caisse" : "Créer le planning de caisse"}`;
+  $("#pl-generer").innerHTML = `<span class="icone" data-icone="generer"></span>${PL.caisse ? "Optimiser toute la semaine" : "Créer le planning de caisse"}`;
   dessinerIcones($("#pl-generer").parentElement);
   $("#pl-autre").disabled = !PL.caisse;
-  $("#pl-imprimer").disabled = !PL.caisse;
 }
 
 async function plCreerCaisse(autre = false) {
   plLirePresencesDeLaGrille();
   const noms = plNoms();
-  if (!noms.some((n) => (PL.presences[n] || []).some((t) => plMinutesTravaillees(t) > 0))) {
-    return notifier("Remplis d'abord les présences de la semaine.", true);
-  }
-  const invalides = noms.filter((n) => (PL.presences[n] || []).some((t) => plLirePlages(t).invalide));
-  if (invalides.length) return notifier(`Horaire illisible pour ${invalides.join(", ")} : corrige-le dans Présences.`, true);
-  if (PL.caisse && !autre) {
-    const { ok } = await demander({ titre: "Refaire le planning de caisse ?", bouton: "Refaire",
-      texte: "Le planning de caisse actuel, avec tes retouches à la main, sera remplacé par une nouvelle répartition." });
+  if (!plPresencesPretes(noms)) return notifier("Remplis d'abord les présences de la semaine.", true);
+  const illisibles = plIllisibles(noms);
+  if (illisibles.length) return notifier(`Horaire illisible pour ${illisibles.join(", ")} : corrige-le dans Présences.`, true);
+  if (PL.caisse && !autre && PL.caisse.retouche) {
+    const { ok } = await demander({ titre: "Optimiser toute la semaine ?", bouton: "Optimiser",
+      texte: "Toute la semaine est répartie de nouveau, de la façon la plus équitable : tes retouches à la main seront remplacées." });
     if (!ok) return;
   }
   PL.graine = autre ? (PL.graine || 1) + 1 : 1;
   PL.caisse = plGenerer(PL.presences, PL.reglages, noms, PL.graine);
+  PL.signatureCaisse = plSignature(noms);
+  PL.changements = new Set();
   plMarquer();
   plAfficherCaisse();
-  notifier(autre ? "Nouvelle proposition, tout aussi équitable." : "Planning de caisse créé. Pense à l'enregistrer.");
+  notifier(autre ? "Nouvelle proposition, tout aussi équitable." : "Toute la semaine a été répartie de nouveau. Pense à enregistrer.");
 }
 
+// Retouche à la main : la personne choisie prend la caisse k du créneau entre debut et fin
 function plChangerChoix(select) {
-  const { cle, place } = select.dataset;
-  const liste = [...(PL.caisse.affectations[cle] || [])];
+  const { cle } = select.dataset;
+  const k = Number(select.dataset.place), debut = Number(select.dataset.debut), fin = Number(select.dataset.fin);
+  const c = plCreneaux(PL.reglages).find((x) => x.cle === cle);
+  if (!c) return;
+  const places = plPlaces(PL.caisse, c, PL.reglages.caisses);
+  const couper = (relais) => relais.flatMap((s) => (s.fin <= debut || s.debut >= fin ? [s]
+    : [{ ...s, fin: debut }, { ...s, debut: fin }].filter((x) => x.fin > x.debut)));
+  const ancien = places[k].find((s) => s.debut < fin && s.fin > debut)?.nom || "";
   const nom = select.value;
-  const ailleurs = liste.indexOf(nom);
-  if (nom && ailleurs >= 0 && ailleurs !== Number(place)) liste[ailleurs] = liste[place] || "";   // échange les deux places
-  liste[place] = nom;
-  PL.caisse.affectations[cle] = liste;
+  places[k] = couper(places[k]);
+  if (nom) {
+    // si la personne tenait déjà une autre caisse à ce moment-là, on échange
+    places.forEach((relais, i) => {
+      if (i === k || !relais.some((s) => s.nom === nom && s.debut < fin && s.fin > debut)) return;
+      places[i] = couper(relais);
+      if (ancien) places[i].push({ nom: ancien, debut, fin });
+    });
+    places[k].push({ nom, debut, fin });
+  }
+  PL.caisse.affectations[cle] = places.map(plFusionner);
   PL.caisse.retouche = true;
+  PL.changements = new Set();
   plMarquer();
   plAfficherCaisse();
+}
+
+// ------------------------------------------------------------ export PDF (A4 paysage)
+const PL_JSPDF = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+const PL_AUTOTABLE = "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js";
+function plChargerScript(src) {
+  return new Promise((ok, ko) => {
+    const s = document.createElement("script");
+    s.src = src; s.onload = ok; s.onerror = () => ko(new Error(src));
+    document.head.appendChild(s);
+  });
+}
+async function plJsPdf() {
+  if (!window.jspdf?.jsPDF) await plChargerScript(PL_JSPDF);
+  if (!window.jspdf.jsPDF.API.autoTable) await plChargerScript(PL_AUTOTABLE);
+  return window.jspdf.jsPDF;
+}
+const plRvb = (hexa) => [1, 3, 5].map((i) => parseInt(String(hexa).slice(i, i + 2), 16) || 0);
+function plImage(source) {
+  return new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = source; });
+}
+
+async function plExporterPdf() {
+  plLirePresencesDeLaGrille();
+  const noms = plNoms();
+  const message = plSynchroniserCaisse();
+  if (message) notifier(message);
+  if (!plPresencesPretes(noms)) return notifier("Remplis d'abord les présences de la semaine.", true);
+  const boutons = $$(".pl-pdf");
+  boutons.forEach((b) => (b.disabled = true));
+  let jsPDF;
+  try { jsPDF = await plJsPdf(); }
+  catch (e) {
+    boutons.forEach((b) => (b.disabled = false));
+    return notifier("Impossible de charger l'outil PDF (connexion internet ?). Réessaie dans un instant.", true);
+  }
+  try {
+    const reglages = PL.reglages;
+    const bilan = plBilan(PL.presences, reglages, noms, PL.caisse);
+    const { creneaux, parNom, places } = bilan;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const L = 297, H = 210, M = 12;
+    const accent = plRvb(ETAT?.reglages?.couleur || "#040037");
+    const gris = [96, 94, 92], noir = [32, 31, 30], trait = [225, 223, 221];
+    const ambre = [255, 241, 207], ambreFonce = [158, 102, 0], rouge = [164, 38, 44];
+    const numero = Number(PL.semaine.split("-S")[1]), annee = PL.semaine.split("-S")[0];
+    const lundi = plDateJour(PL.semaine, 0), dimanche = plDateJour(PL.semaine, 6);
+    const moisLong = (d) => d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
+    const periode = `du lundi ${moisLong(lundi)} au dimanche ${moisLong(dimanche)} ${dimanche.getUTCFullYear()}`;
+    const logo = ETAT?.logos?.complet ? await plImage(ETAT.logos.complet) : null;
+
+    const entete = (titre, sousTitre) => {
+      doc.setFillColor(...accent); doc.rect(0, 0, L, 3, "F");
+      doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(...noir);
+      doc.text(titre, M, 16);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); doc.setTextColor(...gris);
+      doc.text(sousTitre, M, 22.5);
+      if (logo) {
+        const h = 11, w = Math.min(46, h * logo.width / logo.height);
+        doc.addImage(logo, "PNG", L - M - w, 8.5, w, w * logo.height / logo.width);
+      }
+      doc.setDrawColor(...trait); doc.setLineWidth(0.3); doc.line(M, 26.5, L - M, 26.5);
+    };
+    const pastillePdf = (nom, x, y) => {
+      const [r, v, b] = plRvb(couleur(nom));
+      doc.setDrawColor(r, v, b); doc.setFillColor(r, v, b); doc.setLineWidth(0.45);
+      doc.circle(x, y, 1.15, secondaire(nom) ? "S" : "F");
+    };
+
+    // ---- page 1 : planning de caisse
+    entete(`Planning de caisse · semaine ${numero}`, `${periode} · ${reglages.caisses} personne${reglages.caisses > 1 ? "s" : ""} en caisse, créneaux de ${texteHeures(reglages.creneau)}`);
+    const jours = [...new Set(creneaux.map((c) => c.jour))];
+    const nbLignes = Math.max(0, ...jours.map((j) => creneaux.filter((c) => c.jour === j).length));
+    const contenu = [];   // pour chaque case : { c, lignes: [{type, texte, nom, debut, fin}] }
+    const corps = [];
+    for (let i = 0; i < nbLignes; i++) {
+      corps.push(jours.map((j) => {
+        const c = creneaux.filter((x) => x.jour === j)[i];
+        if (!c) { contenu.push(null); return { content: "", _id: contenu.length - 1 }; }
+        const lignes = [{ type: "heure" }];
+        places.get(c.cle).forEach((relais, k) => {
+          if (reglages.caisses > 1 && k > 0) lignes.push({ type: "separateur" });
+          const morceaux = [...relais.map((s) => ({ ...s })), ...plTrous(relais, c).map(([debut, fin]) => ({ nom: "", debut, fin }))].sort((a, b) => a.debut - b.debut);
+          const entier = morceaux.length === 1;
+          morceaux.forEach((s) => lignes.push({ type: s.nom ? "nom" : "trou", nom: s.nom, debut: s.debut, fin: s.fin, entier }));
+        });
+        contenu.push({ c, lignes });
+        return { content: lignes.map(() => " ").join("\n"), _id: contenu.length - 1 };
+      }));
+    }
+    doc.autoTable({
+      startY: 31, margin: { left: M, right: M, bottom: 16 }, theme: "grid",
+      head: [jours.map((j) => `${PL_JOURS[j]} ${plTexteDate(plDateJour(PL.semaine, j))}`)],
+      body: corps,
+      styles: { font: "helvetica", fontSize: 9, cellPadding: { top: 2.4, right: 2.6, bottom: 2.2, left: 2.6 }, lineColor: trait, lineWidth: 0.25, textColor: noir, valign: "top",
+        minCellHeight: Math.max(14, Math.min(34, (H - 31 - 9 - 36) / Math.max(1, nbLignes))) },   // la grille remplit la page
+      headStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 8.5, lineColor: trait, minCellHeight: 0, cellPadding: 2.6 },
+      didParseCell: (d) => {
+        if (d.section !== "body") return;
+        const info = contenu[d.cell.raw?._id];
+        if (!info) { d.cell.styles.fillColor = [248, 249, 251]; return; }
+        if (info.c.rush) d.cell.styles.fillColor = ambre;
+      },
+      didDrawCell: (d) => {
+        if (d.section !== "body") return;
+        const info = contenu[d.cell.raw?._id];
+        if (!info) return;
+        const { c, lignes } = info;
+        const pas = d.cell.styles.fontSize * 1.15 / doc.internal.scaleFactor;
+        const x = d.cell.x + d.cell.padding("left"), largeur = d.cell.width - d.cell.padding("left") - d.cell.padding("right");
+        let y = d.cell.y + d.cell.padding("top") + pas * 0.78;
+        if (c.rush) { doc.setFillColor(...ambreFonce); doc.rect(d.cell.x, d.cell.y, 0.9, d.cell.height, "F"); }
+        for (const l of lignes) {
+          if (l.type === "heure") {
+            doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...noir);
+            doc.text(`${plTexteHeure(c.debut)} – ${plTexteHeure(c.fin)}`, x, y);
+            if (c.rush) { doc.setFontSize(6.8); doc.setTextColor(...ambreFonce); doc.text("RUSH", x + largeur, y, { align: "right" }); }
+          } else if (l.type === "separateur") {
+            doc.setDrawColor(...trait); doc.setLineWidth(0.2); doc.line(x, y - pas * 0.45, x + largeur, y - pas * 0.45);
+          } else if (l.type === "nom") {
+            pastillePdf(l.nom, x + 1.2, y - 1.05);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...noir);
+            doc.text(l.nom, x + 3.6, y);
+            if (!l.entier) { doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...gris); doc.text(`${plTexteHeure(l.debut)}-${plTexteHeure(l.fin)}`, x + largeur, y, { align: "right" }); }
+          } else {
+            doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(...rouge);
+            doc.text(`personne · ${plTexteHeure(l.debut)}-${plTexteHeure(l.fin)}`, x, y);
+          }
+          y += pas;
+        }
+      },
+    });
+    let y = doc.lastAutoTable.finalY + 6;
+    if (y < H - 22) {
+      doc.setFillColor(...ambre); doc.setDrawColor(...ambreFonce); doc.setLineWidth(0.3); doc.rect(M, y - 2.6, 3.2, 3.2, "FD");
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...gris);
+      doc.text("Créneau de rush", M + 5, y);
+      doc.text("Horaires à droite d'un nom : relais pendant une pause.", M + 36, y);
+      if (bilan.manques.length) {
+        doc.setTextColor(...rouge);
+        doc.text(`Pas assez de monde : ${bilan.manques.slice(0, 6).map((m) => `${PL_JOURS_COURTS[m.jour]} ${plTexteHeure(m.debut)}-${plTexteHeure(m.fin)}`).join(", ")}${bilan.manques.length > 6 ? "…" : ""}`, M + 118, y);
+      }
+    }
+
+    // ---- page 2 : présences et temps de caisse
+    doc.addPage();
+    entete(`Présences et temps de caisse · semaine ${numero}`, periode);
+    const lignesPresence = noms.filter((n) => parNom[n].presence || parNom[n].temps);
+    doc.autoTable({
+      startY: 31, margin: { left: M, right: M, bottom: 16 }, theme: "grid",
+      head: [["Conseiller", ...PL_JOURS.map((j, i) => `${PL_JOURS_COURTS[i]} ${plTexteDate(plDateJour(PL.semaine, i))}`), "Présence", "Caisse", "Rush"]],
+      body: lignesPresence.map((n) => [n, ...PL_JOURS.map((_, i) => {
+        const r = plLirePlages(PL.presences[n]?.[i]);
+        if (r.repos) return String(PL.presences[n]?.[i] || "").trim() || "—";
+        return plTextePlages(r.travail) + (r.pauses.length ? `\npause ${plTextePlages(r.pauses)}` : "");
+      }), plDuree(parNom[n].presence), plDuree(parNom[n].temps), plDuree(parNom[n].rush)]),
+      foot: [["Présents", ...PL_JOURS.map((_, i) => { const nb = lignesPresence.filter((n) => plMinutesTravaillees(PL.presences[n]?.[i]) > 0).length; return nb ? `${nb} pers.` : "—"; }),
+        plDuree(lignesPresence.reduce((s, n) => s + parNom[n].presence, 0)), plDuree(lignesPresence.reduce((s, n) => s + parNom[n].temps, 0)), ""]],
+      styles: { font: "helvetica", fontSize: 8.6, cellPadding: { top: 2.4, right: 2.2, bottom: 2.4, left: 2.2 }, lineColor: trait, lineWidth: 0.25, textColor: noir, valign: "middle" },
+      headStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 8 },
+      footStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 8 },
+      columnStyles: { 0: { cellWidth: 34, fontStyle: "bold", cellPadding: { top: 2.4, right: 2.2, bottom: 2.4, left: 6 } }, 8: { halign: "right", cellWidth: 19 }, 9: { halign: "right", cellWidth: 19, fontStyle: "bold" }, 10: { halign: "right", cellWidth: 16 } },
+      didParseCell: (d) => {
+        const i = d.column.index - 1;
+        if (i >= 0 && i < 7 && !reglages.horaires[i]) d.cell.styles.fillColor = [245, 245, 245];
+        if (d.section === "body" && i >= 0 && i < 7) {
+          const r = plLirePlages(PL.presences[lignesPresence[d.row.index]]?.[i]);
+          if (r.repos) { d.cell.styles.textColor = gris; d.cell.styles.fontStyle = "italic"; }
+        }
+      },
+      didDrawCell: (d) => { if (d.section === "body" && d.column.index === 0) pastillePdf(lignesPresence[d.row.index], d.cell.x + 3, d.cell.y + d.cell.height / 2); },
+    });
+
+    // pied de page
+    const total = doc.getNumberOfPages();
+    const edite = new Date();
+    for (let p = 1; p <= total; p++) {
+      doc.setPage(p);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(150, 148, 146);
+      doc.text(`Édité le ${edite.toLocaleDateString("fr-FR")} à ${edite.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}${ETAT?.utilisateur ? ` par ${ETAT.utilisateur.split("@")[0]}` : ""}${PL.modifie ? " · version non enregistrée" : ""}`, M, H - 7);
+      doc.text(`Page ${p} / ${total}`, L - M, H - 7, { align: "right" });
+    }
+    doc.save(`Planning caisse - semaine ${numero} (${annee}).pdf`);
+    notifier("PDF exporté (A4 paysage) : il est dans tes téléchargements.");
+  } catch (e) {
+    notifier(`Export PDF impossible : ${e.message || e}`, true);
+  } finally {
+    boutons.forEach((b) => (b.disabled = false));
+  }
 }
 
 // ------------------------------------------------------------ vue Réglages
@@ -4108,7 +4537,7 @@ async function plEnregistrerReglages() {
   if (r.erreur) return notifier(r.erreur, true);
   PL.reglages = r.reglages;
   PL_REGLAGES = JSON.parse(JSON.stringify(r.reglages));
-  notifier(r.ok + (PL.caisse ? " Refais le planning de caisse pour les appliquer à cette semaine." : ""));
+  notifier(r.ok + (PL.caisse ? " Le planning de caisse de la semaine s'adapte tout seul." : ""));
   plAfficherReglages();
 }
 
@@ -4119,14 +4548,16 @@ async function plEnregistrer() {
   const invalides = noms.filter((n) => (PL.presences[n] || []).some((t) => plLirePlages(t).invalide));
   if (invalides.length) return notifier(`Horaire illisible pour ${invalides.join(", ")}. Écris par exemple 9h-12h 14h-19h.`, true);
   const presences = Object.fromEntries(noms.map((n) => [n, PL.presences[n].map(plTexteNormalise)]));
+  const miseAJour = plSynchroniserCaisse();   // la caisse enregistrée suit toujours les dernières présences
   const r = await api().planning_enregistrer(PL.semaine, presences, PL.caisse);
   if (r.erreur) return notifier(r.erreur, true);
   PL.presences = presences;
   PL.modifie_le = new Date().toISOString();
   PL.saisi_par = (ETAT?.utilisateur || "").split("@")[0];
   plMarquer(false);
-  notifier(r.ok);
+  notifier(r.ok + (miseAJour ? ` ${miseAJour}` : ""));
   if (plVue() === "presences") plAfficherPresences();
+  if (plVue() === "caisse") plAfficherCaisse();
 }
 
 async function plAller(semaine) {
@@ -4156,14 +4587,6 @@ async function plVider() {
   if (!ok) return;
   PL.presences = {};
   plAfficherPresences(); plMarquer();
-}
-
-function plImprimer() {
-  document.documentElement.classList.add("impression-planning");
-  const fin = () => { document.documentElement.classList.remove("impression-planning"); removeEventListener("afterprint", fin); };
-  addEventListener("afterprint", fin);
-  window.print();
-  setTimeout(fin, 1000);
 }
 
 // ------------------------------------------------------------ branchement
@@ -4211,7 +4634,7 @@ function plBrancher() {
 
   $("#pl-generer").addEventListener("click", () => plCreerCaisse(false));
   $("#pl-autre").addEventListener("click", () => plCreerCaisse(true));
-  $("#pl-imprimer").addEventListener("click", plImprimer);
+  $$(".pl-pdf").forEach((b) => b.addEventListener("click", plExporterPdf));
   $("#pl-lignes-caisse").addEventListener("change", (e) => { if (e.target.matches(".pl-choix")) plChangerChoix(e.target); });
 
   $("#pl-enregistrer-reglages").addEventListener("click", plEnregistrerReglages);
@@ -4231,6 +4654,26 @@ function plBrancher() {
   });
 
   addEventListener("beforeunload", (e) => { if (PL?.modifie) { e.preventDefault(); e.returnValue = ""; } });
+  setInterval(plActualiser, 30000);
+}
+
+// Toutes les 30 s : si quelqu'un d'autre a enregistré le planning, on le recharge (sauf si tu es en train de le modifier)
+async function plActualiser() {
+  if (afficher.page !== "planning" || !PL || document.hidden || !$("#dialogue").hidden || !$("#pl-dialogue-coller").hidden) return;
+  if (document.activeElement?.matches("input, select, textarea")) return;
+  if (!PL.modifie) {
+    let r;
+    try { r = await plApi().planning_lire(PL.semaine); } catch (e) { return; }
+    if (!r || r.erreur || r.__erreur__ || r.semaine !== PL.semaine) return;
+    if ((r.modifie_le || "") !== (PL.modifie_le || "") || JSON.stringify(r.reglages) !== JSON.stringify(PL.reglages)) {
+      const parQui = r.saisi_par && r.modifie_le !== PL.modifie_le ? ` par ${r.saisi_par}` : "";
+      PL = { ...r, presences: r.presences || {}, modifie: false, graine: r.caisse?.graine || 1, signatureCaisse: null, changements: new Set() };
+      plMarquer(false);
+      plAfficher();
+      return notifier(`Planning mis à jour${parQui}.`);
+    }
+  }
+  if (plVue() === "caisse" && plMaintenant()) plAfficherCaisse();   // fait avancer le créneau « Maintenant »
 }
 
 window.addEventListener("pywebviewready", () => {
@@ -4240,7 +4683,7 @@ window.addEventListener("pywebviewready", () => {
 });
 
 // pour les tests
-window.__planning = { plLirePlages, plGenerer, plBilan, plCreneaux, plAnalyserCollage, plDecouperTableau, plGrouperJours };
+window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plAnalyserCollage, plDecouperTableau, plGrouperJours, plTexteNormalise };
 
 </script>
 </body>
