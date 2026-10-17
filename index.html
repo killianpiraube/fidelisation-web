@@ -901,6 +901,14 @@ html[data-theme="sombre"] .pl-creneau.pl-rush { background: color-mix(in srgb, v
 .gros.principal-doux:hover { filter: brightness(.97); }
 html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"] .pl-relais-ligne.pl-actuel .pl-relais-heure { color: color-mix(in srgb, var(--accent) 40%, #fff); }
 
+#page-planning.pl-depot .feuille-defilante { outline: 3px dashed var(--accent); outline-offset: -10px; background: var(--accent-doux, var(--fond)); }
+
+.pl-boite-coller { width: 900px; }
+.pl-apercu { max-height: 340px; overflow: auto; margin: 6px 0 8px; }
+.pl-apercu td, .pl-apercu th { white-space: nowrap; font-size: 12px; }
+.pl-apercu td.pl-apercu-erreur { color: var(--rouge); font-weight: 600; background: color-mix(in srgb, var(--rouge) 7%, var(--blanc)); }
+#pl-details-coller summary { cursor: pointer; margin: 4px 0; }
+
 /* impression du planning de caisse */
 @media print {
   html.impression-planning, html.impression-planning body { height: auto; overflow: visible; background: #fff; }
@@ -1233,6 +1241,7 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
           </div>
           <div class="groupe pl-outils" data-pour="presences">
             <div class="commandes">
+              <button class="gros principal-doux pl-importer-pdf"><span class="icone" data-icone="importer"></span>Importer le planning PDF</button>
               <button id="pl-coller" class="gros"><span class="icone" data-icone="coller"></span>Coller depuis Excel</button>
               <button id="pl-reprendre" class="gros"><span class="icone" data-icone="copier"></span>Reprendre la sem. préc.</button>
               <button id="pl-vider" class="gros"><span class="icone" data-icone="effacer"></span>Vider</button>
@@ -1242,12 +1251,14 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
           </div>
           <div class="groupe pl-outils" data-pour="caisse" hidden>
             <div class="commandes">
+              <button class="gros pl-importer-pdf"><span class="icone" data-icone="importer"></span>Importer le planning PDF</button>
               <button id="pl-generer" class="gros"><span class="icone" data-icone="generer"></span>Créer le planning de caisse</button>
               <button id="pl-autre" class="gros"><span class="icone" data-icone="melanger"></span>Autre proposition</button>
               <button class="gros principal-doux pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
             </div>
             <span class="legende">Planning de caisse</span>
           </div>
+          <input type="file" id="pl-fichier-pdf" accept="application/pdf,.pdf" hidden>
           <div class="ruban-info doux" id="pl-info">Écris les horaires comme <strong>9h-12h 14h-19h</strong>.<br>Tu peux aussi coller directement un tableau Excel dans la grille.</div>
         </div>
 
@@ -1465,8 +1476,10 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
   <div id="pl-dialogue-coller" class="voile" hidden>
     <div class="boite pl-boite-coller" role="dialog" aria-modal="true" aria-labelledby="pl-coller-titre">
       <h3 id="pl-coller-titre">Coller le planning depuis Excel</h3>
-      <p class="doux petit">Dans Excel, sélectionne le tableau <strong>avec la colonne des prénoms</strong> (du lundi au dimanche), copie-le, puis colle-le ci-dessous. Les prénoms sont reconnus automatiquement ; les lignes sans prénom connu sont ignorées.</p>
-      <textarea id="pl-texte-coller" rows="10" spellcheck="false" placeholder="Sarah	9h-12h 14h-19h	9h-19h	repos	…"></textarea>
+      <p class="doux petit" id="pl-aide-coller"></p>
+      <div id="pl-apercu-coller" class="pl-apercu" hidden></div>
+      <details id="pl-details-coller" open><summary class="doux petit">Texte lu (modifiable)</summary>
+      <textarea id="pl-texte-coller" rows="8" spellcheck="false" placeholder="Sarah	9h-12h 14h-19h	9h-19h	repos	…"></textarea></details>
       <p id="pl-resume-coller" class="doux petit"></p>
       <div class="boutons-dialogue">
         <button class="bouton" data-coller="non">Annuler</button>
@@ -3511,6 +3524,7 @@ ICONES.coller = '<path d="M8 4h8v3H8zM6 5H4v16h16V5h-2M8 12h8M8 16h5"/>';
 ICONES.copier = '<path d="M8 8h12v12H8zM4 16V4h12"/>';
 ICONES.generer = '<path d="M4 6h16M4 12h10M4 18h7M17 13l2 2 3-4M15 18l2 2 4-5"/>';
 ICONES.melanger = '<path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/>';
+ICONES.importer = '<path d="M5 3h10l4 4v14H5zM15 3v4h4"/><path d="M12 18V9M9 12l3-3 3 3"/>';
 ICONES.pdf = '<path d="M5 3h10l4 4v14H5zM15 3v4h4M8 12h8M8 16h5"/><path d="M12 9v9M9 15l3 3 3-3"/>';
 
 const PL_JOURS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -4034,9 +4048,12 @@ function plAnalyserCollage(texte) {
   return { remplis, ignores };
 }
 
-function plOuvrirCollage() {
+const PL_AIDE_COLLER = "Dans Excel, sélectionne le tableau <strong>avec la colonne des prénoms</strong> (du lundi au dimanche), copie-le, puis colle-le ci-dessous. Les prénoms sont reconnus automatiquement ; les lignes sans prénom connu sont ignorées.";
+function plOuvrirCollage({ titre = "Coller le planning depuis Excel", aide = PL_AIDE_COLLER, texte = "", apresRemplissage = null } = {}) {
   const voile = $("#pl-dialogue-coller");
-  $("#pl-texte-coller").value = "";
+  $("#pl-coller-titre").textContent = titre;
+  $("#pl-aide-coller").innerHTML = aide;
+  $("#pl-texte-coller").value = texte;
   $("#pl-resume-coller").textContent = "";
   voile.hidden = false;
   setTimeout(() => $("#pl-texte-coller").focus(), 50);
@@ -4056,15 +4073,26 @@ function plOuvrirCollage() {
     fermer();
     plAfficherPresences();
     plMarquer();
-    notifier(`Planning collé pour ${nb} conseiller${nb > 1 ? "s" : ""}.` + (ignores.length ? ` Ignoré : ${ignores.slice(0, 4).join(", ")}${ignores.length > 4 ? "…" : ""}.` : ""));
+    notifier(`Planning rempli pour ${nb} conseiller${nb > 1 ? "s" : ""}.` + (ignores.length ? ` Ignoré : ${ignores.slice(0, 4).join(", ")}${ignores.length > 4 ? "…" : ""}.` : ""));
+    if (apresRemplissage) apresRemplissage();
   };
+  $("#pl-details-coller").open = !texte;
   $("#pl-texte-coller").oninput = () => {
     const { remplis, ignores } = plAnalyserCollage($("#pl-texte-coller").value);
     const nb = Object.keys(remplis).length;
+    // aperçu en tableau, plus lisible que le texte
+    $("#pl-apercu-coller").hidden = !nb;
+    $("#pl-apercu-coller").innerHTML = nb ? `<table class="tableau-office compact"><thead><tr><th>Conseiller</th>${PL_JOURS_COURTS.map((j, i) =>
+      `<th>${j} ${plTexteDate(plDateJour(PL.semaine, i))}</th>`).join("")}</tr></thead><tbody>${Object.entries(remplis).map(([n, jours]) =>
+      `<tr><td>${pastille(n)}${echapper(n)}</td>${jours.map((v) => {
+        const r = plLirePlages(v);
+        return `<td class="${r.invalide ? "pl-apercu-erreur" : r.repos ? "doux" : ""}" title="${r.invalide ? "Horaire illisible : corrige-le dans le texte" : ""}">${echapper(v || "—")}</td>`;
+      }).join("")}</tr>`).join("")}</tbody></table>` : "";
     $("#pl-resume-coller").textContent = $("#pl-texte-coller").value.trim()
       ? `${nb} conseiller${nb > 1 ? "s" : ""} reconnu${nb > 1 ? "s" : ""}${nb ? ` : ${Object.keys(remplis).join(", ")}` : ""}.${ignores.length ? ` Non reconnus : ${ignores.join(", ")}.` : ""}`
       : "";
   };
+  if (texte) $("#pl-texte-coller").oninput();
 }
 
 // Collage d'un bloc dans la grille, à partir de la case cliquée (comme dans un tableur)
@@ -4589,6 +4617,180 @@ async function plVider() {
   plAfficherPresences(); plMarquer();
 }
 
+// ------------------------------------------------------------ import du planning général en PDF
+// Le PDF est lu dans le navigateur (pdf.js) : rien n'est envoyé ailleurs.
+// On repère les colonnes des jours (Lundi… ou Lun… ou les dates), les prénoms de l'équipe,
+// puis les horaires de chaque case. Le résultat est montré pour vérification avant de remplir la grille.
+const PL_PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js";
+const PL_PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+async function plPdfJs() {
+  if (!window.pdfjsLib) await plChargerScript(PL_PDFJS);
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = PL_PDFJS_WORKER;
+  return window.pdfjsLib;
+}
+
+const PL_ENTETES_JOURS = [/^lun/, /^mar/, /^mer/, /^jeu/, /^ven/, /^sam/, /^dim/];
+const plJourEntete = (texte) => {
+  const t = plSansAccent(texte).replace(/[^a-z]/g, "");
+  if (t.length < 2 || t.length > 9) return -1;
+  return PL_ENTETES_JOURS.findIndex((r) => r.test(t));
+};
+
+// Les morceaux de texte d'une page : { texte, x, y (depuis le haut), l (largeur), h }
+async function plMorceauxPdf(page) {
+  const vue = page.getViewport({ scale: 1 });
+  const contenu = await page.getTextContent();
+  return contenu.items.filter((i) => i.str && i.str.trim()).map((i) => {
+    const [x, y] = vue.convertToViewportPoint(i.transform[4], i.transform[5]);
+    const h = Math.abs(i.transform[3]) || 8;
+    return { texte: i.str.trim(), x, y: y - h * 0.35, l: i.width || i.str.length * h * 0.5, h };
+  });
+}
+
+// Une page -> { lignes: {nom: [7 textes]}, lundi: "JJ/MM" ou null }
+function plAnalyserPagePdf(morceaux, noms) {
+  // 1) les en-têtes de jours (sur la même ligne, de gauche à droite)
+  const entetes = morceaux.map((m) => ({ ...m, jour: plJourEntete(m.texte) })).filter((m) => m.jour >= 0);
+  let colonnes = null;
+  for (const e of entetes) {
+    const ligne = entetes.filter((x) => Math.abs(x.y - e.y) < Math.max(4, e.h));
+    const parJour = new Map();
+    ligne.forEach((x) => { if (!parJour.has(x.jour)) parJour.set(x.jour, x); });
+    if (parJour.size >= 5 && (!colonnes || parJour.size > colonnes.size)) colonnes = parJour;
+  }
+  // sinon : les dates « 12/10 » alignées sur une ligne
+  if (!colonnes) {
+    const dates = morceaux.filter((m) => /^\d{1,2}[/.-]\d{1,2}([/.-]\d{2,4})?$/.test(m.texte));
+    for (const d of dates) {
+      const ligne = dates.filter((x) => Math.abs(x.y - d.y) < 4).sort((a, b) => a.x - b.x);
+      if (ligne.length >= 5 && (!colonnes || ligne.length > colonnes.size)) colonnes = new Map(ligne.slice(0, 7).map((x, i) => [i, { ...x, jour: i }]));
+    }
+  }
+  if (!colonnes) return null;
+  const jours = [...colonnes.values()].sort((a, b) => a.jour - b.jour);
+  const centres = jours.map((j) => ({ jour: j.jour, x: j.x + j.l / 2 }));
+  const ecart = centres.length > 1 ? (centres[centres.length - 1].x - centres[0].x) / (centres[centres.length - 1].jour - centres[0].jour) : 80;
+  const yEntete = Math.max(...jours.map((j) => j.y));
+
+  // date du lundi, si elle est écrite près de l'en-tête
+  let lundi = null;
+  const premier = centres.find((c) => c.jour === 0);
+  if (premier) {
+    const date = morceaux.find((m) => Math.abs(m.x + m.l / 2 - premier.x) < ecart / 2 && m.y >= yEntete - 20 && m.y <= yEntete + 20 && /\d{1,2}[/.-]\d{1,2}/.test(m.texte));
+    if (date) lundi = date.texte.match(/(\d{1,2})[/.-](\d{1,2})/).slice(1, 3).map(Number);
+  }
+
+  // 2) les prénoms (à gauche du lundi, sous l'en-tête)
+  const gauche = Math.min(...centres.map((c) => c.x)) - ecart / 2;
+  const personnes = [];
+  for (const m of morceaux) {
+    if (m.y <= yEntete + 2 || m.x > gauche + 4 || /\d/.test(m.texte)) continue;
+    const nom = plTrouverNom(m.texte, noms) || m.texte.split(/\s+/).map((mot) => plTrouverNom(mot, noms)).find(Boolean);
+    if (nom && !personnes.some((p) => p.nom === nom)) personnes.push({ nom, y: m.y, h: m.h });
+  }
+  personnes.sort((a, b) => a.y - b.y);
+  // des noms avec des horaires, mais qui ne sont pas dans l'équipe
+  const inconnus = morceaux.filter((m) => m.y > yEntete + 2 && m.x <= gauche + 4 && !/\d/.test(m.texte) && m.texte.length >= 3
+    && !personnes.some((p) => Math.abs(p.y - m.y) < Math.max(3, m.h * 0.6))
+    && morceaux.some((x) => x.x > gauche && Math.abs(x.y - m.y) < Math.max(4, m.h) && /\d/.test(x.texte))).map((m) => m.texte);
+
+  // 3) chaque horaire va à la personne de sa ligne et au jour de sa colonne
+  const lignes = {};
+  personnes.forEach((p, i) => {
+    const haut = i ? (personnes[i - 1].y + p.y) / 2 : p.y - Math.max(12, p.h * 1.5);
+    const bas = i < personnes.length - 1 ? (p.y + personnes[i + 1].y) / 2 : p.y + Math.max(14, p.h * 2);
+    const cases = Array.from({ length: 7 }, () => []);
+    for (const m of morceaux) {
+      if (m.y < haut || m.y >= bas || m.x < gauche) continue;
+      const milieu = m.x + m.l / 2;
+      const col = centres.reduce((a, c) => (Math.abs(c.x - milieu) < Math.abs(a.x - milieu) ? c : a));
+      if (Math.abs(col.x - milieu) > ecart * 0.55) continue;   // colonne « total », etc.
+      cases[col.jour].push(m);
+    }
+    lignes[p.nom] = cases.map((morceauxCase) => plTexteCase(morceauxCase.sort((a, b) => a.y - b.y || a.x - b.x).map((m) => m.texte)));
+  });
+  return { lignes, lundi, inconnus };
+}
+
+// Le texte d'une case : « 09:00 - 13:00 », « 09:00 / 13:00 », « 9h 13h 14h 19h », « Repos »…
+function plTexteCase(textes) {
+  let t = textes.join(" ").replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  if (plLirePlages(t).repos) return t;
+  const lu = plLirePlages(t);
+  if (!lu.invalide) return plTexteNormalise(t);
+  // heures seules : on les assemble deux par deux (début, fin), en gardant la pause à part
+  const pauses = [];
+  const reste = t.replace(/\(?\b(?:pause|pse|p)\b\.?\s*:?\s*(\d{1,2}(?:[h:.]\d{0,2})?\s*-\s*\d{1,2}(?:[h:.]\d{0,2})?)\)?/gi, (_, plage) => { pauses.push(plage); return " "; });
+  const heures = reste.split(/[\s/|;,]+/).map(plLireHeure).filter((h) => h !== null);
+  if (heures.length >= 2 && heures.length % 2 === 0) {
+    const plages = [];
+    for (let k = 0; k < heures.length; k += 2) if (heures[k + 1] > heures[k]) plages.push(`${plTexteHeure(heures[k])}-${plTexteHeure(heures[k + 1])}`);
+    if (plages.length) return plTexteNormalise(plages.join(" ") + (pauses.length ? ` pause ${pauses.join(" ")}` : ""));
+  }
+  // mots qui disent « absent » (CP, RTT, maladie…) au milieu d'un autre texte
+  const mot = t.split(/\s+/).find((x) => PL_REPOS.test(x.replace(/[.\s]/g, "")));
+  return mot || t;
+}
+
+async function plImporterPdf(fichier) {
+  if (!fichier) return;
+  if (!/pdf$/i.test(fichier.type) && !/\.pdf$/i.test(fichier.name)) return notifier("Choisis un fichier PDF.", true);
+  notifier("Lecture du PDF…");
+  let pdfjs;
+  try { pdfjs = await plPdfJs(); }
+  catch (e) { return notifier("Impossible de charger le lecteur de PDF (connexion internet ?). Réessaie dans un instant.", true); }
+  let pdf;
+  try { pdf = await pdfjs.getDocument({ data: await fichier.arrayBuffer() }).promise; }
+  catch (e) { return notifier("Ce fichier PDF n'a pas pu être ouvert (protégé par mot de passe ou abîmé ?).", true); }
+  const noms = PL.conseillers.map((c) => c.nom);
+  const lignes = {};
+  let lundi = null, texteTrouve = false;
+  const inconnus = new Set();
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const morceaux = await plMorceauxPdf(await pdf.getPage(n));
+    if (morceaux.length > 5) texteTrouve = true;
+    const r = plAnalyserPagePdf(morceaux, noms);
+    if (!r) continue;
+    lundi = lundi || r.lundi;
+    r.inconnus.forEach((n) => inconnus.add(n));
+    for (const [nom, jours] of Object.entries(r.lignes)) {
+      lignes[nom] = (lignes[nom] || Array(7).fill("")).map((v, i) => v || jours[i]);
+    }
+  }
+  if (!texteTrouve) {
+    return notifier("Ce PDF est une image (scan ou photo) : il n'y a pas de texte à lire. Utilise le PDF exporté par le logiciel de planning.", true);
+  }
+  if (!Object.keys(lignes).length) {
+    return notifier("Je n'ai pas trouvé le tableau : il faut les jours (Lundi, Mardi… ou les dates) en en-tête et les prénoms de l'équipe en première colonne.", true);
+  }
+
+  // semaine du PDF : si elle diffère de celle affichée, on s'y rend
+  if (lundi) {
+    const [annee] = PL.semaine.split("-S").map(Number);
+    const candidats = [annee - 1, annee, annee + 1].map((a) => new Date(Date.UTC(a, lundi[1] - 1, lundi[0])));
+    const proche = candidats.sort((a, b) => Math.abs(a - plLundi(PL.semaine)) - Math.abs(b - plLundi(PL.semaine)))[0];
+    const semainePdf = plSemaineDe(plIso(proche));
+    if (semainePdf !== PL.semaine && !Number.isNaN(proche.getTime())) {
+      const { ok } = await demander({ titre: `Le PDF concerne la semaine ${Number(semainePdf.split("-S")[1])}`, bouton: "Aller à cette semaine",
+        texte: `Le planning importé commence le ${proche.getUTCDate()}/${String(proche.getUTCMonth() + 1).padStart(2, "0")}. Aller à cette semaine pour le remplir ? (Annuler = le mettre dans la semaine affichée.)` });
+      if (ok) { if (!(await plAbandonnerModifs())) return; await plCharger(semainePdf); }
+    }
+  }
+
+  // vérification avant de remplir : le tableau lu, modifiable
+  const tsv = Object.entries(lignes).map(([nom, jours]) => [nom, ...jours].join("\t")).join("\n");
+  plOuvrirCollage({
+    titre: `Planning lu dans « ${fichier.name} »`,
+    aide: `${Object.keys(lignes).length} conseiller${Object.keys(lignes).length > 1 ? "s" : ""} trouvé${Object.keys(lignes).length > 1 ? "s" : ""}. Vérifie les horaires (une ligne par personne, une colonne par jour, du lundi au dimanche) puis remplis la grille : le planning de caisse se crée tout seul.`
+      + (inconnus.size ? `<br><strong>Pas dans ton équipe :</strong> ${[...inconnus].map(echapper).join(", ")}. Ajoute-les dans la page Équipe (même prénom) puis réimporte le PDF pour les inclure.` : ""),
+    texte: tsv, apresRemplissage: () => {
+      $$('[data-choix="vue-planning"] button').forEach((b) => b.classList.toggle("actif", b.dataset.valeur === "caisse"));
+      plAfficher();
+    },
+  });
+}
+
 // ------------------------------------------------------------ branchement
 function plBrancher() {
   // le menu affiche la page ; on charge le planning à l'ouverture
@@ -4613,7 +4815,22 @@ function plBrancher() {
   $("#pl-cette-semaine").addEventListener("click", () => plAller(plSemaineDe(ETAT.aujourd_hui)));
   $("#pl-date").addEventListener("change", (e) => { if (e.target.value) plAller(plSemaineDe(e.target.value)); });
 
-  $("#pl-coller").addEventListener("click", plOuvrirCollage);
+  $("#pl-coller").addEventListener("click", () => plOuvrirCollage());
+  $$(".pl-importer-pdf").forEach((b) => b.addEventListener("click", () => $("#pl-fichier-pdf").click()));
+  $("#pl-fichier-pdf").addEventListener("change", async (e) => {
+    const fichier = e.target.files[0];
+    e.target.value = "";   // pour pouvoir réimporter le même fichier
+    await plImporterPdf(fichier);
+  });
+  // on peut aussi glisser le PDF sur la page
+  $("#page-planning").addEventListener("dragover", (e) => { if ([...e.dataTransfer.items].some((i) => i.kind === "file")) { e.preventDefault(); $("#page-planning").classList.add("pl-depot"); } });
+  $("#page-planning").addEventListener("dragleave", (e) => { if (e.target === $("#page-planning") || !$("#page-planning").contains(e.relatedTarget)) $("#page-planning").classList.remove("pl-depot"); });
+  $("#page-planning").addEventListener("drop", (e) => {
+    const fichier = [...e.dataTransfer.files].find((f) => /\.pdf$/i.test(f.name) || f.type === "application/pdf");
+    if (!fichier) return;
+    e.preventDefault(); $("#page-planning").classList.remove("pl-depot");
+    plImporterPdf(fichier);
+  });
   $("#pl-reprendre").addEventListener("click", plReprendre);
   $("#pl-vider").addEventListener("click", plVider);
   $("#pl-lignes-presences").addEventListener("input", () => { plTotauxPresences(); plMarquer(); });
@@ -4683,7 +4900,7 @@ window.addEventListener("pywebviewready", () => {
 });
 
 // pour les tests
-window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plAnalyserCollage, plDecouperTableau, plGrouperJours, plTexteNormalise };
+window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plAnalyserCollage, plDecouperTableau, plGrouperJours, plTexteNormalise, plAnalyserPagePdf, plTexteCase };
 
 </script>
 </body>
