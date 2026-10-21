@@ -1261,7 +1261,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
     barre.id = "barre-mobile";
     barre.innerHTML = `
       <button type="button" class="bouton-menu" aria-label="Ouvrir le menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <strong class="titre-mobile">Suivi fidélisation</strong>
+      <strong class="titre-mobile"></strong>
       <button type="button" class="bouton-affichage icone-seule" id="affichage-barre" aria-label="Changer l'affichage">${ICONE}</button>`;
     appli.prepend(barre);
     const voile = document.createElement("div");
@@ -1301,8 +1301,9 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
     // titre de la page affichée dans la barre du haut
     const majTitre = () => {
       const actif = document.querySelector("#navigation .lien.actif .libelle");
-      barre.querySelector(".titre-mobile").textContent = actif ? actif.textContent : "Suivi fidélisation";
+      barre.querySelector(".titre-mobile").textContent = actif ? actif.textContent : document.title;
     };
+    majTitre();
     new MutationObserver(majTitre).observe(document.getElementById("navigation"), { subtree: true, attributes: true, attributeFilter: ["class"] });
 
     majBouton();
