@@ -937,7 +937,385 @@ html[data-theme="sombre"] .pl-zone-import .icone { color: color-mix(in srgb, var
   @page { size: A4 landscape; margin: 12mm; }
 }
 
+/* =====================================================================
+   AFFICHAGE SELON L'APPAREIL (html[data-appareil], posé par appareil.js)
+   ===================================================================== */
+#barre-mobile, .voile-menu, .pl-jours-mobile { display: none; }
+
+/* bouton et menu « Affichage » */
+#menu-affichage {
+  position: fixed; z-index: 90; min-width: 230px; padding: 6px; background: var(--blanc); color: var(--texte);
+  border: 1px solid var(--bord); border-radius: var(--r-l, 0); box-shadow: 0 16px 40px rgba(0, 0, 0, .22);
+}
+#menu-affichage .titre-menu-affichage { padding: 8px 12px 6px; font-size: 11px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; color: var(--doux); }
+#menu-affichage button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: var(--r-s, 0); text-align: left; font-size: 14px; }
+#menu-affichage button:hover, #menu-affichage button:focus-visible { background: var(--survol); outline: none; }
+#menu-affichage button.actif { font-weight: 600; }
+#menu-affichage .coche { width: 16px; color: var(--accent); font-weight: 700; }
+#menu-affichage small { display: block; font-size: 11.5px; font-weight: 400; color: var(--doux); }
+html[data-theme="sombre"] #menu-affichage .coche { color: color-mix(in srgb, var(--accent) 40%, #fff); }
+.lien.bouton-affichage .libelle { font-size: 13px; opacity: .92; }
+
+/* ------------------------------------------------------------ téléphone */
+html[data-appareil="telephone"], html[data-appareil="telephone"] body { height: 100%; }
+html[data-appareil="telephone"] body { overflow: hidden; font-size: 14.5px; }
+html[data-appareil="telephone"] #application {
+  display: flex; flex-direction: column; position: relative; overflow: hidden;
+  height: 100vh; height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--fond);
+}
+/* mode téléphone choisi sur un grand écran : aperçu de la taille d'un téléphone */
+@media (min-width: 560px) {
+  html[data-appareil="telephone"] body { background: #CFCFD6; }
+  html[data-theme="sombre"][data-appareil="telephone"] body { background: #0B0B10; }
+  html[data-appareil="telephone"] #application { box-shadow: 0 0 0 1px var(--bord), 0 24px 70px rgba(0, 0, 0, .28); }
+}
+html[data-appareil="telephone"] #barre-mobile {
+  display: flex; align-items: center; gap: 4px; flex: none; z-index: 30;
+  min-height: 56px; padding: env(safe-area-inset-top) 6px 0;
+  background: var(--accent); color: var(--sur-accent);
+}
+#barre-mobile button { width: 46px; height: 46px; flex: none; display: inline-flex; align-items: center; justify-content: center; color: inherit; border-radius: 12px; }
+#barre-mobile button:active { background: color-mix(in srgb, var(--sur-accent) 16%, transparent); }
+#barre-mobile svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#barre-mobile .titre-mobile { flex: 1; min-width: 0; font-size: 17px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* menu de gauche en tiroir */
+html[data-appareil="telephone"] #navigation {
+  position: absolute; top: 0; bottom: 0; left: 0; z-index: 40; width: 280px; max-width: 86%;
+  overflow-y: auto; transform: translateX(-102%); transition: transform .24s ease;
+  padding-top: env(safe-area-inset-top);
+}
+html[data-appareil="telephone"] #application.menu-ouvert #navigation { transform: none; box-shadow: 16px 0 50px rgba(0, 0, 0, .3); }
+html[data-appareil="telephone"] .voile-menu {
+  display: block; position: absolute; inset: 0; z-index: 35; background: rgba(10, 12, 24, .42);
+  opacity: 0; pointer-events: none; transition: opacity .22s ease;
+}
+html[data-appareil="telephone"] #application.menu-ouvert .voile-menu { opacity: 1; pointer-events: auto; }
+html[data-appareil="telephone"] .lien { height: 50px; font-size: 15px; }
+/* dans le tiroir, le menu est toujours déplié */
+html[data-appareil="telephone"] #application.replie .libelle { display: inline; }
+html[data-appareil="telephone"] #application.replie .utilisateur .libelle { display: flex; }
+html[data-appareil="telephone"] #application.replie .logo-complet { opacity: 1; transform: none; }
+html[data-appareil="telephone"] #application.replie .logo-replie { opacity: 0; }
+html[data-appareil="telephone"] #application.replie .bouton-logo { margin: 12px 12px 18px; height: 64px; }
+html[data-appareil="telephone"] #application.replie .lien { padding: 0 18px; }
+
+/* contenu : une seule colonne qui défile */
+html[data-appareil="telephone"] #principal { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-bottom: env(safe-area-inset-bottom); }
+html[data-appareil="telephone"] .page { height: auto; min-height: 100%; }
+html[data-appareil="telephone"] .page-outil { display: block; }
+html[data-appareil="telephone"] .accueil { padding: 20px 14px 40px; overflow: visible; }
+html[data-appareil="telephone"] h1 { font-size: 25px; }
+html[data-appareil="telephone"] h2 { font-size: 18px; }
+html[data-appareil="telephone"] .titre-section { margin: 24px 0 10px; }
+html[data-appareil="telephone"] input:not([type=checkbox]):not([type=radio]):not([type=range]), html[data-appareil="telephone"] select, html[data-appareil="telephone"] textarea { font-size: 16px; }   /* pas de zoom automatique sur iPhone */
+
+/* barre d'outils : les boutons passent à la ligne, assez grands pour le doigt */
+html[data-appareil="telephone"] .ruban { min-height: 0; padding: 10px 12px; gap: 8px; overflow: visible; }
+html[data-appareil="telephone"] .ruban-info { display: none; }
+html[data-appareil="telephone"] .groupe { flex: 0 1 auto; max-width: 100%; margin: 0; padding: 0; border-right: none; }
+html[data-appareil="telephone"] .commandes { gap: 8px; justify-content: flex-start; }
+html[data-appareil="telephone"] .commandes.colonne { align-items: flex-start; }
+html[data-appareil="telephone"] .gros { height: 42px; padding: 0 13px; font-size: 13.5px; }
+html[data-appareil="telephone"] .gros .icone { width: 18px; height: 18px; }
+html[data-appareil="telephone"] .ruban select { min-width: 0; max-width: 100%; height: 42px; }
+html[data-appareil="telephone"] .ruban input[type=date] { height: 42px; }
+html[data-appareil="telephone"] .choix { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+html[data-appareil="telephone"] .choix button { height: 40px; padding: 0 12px; flex: none; }
+html[data-appareil="telephone"] .bouton.carre { width: 42px; height: 42px; }
+html[data-appareil="telephone"] .bouton.petit-bouton { height: 42px; }
+
+/* zones de travail empilées */
+html[data-appareil="telephone"] .espace { display: block; }
+html[data-appareil="telephone"] .panneau, html[data-appareil="telephone"] .panneau.large { width: auto; overflow: visible; border-right: none; border-bottom: 1px solid var(--bord); padding: 18px 14px 22px; }
+html[data-appareil="telephone"] .zone-principale { display: block; padding: 18px 14px 28px; }
+html[data-appareil="telephone"] .entete-zone { flex-wrap: wrap; gap: 10px; }
+html[data-appareil="telephone"] #filtre-historique { width: 100%; height: 42px; }
+html[data-appareil="telephone"] .defilement { overflow: visible; padding-bottom: 0; }
+html[data-appareil="telephone"] .feuille-defilante { overflow: visible; padding: 12px 8px 32px; }
+html[data-appareil="telephone"] .feuille { padding: 18px 14px 22px; }
+html[data-appareil="telephone"] .explication { font-size: 13.5px; }
+
+/* les tableaux larges défilent dans leur cadre */
+html[data-appareil="telephone"] .tableau-office:not(.pl-caisse) { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+html[data-appareil="telephone"] .tableau-office td, html[data-appareil="telephone"] .tableau-office th { padding-left: 10px; padding-right: 10px; }
+html[data-appareil="telephone"] .grille-saisie td, html[data-appareil="telephone"] .grille-saisie th { padding: 6px 3px !important; font-size: 11px; }
+html[data-appareil="telephone"] .grille-saisie td.nom { font-size: 14px; max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
+html[data-appareil="telephone"] .grille-saisie th { font-size: 9px !important; letter-spacing: 0 !important; white-space: normal !important; line-height: 1.15; }
+html[data-appareil="telephone"] .grille-saisie td.nombre { width: auto; }
+html[data-appareil="telephone"] .grille-saisie input[type=number] { width: 46px; height: 42px; padding: 0 5px; }
+html[data-appareil="telephone"] .grille-saisie input.heures { width: 60px; height: 42px; padding: 0 5px; }
+html[data-appareil="telephone"] .grille-saisie input[type=checkbox] { width: 20px; height: 20px; }
+
+/* accueil */
+html[data-appareil="telephone"] .chiffres { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+html[data-appareil="telephone"] .chiffre { padding: 12px 14px 10px; }
+html[data-appareil="telephone"] .chiffre strong { font-size: 22px; }
+html[data-appareil="telephone"] .duo { grid-template-columns: 1fr; }
+html[data-appareil="telephone"] .vignettes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+html[data-appareil="telephone"] .vignette { width: auto; padding: 14px; background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-l, 0); }
+html[data-appareil="telephone"] .vignette .miniature { display: none; }
+html[data-appareil="telephone"] .vignette .nom { margin-top: 0; }
+
+/* paramètres : catégories en onglets */
+html[data-appareil="telephone"] .categories { width: auto; display: flex; overflow-x: auto; gap: 4px; padding: 8px; border-right: none; border-bottom: 1px solid var(--bord); scrollbar-width: none; }
+html[data-appareil="telephone"] .categories button { width: auto; flex: none; margin: 0; white-space: nowrap; }
+html[data-appareil="telephone"] .selecteur-couleur { flex-wrap: wrap; }
+
+/* fenêtres, notification, connexion */
+html[data-appareil="telephone"] #notification { left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); max-width: 456px; margin: 0 auto; }
+html[data-appareil="telephone"] .carte-connexion { padding: 26px 20px 22px; border-radius: 18px; }
+html[data-appareil="telephone"] .boite { padding: 20px 18px 16px; }
+html[data-appareil="telephone"] .boutons-dialogue .bouton { height: 42px; flex: 1; }
+
+/* planning de caisse : un jour à la fois */
+html[data-appareil="telephone"] .pl-jours-mobile {
+  display: flex; gap: 6px; overflow-x: auto; margin: 6px -2px 12px; padding: 2px; scrollbar-width: none;
+}
+.pl-jours-mobile button {
+  flex: 1 0 52px; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 4px;
+  border: 1px solid var(--bord); border-radius: 12px; background: var(--blanc); color: var(--doux); font-size: 11.5px;
+}
+.pl-jours-mobile button strong { font-size: 17px; color: var(--texte); }
+.pl-jours-mobile button.aujourdhui { border-color: color-mix(in srgb, var(--accent) 45%, var(--bord)); }
+.pl-jours-mobile button.actif { background: var(--accent); border-color: var(--accent); color: var(--sur-accent); }
+.pl-jours-mobile button.actif strong { color: var(--sur-accent); }
+html[data-appareil="telephone"] .pl-caisse { min-width: 0; width: 100%; table-layout: auto; }
+html[data-appareil="telephone"] .pl-caisse[data-col="0"] :is(th, td):not(:nth-child(1)),
+html[data-appareil="telephone"] .pl-caisse[data-col="1"] :is(th, td):not(:nth-child(2)),
+html[data-appareil="telephone"] .pl-caisse[data-col="2"] :is(th, td):not(:nth-child(3)),
+html[data-appareil="telephone"] .pl-caisse[data-col="3"] :is(th, td):not(:nth-child(4)),
+html[data-appareil="telephone"] .pl-caisse[data-col="4"] :is(th, td):not(:nth-child(5)),
+html[data-appareil="telephone"] .pl-caisse[data-col="5"] :is(th, td):not(:nth-child(6)),
+html[data-appareil="telephone"] .pl-caisse[data-col="6"] :is(th, td):not(:nth-child(7)) { display: none; }
+html[data-appareil="telephone"] .pl-caisse thead { display: none; }
+html[data-appareil="telephone"] .pl-caisse td { padding: 10px 12px; border-right: none; }
+html[data-appareil="telephone"] .pl-heure { font-size: 13px; margin-bottom: 8px; }
+html[data-appareil="telephone"] .pl-heure strong { font-size: 15px; }
+html[data-appareil="telephone"] .pl-choix { height: 44px; font-size: 16px; }
+html[data-appareil="telephone"] .pl-relais .pl-choix { height: 40px; }
+html[data-appareil="telephone"] .pl-relais-ligne { grid-template-columns: 74px 1fr; }
+html[data-appareil="telephone"] .pl-relais-heure { font-size: 12px; }
+html[data-appareil="telephone"] .pl-legende { gap: 6px 14px; }
+html[data-appareil="telephone"] .pl-zone-import { padding: 34px 18px; }
+html[data-appareil="telephone"] .pl-navigation strong { min-width: 84px; }
+html[data-appareil="telephone"] .pl-reglages-haut label, html[data-appareil="telephone"] .pl-reglages-haut select, html[data-appareil="telephone"] .pl-reglages-haut input { width: 100%; }
+html[data-appareil="telephone"] .pl-horaires input[type=time] { width: 96px; }
+
+/* ------------------------------------------------------------ tablette */
+html[data-appareil="tablette"] .lien { height: 52px; }
+html[data-appareil="tablette"] .ruban-info { display: none; }
+html[data-appareil="tablette"] .ruban { scrollbar-width: none; }
+html[data-appareil="tablette"] .gros { min-width: 70px; }
+html[data-appareil="tablette"] .choix button { height: 38px; padding: 0 14px; }
+html[data-appareil="tablette"] .bouton { min-height: 38px; }
+html[data-appareil="tablette"] .ruban select, html[data-appareil="tablette"] .ruban input[type=date], html[data-appareil="tablette"] .pl-navigation input[type=date] { height: 38px; }
+html[data-appareil="tablette"] .bouton.carre { width: 38px; height: 38px; }
+html[data-appareil="tablette"] .grille-saisie input[type=number], html[data-appareil="tablette"] .grille-saisie input.heures { height: 38px; }
+html[data-appareil="tablette"] .pl-choix { height: 36px; font-size: 13.5px; }
+html[data-appareil="tablette"] .pl-relais .pl-choix { height: 32px; }
+html[data-appareil="tablette"] .accueil { padding: 28px 28px 44px; }
+html[data-appareil="tablette"] .feuille-defilante { padding: 16px 16px 36px; }
+html[data-appareil="tablette"] .feuille { padding: 22px 22px 26px; }
+html[data-appareil="tablette"] .panneau { width: 300px; }
+html[data-appareil="tablette"] .panneau.large { width: 440px; }
+html[data-appareil="tablette"] .pl-caisse { min-width: 640px; }
+html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
+/* tablette en portrait : menu réduit aux icônes, zones empilées */
+@media (max-width: 1000px) {
+  html[data-appareil="tablette"] #application, html[data-appareil="tablette"] #application.replie { grid-template-columns: 64px 1fr; }
+  html[data-appareil="tablette"] #navigation .libelle { display: none; }
+  html[data-appareil="tablette"] .logo-complet { opacity: 0; transform: scale(.8); }
+  html[data-appareil="tablette"] .logo-replie { opacity: 1; transform: scale(1); }
+  html[data-appareil="tablette"] .bouton-logo { margin: 10px 8px 18px; height: 44px; }
+  html[data-appareil="tablette"] .lien { padding: 0 19px; }
+  html[data-appareil="tablette"] .utilisateur { padding: 6px 19px 10px; }
+  html[data-appareil="tablette"] .espace { flex-direction: column; overflow-y: auto; }
+  html[data-appareil="tablette"] .panneau, html[data-appareil="tablette"] .panneau.large { width: auto; flex: none; overflow: visible; border-right: none; border-bottom: 1px solid var(--bord); }
+  html[data-appareil="tablette"] .zone-principale { flex: none; padding-bottom: 24px; }
+  html[data-appareil="tablette"] .defilement { overflow: visible; }
+  html[data-appareil="tablette"] .categories { width: 170px; }
+}
+
 </style>
+  <script>
+// =====================================================================
+//  APPAREIL : la page reconnaît seule si elle est ouverte sur un téléphone,
+//  une tablette ou un ordinateur, et adapte sa mise en page
+//  (html[data-appareil="telephone" | "tablette" | "ordinateur"]).
+//  Le bouton « Affichage » permet de forcer un autre mode ; le choix est
+//  retenu sur cet appareil (dans ce navigateur).
+//  Chargé dans <head> : la bonne mise en page est posée avant l'affichage.
+// =====================================================================
+(() => {
+  "use strict";
+  const CLE = "fid_affichage";
+  const MODES = { auto: "Automatique", ordinateur: "Ordinateur", tablette: "Tablette", telephone: "Téléphone" };
+  const html = document.documentElement;
+
+  const lire = () => { try { return localStorage.getItem(CLE) || "auto"; } catch (e) { return "auto"; } };
+  const ecrire = (v) => { try { localStorage.setItem(CLE, v); } catch (e) { /* navigation privée : non retenu */ } };
+
+  // L'appareil réel, d'après le navigateur et l'écran
+  function detecter() {
+    const ua = navigator.userAgent || "";
+    const tactile = (navigator.maxTouchPoints || 0) > 1 || matchMedia("(pointer: coarse)").matches;
+    const petitCote = Math.min(screen.width || innerWidth, screen.height || innerHeight);
+    if (/iPhone|iPod|Windows Phone|Android.*Mobile|Mobile.*Firefox|BlackBerry|Opera Mini/i.test(ua)) return petitCote >= 600 ? "tablette" : "telephone";
+    if (/iPad|Tablet|Silk|Kindle|PlayBook|Android/i.test(ua)) return "tablette";
+    if (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1) return "tablette";   // iPad récent (se présente comme un Mac)
+    if (tactile && matchMedia("(pointer: coarse)").matches && !matchMedia("(pointer: fine)").matches) return petitCote < 600 ? "telephone" : "tablette";
+    return "ordinateur";
+  }
+
+  // Le mode affiché : le choix de la personne, ou l'appareil détecté
+  // (une fenêtre d'ordinateur très étroite prend aussi la mise en page téléphone)
+  function modeEffectif() {
+    const choix = lire();
+    if (choix !== "auto") return choix;
+    const detecte = detecter();
+    return detecte !== "telephone" && innerWidth < 600 ? "telephone" : detecte;
+  }
+
+  // Sur un téléphone en mode « Ordinateur », la page est affichée en largeur bureau (dézoomée)
+  function ajusterViewport(mode) {
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    const bureauSurPetit = mode === "ordinateur" && detecter() !== "ordinateur" && Math.min(screen.width, screen.height) < 1000;
+    const contenu = bureauSurPetit ? "width=1280" : "width=device-width, initial-scale=1, viewport-fit=cover";
+    if (meta.getAttribute("content") !== contenu) meta.setAttribute("content", contenu);
+  }
+
+  function appliquer() {
+    const mode = modeEffectif();
+    const avant = html.dataset.appareil;
+    html.dataset.appareil = mode;
+    html.dataset.appareilDetecte = detecter();
+    html.classList.toggle("tactile", (navigator.maxTouchPoints || 0) > 0 || matchMedia("(pointer: coarse)").matches);
+    ajusterViewport(mode);
+    if (document.body) majBouton();
+    if (avant && avant !== mode) {
+      fermerMenu();
+      document.querySelector("#application")?.classList.remove("menu-ouvert");
+      // les graphiques se redessinent à la nouvelle largeur
+      requestAnimationFrame(() => dispatchEvent(new Event("resize")));
+    }
+  }
+  appliquer();
+
+  // ------------------------------------------------------------ bouton et menu « Affichage »
+  const ICONE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h14v10H2zM6 19h6M9 15v4"/><path d="M17 9h5v11h-5zM19 17.5h1"/></svg>';
+  function libelleBouton() {
+    const choix = lire();
+    return choix === "auto" ? "Affichage : auto" : `Affichage : ${MODES[choix].toLowerCase()}`;
+  }
+  function majBouton() {
+    document.querySelectorAll("[data-affichage-libelle]").forEach((e) => (e.textContent = libelleBouton()));
+    const detail = lire() === "auto" ? `Affichage automatique (${MODES[detecter()].toLowerCase()} détecté)` : libelleBouton();
+    document.querySelectorAll(".bouton-affichage").forEach((b) => (b.title = `${detail} : cliquer pour changer`));
+    const menu = document.getElementById("menu-affichage");
+    if (menu && !menu.hidden) remplirMenu(menu);
+  }
+
+  function remplirMenu(menu) {
+    const choix = lire();
+    menu.innerHTML = `<div class="titre-menu-affichage">Affichage</div>` + Object.entries(MODES).map(([valeur, nom]) =>
+      `<button type="button" role="menuitemradio" aria-checked="${valeur === choix}" data-mode="${valeur}" class="${valeur === choix ? "actif" : ""}">
+        <span class="coche">${valeur === choix ? "✓" : ""}</span><span>${nom}${valeur === "auto" ? `<small>détecté : ${MODES[detecter()].toLowerCase()}</small>` : ""}</span>
+      </button>`).join("");
+  }
+
+  function ouvrirMenu(bouton) {
+    const menu = document.getElementById("menu-affichage");
+    if (!menu.hidden && menu.dataset.source === bouton.id) return fermerMenu();
+    remplirMenu(menu);
+    menu.dataset.source = bouton.id;
+    menu.hidden = false;
+    // placé à côté du bouton, sans sortir de l'écran
+    const r = bouton.getBoundingClientRect(), m = menu.getBoundingClientRect();
+    let gauche = r.right + 8, haut = r.bottom - m.height;
+    if (gauche + m.width > innerWidth - 8) { gauche = Math.max(8, r.right - m.width); haut = r.bottom + 6; }
+    if (haut + m.height > innerHeight - 8) haut = innerHeight - m.height - 8;
+    menu.style.left = `${Math.max(8, gauche)}px`;
+    menu.style.top = `${Math.max(8, haut)}px`;
+    menu.querySelector("button.actif")?.focus();
+  }
+  function fermerMenu() {
+    const menu = document.getElementById("menu-affichage");
+    if (menu) menu.hidden = true;
+  }
+
+  function choisir(mode) {
+    ecrire(mode);
+    fermerMenu();
+    appliquer();
+    majBouton();
+    const message = mode === "auto" ? `Affichage automatique : ${MODES[detecter()].toLowerCase()}.` : `Affichage ${MODES[mode].toLowerCase()}.`;
+    if (typeof notifier === "function") notifier(message);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const appli = document.getElementById("application");
+    // barre du haut (téléphone) : menu, titre de la page, affichage
+    const barre = document.createElement("header");
+    barre.id = "barre-mobile";
+    barre.innerHTML = `
+      <button type="button" class="bouton-menu" aria-label="Ouvrir le menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <strong class="titre-mobile">Suivi fidélisation</strong>
+      <button type="button" class="bouton-affichage icone-seule" id="affichage-barre" aria-label="Changer l'affichage">${ICONE}</button>`;
+    appli.prepend(barre);
+    const voile = document.createElement("div");
+    voile.className = "voile-menu";
+    appli.appendChild(voile);
+
+    // bouton dans le menu de gauche
+    const lien = document.createElement("button");
+    lien.type = "button";
+    lien.id = "affichage-menu";
+    lien.className = "lien bouton-affichage";
+    lien.innerHTML = `<span class="icone">${ICONE}</span><span class="libelle" data-affichage-libelle></span>`;
+    document.querySelector("#navigation .liens.bas")?.insertBefore(lien, document.querySelector('#navigation .liens.bas [data-page="parametres"]'));
+
+    const menu = document.createElement("div");
+    menu.id = "menu-affichage";
+    menu.setAttribute("role", "menu");
+    menu.hidden = true;
+    document.body.appendChild(menu);
+
+    // (stopImmediatePropagation : le bouton du menu ne doit pas déclencher la navigation entre pages)
+    document.querySelectorAll(".bouton-affichage").forEach((b) => b.addEventListener("click", (e) => { e.stopImmediatePropagation(); e.stopPropagation(); ouvrirMenu(b); }));
+    menu.addEventListener("click", (e) => { const b = e.target.closest("[data-mode]"); if (b) choisir(b.dataset.mode); });
+    document.addEventListener("click", (e) => { if (!e.target.closest("#menu-affichage")) fermerMenu(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { fermerMenu(); appli.classList.remove("menu-ouvert"); } });
+
+    // menu de gauche en tiroir sur téléphone
+    const basculer = (ouvert) => {
+      appli.classList.toggle("menu-ouvert", ouvert);
+      barre.querySelector(".bouton-menu").setAttribute("aria-expanded", String(ouvert));
+    };
+    barre.querySelector(".bouton-menu").addEventListener("click", () => basculer(!appli.classList.contains("menu-ouvert")));
+    voile.addEventListener("click", () => basculer(false));
+    document.getElementById("navigation").addEventListener("click", (e) => {
+      if (html.dataset.appareil === "telephone" && e.target.closest(".lien[data-page]")) basculer(false);
+    });
+    // titre de la page affichée dans la barre du haut
+    const majTitre = () => {
+      const actif = document.querySelector("#navigation .lien.actif .libelle");
+      barre.querySelector(".titre-mobile").textContent = actif ? actif.textContent : "Suivi fidélisation";
+    };
+    new MutationObserver(majTitre).observe(document.getElementById("navigation"), { subtree: true, attributes: true, attributeFilter: ["class"] });
+
+    majBouton();
+  });
+
+  let minuterie;
+  addEventListener("resize", () => { clearTimeout(minuterie); minuterie = setTimeout(() => { if (lire() === "auto") appliquer(); }, 150); });
+  addEventListener("orientationchange", () => setTimeout(appliquer, 200));
+
+  window.__affichage = { detecter, modeEffectif, choisir };
+})();
+
+</script>
 </head>
 <body>
   <div id="application">
@@ -1285,6 +1663,7 @@ html[data-theme="sombre"] .pl-zone-import .icone { color: color-mix(in srgb, var
               <span><i class="pl-cle-change"></i>Mis à jour d'après le planning</span>
               <span><i class="pl-cle-maintenant"></i>En ce moment</span>
             </div>
+            <div class="pl-jours-mobile" id="pl-jours-mobile" role="tablist" aria-label="Jour affiché"></div>
             <div class="defilement-horizontal">
               <table class="tableau-office pl-caisse">
                 <thead id="pl-entete-caisse"></thead>
@@ -3015,7 +3394,7 @@ function dessinerEvolution() {
     + `<span class="tout"><button data-tout="afficher">Tout afficher</button> · <button data-tout="masquer">Tout masquer</button></span>` : "";
   const series = toutes.filter((s) => toutes.length === 1 || !MASQUES.has(s.nom));
 
-  const L = Math.max(500, zone.clientWidth || 900), H = 360;
+  const L = Math.max(300, zone.clientWidth || 900), H = (zone.clientWidth || 900) < 600 ? 260 : 360;   // plus bas sur téléphone
   const m = { haut: 12, droite: 16, bas: 34, gauche: 44 };
   if (!periodes.length) {
     zone.innerHTML = `<svg viewBox="0 0 ${L} 120"><text class="vide" x="${L / 2}" y="60" text-anchor="middle">Aucune donnée : fais une première saisie.</text></svg>`;
@@ -4085,6 +4464,15 @@ function plAfficherCaisse() {
   }
   $("#pl-lignes-caisse").innerHTML = corps || `<tr class="vide-ligne"><td>Aucun jour d'ouverture : vérifie les horaires dans Réglages.</td></tr>`;
 
+  // sur téléphone : un jour à la fois (onglets), aujourd'hui par défaut
+  if (PL.jourMobile === undefined || !jours.includes(PL.jourMobile)) PL.jourMobile = maintenant && jours.includes(maintenant.jour) ? maintenant.jour : jours[0];
+  $("#pl-jours-mobile").innerHTML = jours.map((j) => {
+    const d = plDateJour(PL.semaine, j);
+    return `<button type="button" role="tab" data-jour="${j}" aria-selected="${j === PL.jourMobile}" class="${j === PL.jourMobile ? "actif" : ""} ${maintenant?.jour === j ? "aujourdhui" : ""}">
+      <span>${PL_JOURS_COURTS[j].replace(".", "")}</span><strong>${d.getUTCDate()}</strong></button>`;
+  }).join("");
+  $(".pl-caisse").dataset.col = String(Math.max(0, jours.indexOf(PL.jourMobile)));
+
   // chiffres
   const enCaisse = noms.filter((n) => cibles.possible[n] > 0);
   const ecartMax = PL.caisse && enCaisse.length ? Math.max(...enCaisse.map((n) => Math.abs(parNom[n].temps - cibles.cible[n]))) : null;
@@ -4703,6 +5091,12 @@ function plBrancher() {
   $("#pl-autre").addEventListener("click", () => plCreerCaisse(true));
   $$(".pl-pdf").forEach((b) => b.addEventListener("click", plExporterPdf));
   $("#pl-lignes-caisse").addEventListener("change", (e) => { if (e.target.matches(".pl-choix")) plChangerChoix(e.target); });
+  $("#pl-jours-mobile").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-jour]");
+    if (!b) return;
+    PL.jourMobile = Number(b.dataset.jour);
+    plAfficherCaisse();
+  });
 
   $("#pl-enregistrer-reglages").addEventListener("click", plEnregistrerReglages);
   const reglageChange = () => { plLireReglages(); plAfficherReglages(); };
