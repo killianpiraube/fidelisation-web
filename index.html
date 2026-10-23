@@ -921,6 +921,64 @@ html[data-theme="sombre"] .pl-caisse th.pl-aujourdhui, html[data-theme="sombre"]
 .pl-alerte .bouton.petit-bouton { height: 26px; margin: 0 6px 0 4px; vertical-align: middle; }
 html[data-theme="sombre"] .pl-zone-import .icone { color: color-mix(in srgb, var(--accent) 45%, #fff); }
 
+
+/* ------------------------------------------------------------ e-résa hors caisse */
+.er-formulaire {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px; margin: 16px 0 6px; padding: 14px 16px;
+  background: var(--accent-doux, var(--fond)); border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--bord)); border-radius: var(--r-l, 0);
+}
+.er-formulaire.desactive { opacity: .5; pointer-events: none; }
+.er-form-titre { flex-basis: 100%; font-size: 13.5px; }
+.er-formulaire label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--doux); }
+.er-formulaire input, .er-formulaire select { height: 36px; padding: 0 10px; border: 1px solid var(--bord-fort); border-radius: var(--r-s, 0); min-width: 130px; }
+.er-formulaire select { min-width: 170px; }
+.er-formulaire .bouton { height: 36px; padding: 0 20px; border-radius: var(--r-s, 0); }
+.er-astuce { flex-basis: 100%; }
+.er-croisement td, .er-croisement th { white-space: nowrap; }
+.er-croisement td.nombre strong { display: block; font-size: 14px; }
+.er-detail { display: block; font-size: 10.5px; color: var(--doux); }
+.er-aujourdhui { background: color-mix(in srgb, var(--accent) 6%, transparent) !important; }
+.er-croisement tfoot td, .ob-repartition tfoot td, .ob-jours tfoot td { font-weight: 600; }
+
+/* ------------------------------------------------------------ objectifs */
+.ob-saisie { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; margin: 8px 0 14px; }
+.ob-saisie label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--doux); font-weight: 550; }
+.ob-saisie input { width: 130px; height: 42px; padding: 0 12px; font-size: 18px; font-weight: 650; border: 1px solid var(--bord-fort); border-radius: var(--r-m, 0); font-variant-numeric: tabular-nums; }
+.ob-saisie input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.ob-total { display: flex; flex-direction: column; gap: 2px; padding: 0 0 4px 8px; }
+.ob-total strong { font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ob-avancement { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.ob-indic { display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-l, 0); box-shadow: var(--ombre-1, none); }
+.ob-indic.score { border-color: color-mix(in srgb, var(--accent) 35%, var(--bord)); }
+.ob-indic .etiquette { font-size: 12px; color: var(--doux); font-weight: 550; }
+.ob-indic strong { font-size: 24px; font-variant-numeric: tabular-nums; }
+.ob-indic strong small { font-size: 14px; color: var(--doux); font-weight: 500; }
+.ob-barre { display: block; height: 8px; border-radius: 99px; background: var(--grille); overflow: hidden; }
+.ob-barre i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .3s ease; }
+.ob-barre.atteint i { background: var(--statut-bon) !important; }
+.ob-barre.petite { display: inline-block; vertical-align: middle; width: 90px; height: 7px; margin-right: 8px; }
+.ob-repartition td, .ob-repartition th { white-space: nowrap; }
+td.ob-ok strong, td.ob-ok .ob-vise { color: var(--vert); }
+.ob-entete-jours { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.ob-entete-jours h3 { margin: 0; }
+.ob-jours td, .ob-jours th { white-space: nowrap; }
+.ob-jours td.ob-jour { line-height: 1.3; }
+.ob-pct { display: block; font-weight: 700; font-size: 13.5px; }
+.ob-vise { display: block; font-size: 12px; }
+.ob-temps { display: block; font-size: 10.5px; color: var(--doux); }
+td.ob-jour.ob-ok { background: color-mix(in srgb, var(--statut-bon) 9%, var(--blanc)); }
+td.ob-jour.ob-retard .ob-vise { color: var(--rouge); font-weight: 600; }
+.ob-jours tfoot .ob-pct { font-size: 12.5px; }
+html[data-theme="sombre"] td.ob-jour.ob-ok { background: color-mix(in srgb, var(--statut-bon) 14%, var(--blanc)); }
+html[data-appareil="telephone"] .er-formulaire label, html[data-appareil="telephone"] .er-formulaire input, html[data-appareil="telephone"] .er-formulaire select { width: 100%; }
+html[data-appareil="telephone"] .er-formulaire .bouton { width: 100%; height: 44px; }
+html[data-appareil="telephone"] .er-formulaire input, html[data-appareil="telephone"] .er-formulaire select { height: 44px; }
+html[data-appareil="telephone"] .ob-saisie label { flex: 1 1 44%; }
+html[data-appareil="telephone"] .ob-saisie input { width: 100%; height: 48px; }
+html[data-appareil="telephone"] .ob-avancement { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-appareil="telephone"] .ob-indic.score { grid-column: 1 / -1; }
+html[data-appareil="tablette"] .ob-saisie input, html[data-appareil="tablette"] .er-formulaire input, html[data-appareil="tablette"] .er-formulaire select { height: 42px; }
+
 /* impression du planning de caisse */
 @media print {
   html.impression-planning, html.impression-planning body { height: auto; overflow: visible; background: #fff; }
@@ -1330,6 +1388,8 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
       <div class="liens">
         <button class="lien" data-page="accueil"><span class="icone" data-icone="accueil"></span><span class="libelle">Accueil</span></button>
         <button class="lien" data-page="saisie"><span class="icone" data-icone="saisie"></span><span class="libelle">Saisie</span></button>
+        <button class="lien" data-page="eresa" id="lien-eresa" hidden><span class="icone" data-icone="eresa"></span><span class="libelle">E-résa</span></button>
+        <button class="lien" data-page="objectifs" id="lien-objectifs" hidden><span class="icone" data-icone="objectif"></span><span class="libelle">Objectifs</span></button>
         <button class="lien" data-page="equipe"><span class="icone" data-icone="equipe"></span><span class="libelle">Équipe</span></button>
         <button class="lien" data-page="planning" id="lien-planning" hidden><span class="icone" data-icone="planning"></span><span class="libelle">Planning</span></button>
         <button class="lien" data-page="classement"><span class="icone" data-icone="podium"></span><span class="libelle">Classement</span></button>
@@ -1394,7 +1454,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
 
         <h2 class="titre-section">Dernières saisies</h2>
         <table class="tableau-office">
-          <thead><tr><th>Date</th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Score</th><th class="nombre">Temps caisse</th><th class="nombre">Score / h</th></tr></thead>
+          <thead><tr><th>Date</th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Livret bébé</th><th class="nombre">Score</th><th class="nombre">Temps caisse</th><th class="nombre">Score / h</th></tr></thead>
           <tbody id="dernieres"></tbody>
         </table>
         <button id="ouvrir-fichier" class="bouton-lien seulement-local">Ouvrir le fichier des résultats</button>
@@ -1430,9 +1490,9 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
             <h3 id="titre-saisie">Résultats</h3>
             <p class="doux petit">Décoche un conseiller absent : aucune ligne ne sera créée pour lui. Le temps en caisse s'écrit <strong>12h30</strong>, <strong>12:30</strong> ou <strong>12,5</strong>.</p>
             <table class="tableau-office grille-saisie">
-              <thead><tr><th></th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Temps caisse</th></tr></thead>
+              <thead><tr><th></th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre" title="E-résa faites en caisse (celles hors caisse se notent dans l'onglet E-résa)">E-résa caisse</th><th class="nombre">Livret bébé</th><th class="nombre">Temps caisse</th></tr></thead>
               <tbody id="lignes-saisie"></tbody>
-              <tfoot><tr><td></td><td>Total</td><td class="nombre" id="total-comptes">0</td><td class="nombre" id="total-famille">0</td><td class="nombre" id="total-resa">0</td><td class="nombre" id="total-heures">—</td></tr></tfoot>
+              <tfoot><tr><td></td><td>Total</td><td class="nombre" id="total-comptes">0</td><td class="nombre" id="total-famille">0</td><td class="nombre" id="total-resa">0</td><td class="nombre" id="total-livret">0</td><td class="nombre" id="total-heures">—</td></tr></tfoot>
             </table>
             <p id="info-saisie" class="attente" hidden></p>
           </div>
@@ -1443,7 +1503,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
             </div>
             <div class="defilement">
               <table class="tableau-office compact cliquable">
-                <thead><tr><th>Date</th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Score</th><th class="nombre">Temps</th><th class="nombre">Score / h</th><th class="seulement-en-ligne">Par</th><th></th></tr></thead>
+                <thead><tr><th>Date</th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Livret bébé</th><th class="nombre">Score</th><th class="nombre">Temps</th><th class="nombre">Score / h</th><th class="seulement-en-ligne">Par</th><th></th></tr></thead>
                 <tbody id="historique"></tbody>
               </table>
             </div>
@@ -1496,23 +1556,23 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
             <div class="commandes"><select id="tri-classement">
               <optgroup label="Résultats">
                 <option value="score_total">Score total</option><option value="comptes">Comptes créés</option>
-                <option value="famille_plus">Cartes Famille+</option><option value="e_reservations">E-réservations</option>
+                <option value="famille_plus">Cartes Famille+</option><option value="e_reservations">E-réservations</option><option value="livret_bebe">Livrets bébé</option>
               </optgroup>
               <optgroup label="Par heure de caisse">
                 <option value="score_total_h">Score par heure de caisse</option><option value="comptes_h">Comptes par heure</option>
-                <option value="famille_plus_h">Famille+ par heure</option><option value="e_reservations_h">E-résa par heure</option>
+                <option value="famille_plus_h">Famille+ par heure</option><option value="e_reservations_h">E-résa par heure</option><option value="livret_bebe_h">Livret bébé par heure</option>
               </optgroup>
             </select></div>
             <span class="legende">Trier par</span>
           </div>
-          <div class="ruban-info doux">Score = comptes + Famille+ + e-résa. Par heure = résultat ÷ temps en caisse.<br><span id="info-precedente"></span></div>
+          <div class="ruban-info doux">Score = comptes + Famille+ + e-résa (caisse et hors caisse) + livrets bébé. Par heure = résultat ÷ temps en caisse.<br><span id="info-precedente"></span></div>
         </div>
         <div class="feuille-defilante">
           <div class="feuille">
             <h2 id="titre-classement">Classement</h2>
             <div id="chiffres-classement" class="chiffres compacts"></div>
             <table class="tableau-office classement">
-              <thead><tr><th class="rang">#</th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Score</th><th class="nombre">Temps</th><th class="nombre">Score / h</th><th class="barre-col"></th><th class="nombre">vs préc.</th></tr></thead>
+              <thead><tr><th class="rang">#</th><th>Conseiller</th><th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Livret bébé</th><th class="nombre">Score</th><th class="nombre">Temps</th><th class="nombre">Score / h</th><th class="barre-col"></th><th class="nombre">vs préc.</th></tr></thead>
               <tbody id="lignes-classement"></tbody>
             </table>
           </div>
@@ -1530,7 +1590,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
           </div>
           <div class="groupe">
             <div class="commandes"><span class="choix" data-choix="indicateur-stabilite">
-              <button data-valeur="score_total" class="actif">Score total</button><button data-valeur="comptes">Comptes</button><button data-valeur="famille_plus">Famille+</button><button data-valeur="e_reservations">E-résa</button>
+              <button data-valeur="score_total" class="actif">Score total</button><button data-valeur="comptes">Comptes</button><button data-valeur="famille_plus">Famille+</button><button data-valeur="e_reservations">E-résa</button><button data-valeur="livret_bebe">Livret bébé</button>
             </span></div>
             <span class="legende">Indicateur</span>
           </div>
@@ -1572,7 +1632,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
           </div>
           <div class="groupe">
             <div class="commandes"><span class="choix" data-choix="indicateur-evolution">
-              <button data-valeur="score_total" class="actif">Score total</button><button data-valeur="comptes">Comptes</button><button data-valeur="famille_plus">Famille+</button><button data-valeur="e_reservations">E-résa</button>
+              <button data-valeur="score_total" class="actif">Score total</button><button data-valeur="comptes">Comptes</button><button data-valeur="famille_plus">Famille+</button><button data-valeur="e_reservations">E-résa</button><button data-valeur="livret_bebe">Livret bébé</button>
             </span></div>
             <span class="legende">Indicateur</span>
           </div>
@@ -1597,6 +1657,119 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
             <div id="graphique-evolution" class="graphique"></div>
             <h4>Valeurs</h4>
             <div class="defilement-horizontal"><table class="tableau-office compact" id="table-evolution"></table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== E-RÉSERVATIONS HORS CAISSE ===================== -->
+      <section id="page-eresa" class="page page-outil" hidden>
+        <div class="ruban">
+          <div class="groupe">
+            <div class="commandes">
+              <button id="er-feuille" class="gros principal"><span class="icone" data-icone="pdf"></span>Imprimer la feuille à remplir</button>
+            </div>
+            <span class="legende">Feuille</span>
+          </div>
+          <div class="groupe">
+            <div class="commandes colonne">
+              <div class="pl-navigation">
+                <button class="bouton carre" data-semaine-er="-1" title="Semaine précédente">‹</button>
+                <strong id="er-titre-semaine">Semaine</strong>
+                <button class="bouton carre" data-semaine-er="1" title="Semaine suivante">›</button>
+              </div>
+              <div class="pl-navigation">
+                <input id="er-date" type="date" title="Aller à la semaine de cette date">
+                <button class="bouton petit-bouton" data-semaine-er="0">Cette semaine</button>
+              </div>
+            </div>
+            <span class="legende">Semaine</span>
+          </div>
+          <div class="ruban-info doux">Les e-résa faites en dehors de la caisse (tablette, téléphone…) sont notées sur la feuille,<br>puis recopiées ici : elles s'ajoutent à celles de la caisse pour chaque conseiller.</div>
+        </div>
+        <div class="feuille-defilante">
+          <div class="feuille">
+            <h2 id="er-titre">E-réservations</h2>
+            <p class="doux explication">Chaque e-résa notée ici compte pour le conseiller, dans le classement, la stabilité, l'évolution et les objectifs, en plus des e-résa saisies avec les résultats de caisse.</p>
+            <div id="er-alerte"></div>
+            <form id="er-formulaire" class="er-formulaire" autocomplete="off">
+              <strong class="er-form-titre">Ajouter une e-résa hors caisse</strong>
+              <label>Date<input id="er-f-date" type="date" required></label>
+              <label>Heure<input id="er-f-heure" type="time" step="300"></label>
+              <label>Conseiller<select id="er-f-conseiller" required></select></label>
+              <button type="submit" class="bouton principal">Ajouter</button>
+              <span class="doux petit er-astuce">Entrée = ajouter. La date et le conseiller restent choisis pour la ligne suivante.</span>
+            </form>
+            <div id="er-chiffres" class="chiffres compacts"></div>
+            <h3 class="espace-haut">Par conseiller : caisse + hors caisse</h3>
+            <p class="doux petit">Dans chaque case : le total du jour, et en dessous le détail « caisse + hors caisse ».</p>
+            <div class="defilement-horizontal"><table class="tableau-office compact er-croisement"><thead id="er-entete-croisement"></thead><tbody id="er-lignes-croisement"></tbody><tfoot id="er-pied-croisement"></tfoot></table></div>
+            <h3 class="espace-haut">E-résa hors caisse de la semaine</h3>
+            <table class="tableau-office compact er-liste">
+              <thead><tr><th>Date</th><th>Heure</th><th>Conseiller</th><th class="seulement-en-ligne">Saisie par</th><th></th></tr></thead>
+              <tbody id="er-lignes"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== OBJECTIFS DE LA SEMAINE ===================== -->
+      <section id="page-objectifs" class="page page-outil" hidden>
+        <div class="ruban">
+          <div class="groupe">
+            <div class="commandes">
+              <button id="ob-enregistrer" class="gros principal"><span class="icone" data-icone="enregistrer"></span>Enregistrer les objectifs</button>
+            </div>
+            <span class="legende">Objectifs</span>
+          </div>
+          <div class="groupe">
+            <div class="commandes colonne">
+              <div class="pl-navigation">
+                <button class="bouton carre" data-semaine-ob="-1" title="Semaine précédente">‹</button>
+                <strong id="ob-titre-semaine">Semaine</strong>
+                <button class="bouton carre" data-semaine-ob="1" title="Semaine suivante">›</button>
+              </div>
+              <div class="pl-navigation">
+                <input id="ob-date" type="date" title="Aller à la semaine de cette date">
+                <button class="bouton petit-bouton" data-semaine-ob="0">Cette semaine</button>
+              </div>
+            </div>
+            <span class="legende">Semaine</span>
+          </div>
+          <div class="ruban-info doux">Chaque conseiller reçoit une part de l'objectif égale à sa part<br>du temps de caisse de la semaine (planning de caisse).</div>
+        </div>
+        <div class="feuille-defilante">
+          <div class="feuille">
+            <h2 id="ob-titre">Objectifs</h2>
+            <p id="ob-etat" class="doux petit"></p>
+            <div id="ob-alerte"></div>
+            <h3 class="espace-haut">Objectifs du magasin pour la semaine</h3>
+            <div class="ob-saisie" id="ob-saisie">
+              <label>Comptes créés<input type="number" min="0" step="1" inputmode="numeric" data-objectif="comptes"></label>
+              <label>Cartes Famille+<input type="number" min="0" step="1" inputmode="numeric" data-objectif="famille_plus"></label>
+              <label>E-réservations<input type="number" min="0" step="1" inputmode="numeric" data-objectif="e_reservations"></label>
+              <label>Livrets bébé<input type="number" min="0" step="1" inputmode="numeric" data-objectif="livret_bebe"></label>
+              <div class="ob-total"><span class="doux">Score visé</span><strong id="ob-score">0</strong></div>
+            </div>
+            <div id="ob-avancement" class="ob-avancement"></div>
+
+            <h3 class="espace-haut">Répartition par conseiller</h3>
+            <p class="doux petit" id="ob-base"></p>
+            <div class="defilement-horizontal"><table class="tableau-office compact ob-repartition">
+              <thead><tr><th>Conseiller</th><th class="nombre">Temps de caisse</th><th class="nombre">Part</th>
+                <th class="nombre">Comptes</th><th class="nombre">Famille+</th><th class="nombre">E-résa</th><th class="nombre">Livret bébé</th><th class="nombre">Score</th><th class="barre-col">Avancement</th></tr></thead>
+              <tbody id="ob-lignes"></tbody>
+              <tfoot id="ob-pied"></tfoot>
+            </table></div>
+            <p class="doux petit">Dans chaque case : réalisé / objectif de la semaine. L'objectif de chacun est arrondi pour que la somme fasse exactement l'objectif du magasin.</p>
+
+            <div class="ob-entete-jours espace-haut">
+              <h3>Jour par jour</h3>
+              <span class="choix" data-choix="ob-indicateur">
+                <button data-valeur="score_total" class="actif">Score</button><button data-valeur="comptes">Comptes</button><button data-valeur="famille_plus">Famille+</button><button data-valeur="e_reservations">E-résa</button><button data-valeur="livret_bebe">Livret bébé</button>
+              </span>
+            </div>
+            <p class="doux petit">Pour chaque jour : la part de l'objectif de la semaine que la personne doit faire ce jour-là (son temps de caisse du jour ÷ le temps de caisse de toute la semaine), l'objectif correspondant, et ce qui a été fait.</p>
+            <div class="defilement-horizontal"><table class="tableau-office compact ob-jours"><thead id="ob-entete-jours"></thead><tbody id="ob-lignes-jours"></tbody><tfoot id="ob-pied-jours"></tfoot></table></div>
           </div>
         </div>
       </section>
@@ -1872,11 +2045,11 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
   document.documentElement.classList.add("version-web");
 
   // ------------------------------------------------------------ constantes (comme moteur.py)
-  const INDICATEURS = ["comptes", "famille_plus", "e_reservations"];
+  const INDICATEURS = ["comptes", "famille_plus", "e_reservations", "livret_bebe"];
   const COLONNES = [...INDICATEURS, "score_total"];
   const HEURES = "heures_caisse";
   const LIBELLES = {
-    comptes: "Comptes créés", famille_plus: "Cartes Famille+", e_reservations: "E-réservations",
+    comptes: "Comptes créés", famille_plus: "Cartes Famille+", e_reservations: "E-réservations", livret_bebe: "Livrets bébé",
     score_total: "Score total", heures_caisse: "Temps en caisse",
   };
   const RATIOS = {};
@@ -1900,7 +2073,9 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
   };
   const REGLAGES_PAR_DEFAUT = { seuils: [15, 30, 50], theme: "auto", couleur: "#040037", periodes_minimum: 3, menu_replie: false, planning: PLANNING_PAR_DEFAUT };
   const REGLAGES_PARTAGES = ["seuils", "periodes_minimum", "planning"];
-  const TABLES = { resultats: "fid_resultats", conseillers: "fid_conseillers", reglages: "fid_reglages", plannings: "fid_plannings" };
+  const TABLES = { resultats: "fid_resultats", conseillers: "fid_conseillers", reglages: "fid_reglages", plannings: "fid_plannings",
+                   eresa: "fid_eresa", objectifs: "fid_objectifs" };
+  const SCRIPT_OBJECTIFS = "Les e-résa hors caisse, les objectifs et le livret bébé ne sont pas encore installés dans la base : lance le script installation_objectifs.sql dans Supabase › SQL Editor.";
 
   class ErreurConnexion extends Error {}
   class SessionRequise extends ErreurConnexion {}
@@ -2098,6 +2273,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
         await this.renouveler();
         return this.requete(methode, table, params, corps, prefer, true);
       }
+      if (reponse.status === 404 && (table === "eresa" || table === "objectifs")) throw new ErreurConnexion(SCRIPT_OBJECTIFS);
       if (reponse.status === 404 && table === "plannings") {
         throw new ErreurConnexion("Le planning n'est pas encore installé dans la base : lance le script installation_planning.sql dans Supabase › SQL Editor.");
       }
@@ -2105,8 +2281,9 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
         throw new ErreurConnexion("Les tables n'existent pas encore dans la base : lance le script d'installation (installation_base.sql) dans Supabase.");
       }
       const texte = await reponse.text();
+      if (!reponse.ok && /livret_bebe/.test(texte)) throw new ErreurConnexion(SCRIPT_OBJECTIFS);
       if (!reponse.ok) throw new ErreurConnexion(`La base en ligne a refusé l'opération (${reponse.status}) : ${texte.slice(0, 200)}`);
-      if (methode !== "GET") this.cache = null;
+      if (methode !== "GET") { this.cache = null; this.cacheEresa = null; }
       return texte.trim() ? JSON.parse(texte) : null;
     },
 
@@ -2120,9 +2297,13 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
       }
     },
 
+    colonneLivret: null,   // la colonne livret_bebe existe-t-elle ? (null = on ne sait pas encore)
     lireResultats() {
       if (this.cache && Date.now() - this.cache.heure < 2000) return this.cache.promesse;
-      const promesse = this.toutLire("resultats", "date.asc,conseiller.asc");
+      const promesse = this.toutLire("resultats", "date.asc,conseiller.asc").then((lignes) => {
+        if (lignes.length) this.colonneLivret = "livret_bebe" in lignes[0];
+        return lignes;
+      });
       this.cache = { heure: Date.now(), promesse };
       promesse.catch(() => { if (this.cache?.promesse === promesse) this.cache = null; });
       return promesse;
@@ -2130,8 +2311,12 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
 
     enregistrerLignes(jourIso, lignes) {
       const auteur = this.utilisateur(), maintenant = new Date().toISOString();
+      // base pas encore mise à jour : on enregistre quand même le reste, sauf s'il y a des livrets bébé à garder
+      const sansLivret = this.colonneLivret === false;
+      if (sansLivret && lignes.some((l) => l.livret_bebe > 0)) throw new ErreurConnexion(SCRIPT_OBJECTIFS);
       const corps = lignes.map((l) => ({
-        date: jourIso, conseiller: l.conseiller, ...Object.fromEntries(INDICATEURS.map((c) => [c, l[c]])),
+        date: jourIso, conseiller: l.conseiller,
+        ...Object.fromEntries(INDICATEURS.filter((c) => !(sansLivret && c === "livret_bebe")).map((c) => [c, l[c]])),
         [HEURES]: l[HEURES], saisi_par: auteur, modifie_le: maintenant,
       }));
       return this.requete("POST", "resultats", { on_conflict: "date,conseiller" }, corps, "resolution=merge-duplicates,return=minimal");
@@ -2141,11 +2326,45 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
     },
     async renommerResultats(ancien, nouveau) {
       const r = await this.requete("PATCH", "resultats", { conseiller: `eq.${ancien}` }, { conseiller: nouveau }, "return=representation");
+      try { await this.requete("PATCH", "eresa", { conseiller: `eq.${ancien}` }, { conseiller: nouveau }); } catch (e) { /* table pas encore installée */ }
       return (r || []).length;
     },
     async supprimerResultats(nom) {
       const r = await this.requete("DELETE", "resultats", { conseiller: `eq.${nom}` }, undefined, "return=representation");
+      try { await this.requete("DELETE", "eresa", { conseiller: `eq.${nom}` }); } catch (e) { /* table pas encore installée */ }
       return (r || []).length;
+    },
+
+    // --- e-réservations faites hors caisse (une ligne par e-résa)
+    eresaManquante: false,
+    lireEresa() {
+      if (this.cacheEresa && Date.now() - this.cacheEresa.heure < 2000) return this.cacheEresa.promesse;
+      const promesse = this.toutLire("eresa", "date.asc,heure.asc").then((l) => { this.eresaManquante = false; return l; }, (e) => {
+        if (e instanceof SessionRequise) throw e;
+        this.eresaManquante = true;   // script pas encore lancé : les pages marchent quand même
+        return [];
+      });
+      this.cacheEresa = { heure: Date.now(), promesse };
+      return promesse;
+    },
+    ajouterEresa(lignes) {
+      const auteur = this.utilisateur(), maintenant = new Date().toISOString();
+      return this.requete("POST", "eresa", {}, lignes.map((l) => ({ ...l, saisi_par: auteur, modifie_le: maintenant })), "return=minimal");
+    },
+    supprimerEresa(id) { return this.requete("DELETE", "eresa", { id: `eq.${id}` }); },
+
+    // --- objectifs de la semaine
+    async lireObjectifs(semaine) {
+      const r = await this.requete("GET", "objectifs", { select: "*", semaine: `eq.${semaine}` });
+      return r && r.length ? r[0] : null;
+    },
+    async objectifsPrecedents(semaine) {
+      const r = await this.requete("GET", "objectifs", { select: "*", semaine: `lt.${semaine}`, order: "semaine.desc", limit: 1 });
+      return r && r.length ? r[0] : null;
+    },
+    ecrireObjectifs(semaine, obj) {
+      return this.requete("POST", "objectifs", { on_conflict: "semaine" },
+        [{ semaine, ...obj, saisi_par: this.utilisateur(), modifie_le: new Date().toISOString() }], "resolution=merge-duplicates,return=minimal");
     },
 
     async lireListeConseillers() {
@@ -2216,7 +2435,13 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
 
   // ------------------------------------------------------------ chargement des résultats (comme charger())
   async function charger() {
-    const brut = await base.lireResultats();
+    const [brut, eresa] = await Promise.all([base.lireResultats(), base.lireEresa()]);
+    // e-résa hors caisse comptées par jour et par conseiller
+    const horsCaisse = new Map();
+    for (const e of eresa) {
+      const nom = String(e.conseiller ?? "").trim(), jour = String(e.date || "").slice(0, 10);
+      if (nom && jour) horsCaisse.set(`${jour}\u0000${nom}`, (horsCaisse.get(`${jour}\u0000${nom}`) || 0) + 1);
+    }
     const lignes = [];
     for (const l of brut) {
       if (!l.date) continue;
@@ -2225,9 +2450,26 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
       const d = versDate(String(l.date).slice(0, 10));
       const ligne = { date: versIso(d), d, conseiller, saisi_par: l.saisi_par || "" };
       INDICATEURS.forEach((c) => { const n = Math.trunc(Number(l[c])); ligne[c] = Number.isFinite(n) ? n : 0; });
+      // e-résa : celles de la caisse + celles notées sur la feuille hors caisse
+      const cle = `${ligne.date}\u0000${conseiller}`;
+      ligne.e_reservations_caisse = ligne.e_reservations;
+      ligne.e_resa_hc = horsCaisse.get(cle) || 0;
+      ligne.e_reservations += ligne.e_resa_hc;
+      horsCaisse.delete(cle);
       ligne.score_total = somme(INDICATEURS.map((c) => ligne[c]));
       const h = l[HEURES] === null || l[HEURES] === undefined || l[HEURES] === "" ? NaN : Number(l[HEURES]);
       ligne[HEURES] = Number.isFinite(h) ? arrondi(Number(h.toPrecision(6)), 4) : null;
+      TYPES_PERIODE.forEach((t) => { ligne[t] = codePeriode(t, d); });
+      lignes.push(ligne);
+    }
+    // jours où quelqu'un n'a que des e-résa hors caisse (pas de ligne de caisse)
+    for (const [cle, nb] of horsCaisse) {
+      const [jour, conseiller] = cle.split("\u0000");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(jour)) continue;
+      const d = versDate(jour);
+      const ligne = { date: versIso(d), d, conseiller, saisi_par: "", seulement_hc: true, [HEURES]: null,
+        ...Object.fromEntries(INDICATEURS.map((c) => [c, 0])), e_reservations: nb, e_reservations_caisse: 0, e_resa_hc: nb };
+      ligne.score_total = nb;
       TYPES_PERIODE.forEach((t) => { ligne[t] = codePeriode(t, d); });
       lignes.push(ligne);
     }
@@ -2262,6 +2504,15 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
   }
 
   const dateTexte = (iso) => iso.split("-").reverse().join("/");
+  // identifiant unique (crypto.randomUUID n'existe que sur une page sécurisée : sinon on le fabrique)
+  const nouvelId = () => (crypto.randomUUID ? crypto.randomUUID()
+    : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)));
+  // les 7 jours (AAAA-MM-JJ) d'une semaine « 2026-S43 »
+  function joursSemaine(semaine) {
+    const [a, s] = semaine.split("-S").map(Number);
+    const lundi = lundiIso(a, s);
+    return Array.from({ length: 7 }, (_, i) => versIso(new Date(lundi.getTime() + i * 86400000)));
+  }
 
   async function equipe() {
     const df = await charger();
@@ -2335,8 +2586,9 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
   // ------------------------------------------------------------ saisie
   async function lignesDuJour(jourIso) {
     const r = {};
-    for (const l of (await charger()).filter((x) => x.date === jourIso)) {
-      r[l.conseiller] = { ...Object.fromEntries(INDICATEURS.map((c) => [c, l[c]])), [HEURES]: texteHeures(l[HEURES]) };
+    for (const l of (await charger()).filter((x) => x.date === jourIso && !x.seulement_hc)) {
+      r[l.conseiller] = { ...Object.fromEntries(INDICATEURS.map((c) => [c, l[c]])), e_reservations: l.e_reservations_caisse, [HEURES]: texteHeures(l[HEURES]),
+                          e_resa_hc: l.e_resa_hc };
     }
     return r;
   }
@@ -2359,11 +2611,11 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
   }
 
   function historique(df) {
-    return [...df].sort((a, b) => (a.date === b.date ? (a.conseiller < b.conseiller ? -1 : a.conseiller > b.conseiller ? 1 : 0)
+    return [...df].filter((l) => !l.seulement_hc).sort((a, b) => (a.date === b.date ? (a.conseiller < b.conseiller ? -1 : a.conseiller > b.conseiller ? 1 : 0)
                                                      : a.date < b.date ? 1 : -1))
       .map((l) => ({
         date: l.date, date_texte: dateTexte(l.date), semaine: l.semaine, conseiller: l.conseiller,
-        ...Object.fromEntries(INDICATEURS.map((c) => [c, l[c]])), score_total: l.score_total,
+        ...Object.fromEntries(INDICATEURS.map((c) => [c, l[c]])), e_resa_hc: l.e_resa_hc, score_total: l.score_total,
         heures: texteHeures(l[HEURES]), score_h: ratio(l.score_total, l[HEURES]),
         saisi_par: (l.saisi_par || "").split("@")[0],
       }));
@@ -2705,6 +2957,94 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
       return { ok: "Réglages du planning enregistrés.", reglages: propres };
     }),
 
+    // --- e-réservations faites hors caisse
+    eresa_semaine: protege(async (semaine) => {
+      if (!/^\d{4}-S\d{2}$/.test(semaine || "")) return { erreur: "Semaine invalide." };
+      const jours = joursSemaine(semaine);
+      const [df, eresa, conseillers] = await Promise.all([charger(), base.lireEresa(), lireConseillers()]);
+      const entrees = eresa.filter((e) => jours.includes(String(e.date).slice(0, 10)))
+        .map((e) => ({ id: e.id, date: String(e.date).slice(0, 10), heure: e.heure || "", conseiller: e.conseiller, saisi_par: (e.saisi_par || "").split("@")[0] }))
+        .sort((a, b) => (a.date + a.heure < b.date + b.heure ? 1 : -1));
+      // croisement : e-résa de caisse et hors caisse, par personne et par jour
+      const parNom = {};
+      for (const l of df.filter((x) => jours.includes(x.date))) {
+        parNom[l.conseiller] = parNom[l.conseiller] || jours.map(() => ({ caisse: 0, hc: 0 }));
+        const j = jours.indexOf(l.date);
+        parNom[l.conseiller][j].caisse += l.e_reservations_caisse;
+        parNom[l.conseiller][j].hc += l.e_resa_hc;
+      }
+      return { semaine, libelle: libellePeriode("semaine", semaine), jours, entrees, parNom, conseillers, manquante: base.eresaManquante };
+    }),
+    eresa_ajouter: protege(async (lignes) => {
+      const propres = [];
+      for (const l of lignes || []) {
+        const date = String(l.date || ""), conseiller = String(l.conseiller || "").trim(), heure = String(l.heure || "").trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { erreur: "Date invalide." };
+        if (!conseiller) return { erreur: "Choisis le conseiller." };
+        if (heure && !/^\d{2}:\d{2}$/.test(heure)) return { erreur: "Heure invalide (ex. 14:30)." };
+        propres.push({ id: nouvelId(), date, heure: heure || null, conseiller });
+      }
+      if (!propres.length) return { erreur: "Rien à ajouter." };
+      try { await base.ajouterEresa(propres); }
+      catch (erreur) {
+        if (erreur instanceof ErreurConnexion) throw erreur;
+        return { erreur: `Enregistrement impossible : ${erreur.message || erreur}` };
+      }
+      return { ok: propres.length > 1 ? `${propres.length} e-résa ajoutées.` : `E-résa de ${propres[0].conseiller} ajoutée.` };
+    }),
+    eresa_supprimer: protege(async (id) => {
+      await base.supprimerEresa(id);
+      return { ok: "E-résa supprimée." };
+    }),
+
+    // --- objectifs de la semaine
+    objectifs_lire: protege(async (semaine) => {
+      if (!/^\d{4}-S\d{2}$/.test(semaine || "")) return { erreur: "Semaine invalide." };
+      const jours = joursSemaine(semaine);
+      const [df, conseillers, reglages, planning] = await Promise.all([charger(), lireConseillers(), lireReglages(),
+        base.lirePlanning(semaine).catch((e) => { if (e instanceof SessionRequise) throw e; return null; })]);
+      let objectifs = null, precedents = null, manquante = false;
+      try {
+        objectifs = await base.lireObjectifs(semaine);
+        if (!objectifs) precedents = await base.objectifsPrecedents(semaine);
+      } catch (e) {
+        if (e instanceof SessionRequise) throw e;
+        manquante = true;
+      }
+      // réalisé par personne et par jour (e-résa = caisse + hors caisse) et temps de caisse saisi
+      const realise = {}, tempsSaisi = {};
+      for (const l of df.filter((x) => jours.includes(x.date))) {
+        const j = jours.indexOf(l.date);
+        realise[l.conseiller] = realise[l.conseiller] || Object.fromEntries([...COLONNES].map((c) => [c, Array(7).fill(0)]));
+        COLONNES.forEach((c) => { realise[l.conseiller][c][j] += l[c]; });
+        if (estNombre(l[HEURES])) { tempsSaisi[l.conseiller] = tempsSaisi[l.conseiller] || Array(7).fill(0); tempsSaisi[l.conseiller][j] += l[HEURES] * 60; }
+      }
+      const garder = (o) => (o ? Object.fromEntries(INDICATEURS.map((c) => [c, Number(o[c]) || 0])) : null);
+      return {
+        semaine, libelle: libellePeriode("semaine", semaine), jours, conseillers,
+        objectifs: garder(objectifs), precedents: precedents ? { semaine: precedents.semaine, ...garder(precedents) } : null,
+        modifie_par: (objectifs?.saisi_par || "").split("@")[0], realise, tempsSaisi,
+        planning: planning ? { presences: planning.presences || {}, caisse: planning.caisse || null } : null,
+        reglages_planning: reglages.planning, manquante, en_cours: semaine === codePeriode("semaine", aujourdhui()),
+        aujourd_hui: versIso(aujourdhui()),
+      };
+    }),
+    objectifs_enregistrer: protege(async (semaine, obj) => {
+      if (!/^\d{4}-S\d{2}$/.test(semaine || "")) return { erreur: "Semaine invalide." };
+      const propres = {};
+      for (const c of INDICATEURS) {
+        const n = Number(String(obj?.[c] ?? "").replace(",", ".") || 0);
+        if (!Number.isFinite(n) || n < 0) return { erreur: `Objectif invalide pour ${LIBELLES[c].toLowerCase()}.` };
+        propres[c] = Math.round(n);
+      }
+      try { await base.ecrireObjectifs(semaine, propres); }
+      catch (erreur) {
+        if (erreur instanceof ErreurConnexion) throw erreur;
+        return { erreur: `Enregistrement impossible : ${erreur.message || erreur}` };
+      }
+      return { ok: `Objectifs de la ${libellePeriode("semaine", semaine).split(" · ")[0].toLowerCase()} enregistrés.` };
+    }),
+
     memoriser_menu: async (replie) => {
       memoire.ecrire(CLE_REGLAGES, { ...(memoire.lire(CLE_REGLAGES) || {}), menu_replie: !!replie });
     },
@@ -2776,7 +3116,7 @@ const PALETTE = {
 const GRIS = "#8a8886";
 
 const LIBELLES_PERIODE = { semaine: "Semaine", mois: "Mois", trimestre: "Trimestre", semestre: "Semestre", annee: "Année" };
-const LIBELLES_COURTS = { comptes: "Comptes", famille_plus: "Famille+", e_reservations: "E-résa", score_total: "Score" };
+const LIBELLES_COURTS = { comptes: "Comptes", famille_plus: "Famille+", e_reservations: "E-résa", livret_bebe: "Livret bébé", score_total: "Score" };
 
 // ------------------------------------------------------------ petits outils
 function dessinerIcones(racine = document) {
@@ -3110,7 +3450,7 @@ async function remplirAccueil() {
     : `${ETAT.date} · aucune donnée pour l'instant : commence par une saisie.`;
   $("#titre-mois").textContent = `${r.mois} (en cours)`;
 
-  $("#chiffres-mois").innerHTML = ["comptes", "famille_plus", "e_reservations", "score_total"].map((c) => `
+  $("#chiffres-mois").innerHTML = ["comptes", "famille_plus", "e_reservations", "livret_bebe", "score_total"].map((c) => `
     <div class="chiffre">
       <span class="etiquette">${echapper(ETAT.libelles[c])}</span>
       <strong>${nombre(r.actuel[c])}</strong>
@@ -3125,7 +3465,7 @@ async function remplirAccueil() {
   $("#encart-meilleur").innerHTML = r.meilleur
     ? `<span class="etiquette">Meilleur score du mois</span>
        <strong>${pastille(r.meilleur.nom)}${echapper(r.meilleur.nom)}</strong>
-       <span class="doux">${nombre(r.meilleur.score)} points (comptes + Famille+ + e-résa)</span>`
+       <span class="doux">${nombre(r.meilleur.score)} points (comptes + Famille+ + e-résa + livrets bébé)</span>`
     : `<span class="etiquette">Meilleur score du mois</span><strong>—</strong><span class="doux">Pas encore de saisie ce mois-ci.</span>`;
 
   $("#encart-regulier").innerHTML = r.plus_regulier
@@ -3137,10 +3477,10 @@ async function remplirAccueil() {
   const lignes = HISTORIQUE.slice(0, 8);
   $("#dernieres").innerHTML = lignes.length
     ? lignes.map((l) => `<tr><td>${l.date_texte}</td><td>${pastille(l.conseiller)}${echapper(l.conseiller)}</td>
-        <td class="nombre">${l.comptes}</td><td class="nombre">${l.famille_plus}</td><td class="nombre">${l.e_reservations}</td>
+        <td class="nombre">${l.comptes}</td><td class="nombre">${l.famille_plus}</td><td class="nombre">${l.e_reservations}</td><td class="nombre">${l.livret_bebe}</td>
         <td class="nombre"><strong>${l.score_total}</strong></td>
         <td class="nombre">${l.heures || '<span class="doux">—</span>'}</td><td class="nombre">${parHeure(l.score_h)}</td></tr>`).join("")
-    : `<tr class="vide-ligne"><td colspan="8">Aucune saisie pour l'instant.</td></tr>`;
+    : `<tr class="vide-ligne"><td colspan="9">Aucune saisie pour l'instant.</td></tr>`;
 }
 
 // ============================================================ SAISIE
@@ -3166,9 +3506,9 @@ async function chargerDateSaisie() {
     const champ = (cle) => `<td class="nombre"><input type="number" min="0" step="1" data-cle="${cle}" value="${v ? v[cle] : ""}" ${present ? "" : "disabled"}></td>`;
     return `<tr data-nom="${echapper(nom)}" class="${present ? "" : "absent"}">
       <td><input type="checkbox" class="present" ${present ? "checked" : ""} title="Présent sur ce tableau"></td>
-      <td class="nom">${pastille(nom)}${echapper(nom)}</td>${champ("comptes")}${champ("famille_plus")}${champ("e_reservations")}
+      <td class="nom">${pastille(nom)}${echapper(nom)}${v?.e_resa_hc ? `<div class="doux petit">+ ${v.e_resa_hc} e-résa hors caisse</div>` : ""}</td>${champ("comptes")}${champ("famille_plus")}${champ("e_reservations")}${champ("livret_bebe")}
       <td class="nombre"><input type="text" class="heures" data-cle="heures_caisse" placeholder="0h00" maxlength="6" value="${v ? echapper(v.heures_caisse) : ""}" ${present ? "" : "disabled"}></td></tr>`;
-  }).join("") : `<tr class="vide-ligne"><td colspan="6">Ajoute d'abord tes conseillers dans la page Équipe.</td></tr>`;
+  }).join("") : `<tr class="vide-ligne"><td colspan="7">Ajoute d'abord tes conseillers dans la page Équipe.</td></tr>`;
 
   const nbExistantes = Object.keys(existantes).length;
   $("#titre-saisie").textContent = `Résultats du ${new Date(jour + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
@@ -3180,7 +3520,7 @@ async function chargerDateSaisie() {
 }
 
 function calculerTotauxSaisie() {
-  const total = { comptes: 0, famille_plus: 0, e_reservations: 0, heures: 0 };
+  const total = { comptes: 0, famille_plus: 0, e_reservations: 0, livret_bebe: 0, heures: 0 };
   $$("#lignes-saisie tr[data-nom]").forEach((tr) => {
     if (!$(".present", tr).checked) return;
     $$("input[type=number][data-cle]", tr).forEach((i) => (total[i.dataset.cle] += Number(i.value) || 0));
@@ -3193,6 +3533,7 @@ function calculerTotauxSaisie() {
   $("#total-comptes").textContent = total.comptes;
   $("#total-famille").textContent = total.famille_plus;
   $("#total-resa").textContent = total.e_reservations;
+  $("#total-livret").textContent = total.livret_bebe;
 }
 
 async function enregistrerSaisie() {
@@ -3233,12 +3574,12 @@ function filtrerHistorique() {
   $("#historique").innerHTML = lignes.length ? lignes.map((l) => `
     <tr data-date="${l.date}">
       <td title="${l.semaine}">${l.date_texte}</td><td>${pastille(l.conseiller)}${echapper(l.conseiller)}</td>
-      <td class="nombre">${l.comptes}</td><td class="nombre">${l.famille_plus}</td><td class="nombre">${l.e_reservations}</td>
+      <td class="nombre">${l.comptes}</td><td class="nombre">${l.famille_plus}</td><td class="nombre">${l.e_reservations}</td><td class="nombre">${l.livret_bebe}</td>
       <td class="nombre"><strong>${l.score_total}</strong></td>
       <td class="nombre">${l.heures || '<span class="doux">—</span>'}</td><td class="nombre">${parHeure(l.score_h)}</td>
       <td class="seulement-en-ligne doux">${echapper(l.saisi_par || "")}</td>
       <td class="nombre"><button class="supprimer" data-supprimer="${echapper(l.conseiller)}" title="Supprimer cette ligne">×</button></td>
-    </tr>`).join("") : `<tr class="vide-ligne"><td colspan="10">${HISTORIQUE.length ? "Aucune ligne ne correspond au filtre." : "Aucune saisie pour l'instant."}</td></tr>`;
+    </tr>`).join("") : `<tr class="vide-ligne"><td colspan="11">${HISTORIQUE.length ? "Aucune ligne ne correspond au filtre." : "Aucune saisie pour l'instant."}</td></tr>`;
 }
 
 // ============================================================ CLASSEMENT
@@ -3277,7 +3618,7 @@ function afficherClassement() {
   const valeur = (l) => (l[tri] === null || l[tri] === undefined ? -Infinity : l[tri]);   // sans temps saisi -> en bas
   const lignes = [...(CLASSEMENT?.lignes || [])].sort((a, b) => valeur(b) - valeur(a) || b.score_total - a.score_total);
   const total = CLASSEMENT?.total;
-  $("#chiffres-classement").innerHTML = total ? ["comptes", "famille_plus", "e_reservations", "score_total"].map((c) => `
+  $("#chiffres-classement").innerHTML = total ? ["comptes", "famille_plus", "e_reservations", "livret_bebe", "score_total"].map((c) => `
     <div class="chiffre"><span class="etiquette">${echapper(ETAT.libelles[c])} · magasin</span><strong>${nombre(total[c])}</strong></div>`).join("") + `
     <div class="chiffre"><span class="etiquette">Temps en caisse · magasin</span><strong>${total.heures_texte || "—"}</strong></div>
     <div class="chiffre"><span class="etiquette">Score par heure · magasin</span><strong>${parHeure(total.score_total_h)}</strong></div>` : "";
@@ -3297,13 +3638,13 @@ function afficherClassement() {
       ? `<span class="doux petit" title="${echapper(ETAT.libelles[tri])}"> (${parHeure(l[tri])})</span>` : "";
     return `<tr class="${rang === 1 && !sansTemps ? "premier" : ""}">
       <td class="rang">${sansTemps ? "–" : rang}</td><td class="nom">${pastille(l.conseiller)}${echapper(l.conseiller)}${indicateurH}</td>
-      ${cellule("comptes")}${cellule("famille_plus")}${cellule("e_reservations")}${cellule("score_total")}
+      ${cellule("comptes")}${cellule("famille_plus")}${cellule("e_reservations")}${cellule("livret_bebe")}${cellule("score_total")}
       <td class="nombre">${l.heures_texte || '<span class="doux">—</span>'}</td>
       <td class="nombre">${tri === "score_total_h" ? `<strong>${parHeure(l.score_total_h)}</strong>` : parHeure(l.score_total_h)}</td>
       <td>${sansTemps ? '<span class="doux petit">temps non saisi</span>'
         : `<div class="barre-fond"><div class="barre" style="width:${((l[tri] ?? 0) / maximum) * 100}%;${fondBarre(l.conseiller)}"></div></div>`}</td>
       <td class="nombre">${ecart}</td></tr>`;
-  }).join("") : `<tr class="vide-ligne"><td colspan="10">Aucun résultat pour cette période.</td></tr>`;
+  }).join("") : `<tr class="vide-ligne"><td colspan="11">Aucun résultat pour cette période.</td></tr>`;
 }
 
 // ============================================================ STABILITÉ
@@ -5147,6 +5488,384 @@ window.addEventListener("pywebviewready", () => {
 
 // pour les tests
 window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plTexteNormalise, plAnalyserPagePdf, plTexteCase, plTrouverNom };
+
+</script>
+  <script>
+// =====================================================================
+//  E-RÉSA HORS CAISSE et OBJECTIFS DE LA SEMAINE (version web)
+//  - E-résa : les e-réservations faites en dehors de la caisse, recopiées
+//    depuis la feuille papier (date, heure, conseiller). Elles s'ajoutent à
+//    celles de la caisse pour chaque conseiller (classement, objectifs…).
+//  - Objectifs : comptes, Famille+, e-résa et livrets bébé pour la semaine,
+//    répartis entre les conseillers selon leur part du temps de caisse
+//    (planning de caisse de la semaine), pour la semaine et jour par jour.
+//  S'appuie sur planning.js (semaines, créneaux, export PDF).
+// =====================================================================
+
+ICONES.eresa = '<path d="M4 4h16v16H4zM4 9h16M9 13h6M9 16h4"/><path d="M15 2v4M9 2v4"/>';
+ICONES.objectif = '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l7-7M16 5h3v3"/>';
+
+const OB_INDICATEURS = ["comptes", "famille_plus", "e_reservations", "livret_bebe"];
+const OB_COURTS = { comptes: "Comptes", famille_plus: "Famille+", e_reservations: "E-résa", livret_bebe: "Livret bébé", score_total: "Score" };
+
+let ER = null;   // données de la page E-résa
+let OB = null;   // données de la page Objectifs
+let OB_MODIFIE = false;
+
+const obPct = (x) => `${nombre(x * 100, x * 100 < 10 && x > 0 ? 1 : 0)} %`;
+const obDec = (x) => nombre(x, Math.abs(x) < 10 && x % 1 ? 1 : 0);
+
+// ------------------------------------------------------------ navigation par semaine (les deux pages)
+function obSemaineNav(prefixe, semaine) {
+  $(`#${prefixe}-titre-semaine`).textContent = `Semaine ${Number(semaine.split("-S")[1])}`;
+  $(`#${prefixe}-titre-semaine`).title = `du ${plTexteDate(plLundi(semaine))} au ${plTexteDate(plDateJour(semaine, 6))}`;
+  $(`#${prefixe}-date`).value = plIso(plLundi(semaine));
+}
+function obBrancherNav(prefixe, aller) {
+  $$(`[data-semaine-${prefixe}]`).forEach((b) => b.addEventListener("click", () => {
+    const pas = Number(b.dataset[`semaine${prefixe[0].toUpperCase()}${prefixe.slice(1)}`]);
+    const actuelle = (prefixe === "er" ? ER : OB)?.semaine || plSemaineDe(ETAT.aujourd_hui);
+    aller(pas === 0 ? plSemaineDe(ETAT.aujourd_hui) : plDecaler(actuelle, pas));
+  }));
+  $(`#${prefixe}-date`).addEventListener("change", (e) => { if (e.target.value) aller(plSemaineDe(e.target.value)); });
+}
+const obAlerteScript = () => `<p class="attente pl-alerte"><strong>Une étape à faire une seule fois :</strong> lance le script <strong>installation_objectifs.sql</strong> dans Supabase › SQL Editor (New query › coller › Run). Il ajoute le livret bébé, les e-résa hors caisse et les objectifs à la base partagée.</p>`;
+
+// ============================================================ E-RÉSA HORS CAISSE
+async function erCharger(semaine) {
+  const r = await api().eresa_semaine(semaine);
+  if (r.erreur) return notifier(r.erreur, true);
+  const garderDate = ER && ER.semaine === semaine ? $("#er-f-date").value : null;
+  ER = r;
+  obSemaineNav("er", semaine);
+  // formulaire : aujourd'hui si c'est cette semaine, sinon le lundi
+  const dateDefaut = r.jours.includes(ETAT.aujourd_hui) ? ETAT.aujourd_hui : r.jours[0];
+  $("#er-f-date").value = garderDate && r.jours.includes(garderDate) ? garderDate : dateDefaut;
+  $("#er-f-date").min = r.jours[0]; $("#er-f-date").max = r.jours[6];
+  const choisi = $("#er-f-conseiller").value;
+  const actifs = r.conseillers.filter((c) => c.actif).map((c) => c.nom);
+  $("#er-f-conseiller").innerHTML = `<option value="">— choisir —</option>` + actifs.map((n) => `<option ${n === choisi ? "selected" : ""}>${echapper(n)}</option>`).join("");
+  erAfficher();
+}
+
+function erAfficher() {
+  const r = ER;
+  $("#er-titre").textContent = `E-réservations · ${r.libelle}`;
+  $("#er-alerte").innerHTML = r.manquante ? obAlerteScript() : "";
+  $("#er-formulaire").classList.toggle("desactive", r.manquante);
+
+  // jours affichés : ceux où quelque chose s'est passé, et les jours ouvrés
+  const ordre = (n) => { const i = r.conseillers.findIndex((c) => c.nom === n); return i < 0 ? 999 : i; };
+  const noms = Object.keys(r.parNom).filter((n) => r.parNom[n].some((j) => j.caisse || j.hc)).sort((a, b) => ordre(a) - ordre(b));
+  const joursVus = r.jours.map((_, j) => j).filter((j) => j < 6 || noms.some((n) => r.parNom[n][j].caisse || r.parNom[n][j].hc));
+  const tot = { caisse: 0, hc: 0 };
+  noms.forEach((n) => r.parNom[n].forEach((j) => { tot.caisse += j.caisse; tot.hc += j.hc; }));
+  const total = tot.caisse + tot.hc;
+  $("#er-chiffres").innerHTML = `
+    <div class="chiffre"><span class="etiquette">E-résa de la semaine</span><strong>${total}</strong><span class="comparaison">caisse + hors caisse</span></div>
+    <div class="chiffre"><span class="etiquette">Faites en caisse</span><strong>${tot.caisse}</strong><span class="comparaison">saisies avec les résultats</span></div>
+    <div class="chiffre"><span class="etiquette">Faites hors caisse</span><strong>${tot.hc}</strong><span class="comparaison">${total ? `${obPct(tot.hc / total)} du total` : "notées sur la feuille"}</span></div>`;
+
+  const cellule = (c, h) => (c + h ? `<strong>${c + h}</strong><span class="er-detail">${c} + ${h}</span>` : '<span class="doux">—</span>');
+  $("#er-entete-croisement").innerHTML = `<tr><th>Conseiller</th>${joursVus.map((j) => `<th class="nombre ${r.jours[j] === ETAT.aujourd_hui ? "er-aujourdhui" : ""}">${PL_JOURS_COURTS[j]} ${plTexteDate(plDateJour(r.semaine, j))}</th>`).join("")}<th class="nombre">Caisse</th><th class="nombre">Hors caisse</th><th class="nombre">Total</th></tr>`;
+  $("#er-lignes-croisement").innerHTML = noms.length ? noms.map((n) => {
+    const s = r.parNom[n].reduce((a, j) => ({ caisse: a.caisse + j.caisse, hc: a.hc + j.hc }), { caisse: 0, hc: 0 });
+    return `<tr><td class="nom">${pastille(n)}${echapper(n)}</td>${joursVus.map((j) => `<td class="nombre ${r.jours[j] === ETAT.aujourd_hui ? "er-aujourdhui" : ""}">${cellule(r.parNom[n][j].caisse, r.parNom[n][j].hc)}</td>`).join("")}
+      <td class="nombre">${s.caisse}</td><td class="nombre">${s.hc}</td><td class="nombre"><strong>${s.caisse + s.hc}</strong></td></tr>`;
+  }).join("") : `<tr class="vide-ligne"><td colspan="${joursVus.length + 4}">Aucune e-résa cette semaine.</td></tr>`;
+  $("#er-pied-croisement").innerHTML = noms.length ? `<tr><td>Magasin</td>${joursVus.map((j) => {
+    const c = noms.reduce((s, n) => s + r.parNom[n][j].caisse, 0), h = noms.reduce((s, n) => s + r.parNom[n][j].hc, 0);
+    return `<td class="nombre">${cellule(c, h)}</td>`;
+  }).join("")}<td class="nombre">${tot.caisse}</td><td class="nombre">${tot.hc}</td><td class="nombre"><strong>${total}</strong></td></tr>` : "";
+
+  $("#er-lignes").innerHTML = r.entrees.length ? r.entrees.map((e) => `<tr data-id="${echapper(e.id)}">
+      <td>${PL_JOURS[(new Date(e.date + "T12:00:00").getDay() + 6) % 7]} ${e.date.split("-").reverse().slice(0, 2).join("/")}</td>
+      <td>${e.heure ? e.heure.replace(":", "h") : '<span class="doux">—</span>'}</td>
+      <td>${pastille(e.conseiller)}${echapper(e.conseiller)}</td>
+      <td class="seulement-en-ligne doux">${echapper(e.saisi_par || "")}</td>
+      <td class="nombre"><button class="supprimer" data-supprimer-eresa title="Supprimer cette e-résa">×</button></td></tr>`).join("")
+    : `<tr class="vide-ligne"><td colspan="5">Aucune e-résa hors caisse notée cette semaine.</td></tr>`;
+}
+
+async function erAjouter(e) {
+  e.preventDefault();
+  if (ER?.manquante) return notifier("Lance d'abord le script installation_objectifs.sql dans Supabase.", true);
+  const ligne = { date: $("#er-f-date").value, heure: $("#er-f-heure").value, conseiller: $("#er-f-conseiller").value };
+  if (!ligne.conseiller) { $("#er-f-conseiller").focus(); return notifier("Choisis le conseiller.", true); }
+  const bouton = $("#er-formulaire button[type=submit]");
+  bouton.disabled = true;
+  try {
+    const r = await api().eresa_ajouter([ligne]);
+    if (r.erreur) return notifier(r.erreur, true);
+    notifier(r.ok);
+    $("#er-f-heure").value = "";
+    await erCharger(ER.semaine);
+    $("#er-f-heure").focus();
+  } finally { bouton.disabled = false; }
+}
+
+async function erSupprimer(tr) {
+  const e = ER.entrees.find((x) => x.id === tr.dataset.id);
+  if (!e) return;
+  const { ok } = await demander({ titre: "Supprimer cette e-résa ?", bouton: "Supprimer", danger: true,
+    texte: `E-résa hors caisse de ${e.conseiller}, le ${e.date.split("-").reverse().join("/")}${e.heure ? ` à ${e.heure.replace(":", "h")}` : ""}.` });
+  if (!ok) return;
+  const r = await api().eresa_supprimer(e.id);
+  if (r.erreur) return notifier(r.erreur, true);
+  notifier(r.ok);
+  await erCharger(ER.semaine);
+}
+
+// Feuille papier à remplir (A4 portrait) : une ligne par e-résa faite hors caisse
+async function erFeuillePdf() {
+  let jsPDF;
+  try { jsPDF = await plJsPdf(); }
+  catch (e) { return notifier("Impossible de charger l'outil PDF (connexion internet ?). Réessaie dans un instant.", true); }
+  const semaine = ER?.semaine || plSemaineDe(ETAT.aujourd_hui);
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const L = 210, H = 297, M = 14;
+  const accent = plRvb(ETAT?.reglages?.couleur || "#040037");
+  const gris = [96, 94, 92], noir = [32, 31, 30], trait = [200, 198, 196];
+  const lundi = plLundi(semaine), dimanche = plDateJour(semaine, 6);
+  const long = (d) => d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
+  const logo = ETAT?.logos?.complet ? await plImage(ETAT.logos.complet) : null;
+
+  doc.setFillColor(...accent); doc.rect(0, 0, L, 3, "F");
+  doc.setFont("helvetica", "bold"); doc.setFontSize(17); doc.setTextColor(...noir);
+  doc.text("E-réservations faites hors caisse", M, 17);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); doc.setTextColor(...gris);
+  doc.text(`Semaine ${Number(semaine.split("-S")[1])} · du lundi ${long(lundi)} au dimanche ${long(dimanche)} ${dimanche.getUTCFullYear()}`, M, 23.5);
+  if (logo) { const h = 10, w = Math.min(40, h * logo.width / logo.height); doc.addImage(logo, "PNG", L - M - w, 9, w, w * logo.height / logo.width); }
+  doc.setFontSize(9.5); doc.setTextColor(...noir);
+  doc.text(doc.splitTextToSize("Note ici chaque e-réservation faite en dehors de la caisse (tablette, téléphone, en rayon…) : une ligne par e-résa. "
+    + "Elle sera comptée pour toi, en plus de celles de la caisse.", L - 2 * M), M, 31);
+
+  const lignes = 30;
+  doc.autoTable({
+    startY: 40, margin: { left: M, right: M, bottom: 18 }, theme: "grid",
+    head: [["Date", "Heure", "Conseiller (prénom)", "Saisie dans le logiciel"]],
+    body: Array.from({ length: lignes }, () => ["", "", "", ""]),
+    styles: { font: "helvetica", fontSize: 10, minCellHeight: 7.4, lineColor: trait, lineWidth: 0.25, textColor: noir, valign: "middle" },
+    headStyles: { fillColor: [248, 249, 251], textColor: gris, fontStyle: "bold", fontSize: 9, minCellHeight: 8 },
+    columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 26 }, 3: { cellWidth: 40, halign: "center" } },
+    didDrawCell: (d) => {
+      if (d.section === "body" && d.column.index === 0) { doc.setFontSize(8); doc.setTextColor(185, 183, 181); doc.text("     /     ", d.cell.x + 4, d.cell.y + d.cell.height / 2 + 1.2); }
+      if (d.section === "body" && d.column.index === 1) { doc.setFontSize(8); doc.setTextColor(185, 183, 181); doc.text("    h", d.cell.x + 6, d.cell.y + d.cell.height / 2 + 1.2); }
+      if (d.section === "body" && d.column.index === 3) { doc.setDrawColor(150, 148, 146); doc.setLineWidth(0.3); doc.rect(d.cell.x + d.cell.width / 2 - 2, d.cell.y + d.cell.height / 2 - 2, 4, 4); }
+    },
+  });
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(150, 148, 146);
+  doc.text("À recopier dans l'onglet E-résa du suivi fidélisation, puis cocher la dernière case.", M, H - 9);
+  doc.text("Feuille pleine ? En imprimer une autre.", L - M, H - 9, { align: "right" });
+  doc.save(`Feuille e-resa hors caisse - semaine ${Number(semaine.split("-S")[1])}.pdf`);
+  notifier("Feuille exportée en PDF : il est dans tes téléchargements.");
+}
+
+// ============================================================ OBJECTIFS
+// Temps de caisse (minutes) par personne et par jour, d'après le planning de caisse enregistré
+function obTempsPlanning(planning, reglages) {
+  const temps = {};
+  if (!planning?.caisse?.affectations) return temps;
+  const creneaux = new Map(plCreneaux(reglages).map((c) => [c.cle, c]));
+  for (const [cle, places] of Object.entries(planning.caisse.affectations)) {
+    const jour = Number(cle.split("-")[0]);
+    const c = creneaux.get(cle);
+    const ajouter = (nom, minutes) => {
+      if (!nom || !(minutes > 0)) return;
+      temps[nom] = temps[nom] || Array(7).fill(0);
+      temps[nom][jour] += minutes;
+    };
+    for (const p of places || []) {
+      if (typeof p === "string") ajouter(p, c ? c.duree : reglages.creneau * 60);   // ancien format : un prénom par caisse
+      else if (Array.isArray(p)) p.forEach((s) => s && ajouter(s.nom, (s.fin || 0) - (s.debut || 0)));
+    }
+  }
+  return temps;
+}
+
+// Arrondi qui garde la somme : les parts de l'objectif sont arrondies, les restes les plus grands prennent les unités restantes
+function obArrondirParts(total, parts) {
+  const brut = parts.map((p) => total * p);
+  const entiers = brut.map(Math.floor);
+  let reste = Math.round(total - entiers.reduce((a, b) => a + b, 0));
+  brut.map((b, i) => [b - Math.floor(b), i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (reste > 0) { entiers[i]++; reste--; } });
+  return entiers;
+}
+
+function obLireSaisie() {
+  return Object.fromEntries(OB_INDICATEURS.map((c) => [c, Math.max(0, Math.round(Number($(`[data-objectif="${c}"]`).value) || 0))]));
+}
+
+async function obCharger(semaine) {
+  const r = await api().objectifs_lire(semaine);
+  if (r.erreur) return notifier(r.erreur, true);
+  OB = r;
+  OB_MODIFIE = false;
+  obSemaineNav("ob", semaine);
+  const valeurs = r.objectifs || r.precedents || {};
+  OB_INDICATEURS.forEach((c) => { $(`[data-objectif="${c}"]`).value = valeurs[c] ?? ""; });
+  if (!r.objectifs && r.precedents) OB_MODIFIE = true;   // repris de la semaine d'avant : à valider
+  obAfficher();
+}
+
+function obCalculs() {
+  const r = OB, obj = obLireSaisie();
+  obj.score_total = OB_INDICATEURS.reduce((s, c) => s + obj[c], 0);
+  // base de la répartition : le planning de caisse, sinon le temps de caisse saisi avec les résultats
+  let temps = obTempsPlanning(r.planning, r.reglages_planning), source = "planning";
+  if (!Object.values(temps).some((j) => j.some(Boolean))) {
+    temps = Object.fromEntries(Object.entries(r.tempsSaisi || {}).map(([n, j]) => [n, j.map((m) => Math.round(m))]));
+    source = Object.values(temps).some((j) => j.some(Boolean)) ? "saisie" : null;
+  }
+  const totalMinutes = Object.values(temps).reduce((s, j) => s + j.reduce((a, b) => a + b, 0), 0);
+  const ordre = (n) => { const i = r.conseillers.findIndex((c) => c.nom === n); return i < 0 ? 999 : i; };
+  const noms = [...new Set([...Object.keys(temps), ...Object.keys(r.realise)])]
+    .filter((n) => (temps[n] || []).some(Boolean) || (r.realise[n] && Object.values(r.realise[n]).some((j) => j.some(Boolean))))
+    .sort((a, b) => ordre(a) - ordre(b));
+  const minutes = Object.fromEntries(noms.map((n) => [n, temps[n] || Array(7).fill(0)]));
+  const part = Object.fromEntries(noms.map((n) => [n, totalMinutes ? minutes[n].reduce((a, b) => a + b, 0) / totalMinutes : 0]));
+  // objectifs entiers de chacun (la somme fait l'objectif du magasin)
+  const objNom = Object.fromEntries(noms.map((n) => [n, {}]));
+  for (const c of OB_INDICATEURS) obArrondirParts(obj[c], noms.map((n) => part[n])).forEach((v, i) => { objNom[noms[i]][c] = v; });
+  noms.forEach((n) => { objNom[n].score_total = OB_INDICATEURS.reduce((s, c) => s + objNom[n][c], 0); });
+  const realise = (n, c, j = null) => {
+    const serie = r.realise[n]?.[c] || Array(7).fill(0);
+    return j === null ? serie.reduce((a, b) => a + b, 0) : serie[j];
+  };
+  const ouverture = (r.reglages_planning?.horaires || []).reduce((s, h) => s + (h ? plMinutes(h[1]) - plMinutes(h[0]) : 0), 0);
+  return { obj, temps: minutes, totalMinutes, part, noms, objNom, realise, source, ouverture };
+}
+
+function obAfficher() {
+  const r = OB, k = obCalculs();
+  $("#ob-titre").textContent = `Objectifs · ${r.libelle}`;
+  $("#ob-alerte").innerHTML = r.manquante ? obAlerteScript() : "";
+  $("#ob-etat").innerHTML = OB_MODIFIE
+    ? (r.objectifs ? "<strong>Modifications non enregistrées.</strong>" : r.precedents
+      ? `<strong>Objectifs repris de la semaine ${Number(r.precedents.semaine.split("-S")[1])}</strong> : ajuste-les si besoin, puis Enregistrer.` : "")
+    : r.objectifs ? `Objectifs enregistrés${r.modifie_par ? ` par ${echapper(r.modifie_par)}` : ""}.` : "Aucun objectif pour cette semaine : entre-les ci-dessous puis Enregistrer.";
+  $("#ob-score").textContent = k.obj.score_total;
+  $("#ob-enregistrer").classList.toggle("a-enregistrer", OB_MODIFIE);
+
+  // avancement du magasin
+  const totalRealise = (c) => k.noms.reduce((s, n) => s + k.realise(n, c), 0);
+  const barre = (fait, vise) => {
+    const p = vise ? Math.min(1, fait / vise) : 0;
+    return `<span class="ob-barre ${vise && fait >= vise ? "atteint" : ""}"><i style="width:${Math.round(p * 100)}%"></i></span>`;
+  };
+  $("#ob-avancement").innerHTML = [...OB_INDICATEURS, "score_total"].map((c) => {
+    const fait = totalRealise(c), vise = k.obj[c];
+    return `<div class="ob-indic ${c === "score_total" ? "score" : ""}"><span class="etiquette">${OB_COURTS[c]} · magasin</span>
+      <strong>${fait}<small> / ${vise || "—"}</small></strong>${barre(fait, vise)}
+      <span class="doux petit">${vise ? (fait >= vise ? "objectif atteint ✓" : `reste ${vise - fait} · ${obPct(fait / vise)} fait`) : "pas d'objectif"}</span></div>`;
+  }).join("");
+
+  // base de la répartition
+  const caisses = r.reglages_planning?.caisses || 1;
+  $("#ob-base").innerHTML = k.source === "planning"
+    ? `D'après le <strong>planning de caisse</strong> de la semaine : ${plDuree(k.totalMinutes)} de caisse tenue${k.ouverture ? ` pour ${plDuree(k.ouverture)} d'ouverture du magasin` : ""}${caisses > 1 ? ` (${caisses} caisses)` : ""}. La part de chacun = son temps de caisse ÷ ${plDuree(k.totalMinutes)}.`
+    : k.source === "saisie"
+      ? `Pas de planning de caisse pour cette semaine : répartition d'après le <strong>temps de caisse saisi</strong> avec les résultats (${plDuree(k.totalMinutes)}). Importe le planning dans l'onglet Planning pour une répartition prévue à l'avance.`
+      : `<strong>Pas encore de temps de caisse pour cette semaine.</strong> Importe le planning de la semaine dans l'onglet <strong>Planning</strong> : les objectifs de chacun se calculeront tout seuls.`;
+
+  const caseObj = (fait, vise) => {
+    const classe = vise && fait >= vise ? "ob-ok" : "";
+    return `<td class="nombre ${classe}"><strong>${fait}</strong><span class="doux"> / ${vise}</span></td>`;
+  };
+  $("#ob-lignes").innerHTML = k.noms.length ? k.noms.map((n) => {
+    const m = k.temps[n].reduce((a, b) => a + b, 0), o = k.objNom[n];
+    const faitScore = k.realise(n, "score_total");
+    const p = o.score_total ? Math.min(1, faitScore / o.score_total) : 0;
+    return `<tr><td class="nom">${pastille(n)}${echapper(n)}</td><td class="nombre">${plDuree(m)}</td>
+      <td class="nombre"><strong>${obPct(k.part[n])}</strong>${caisses > 1 && k.ouverture ? `<div class="doux petit">${obPct(m / k.ouverture)} de l'ouverture</div>` : ""}</td>
+      ${OB_INDICATEURS.map((c) => caseObj(k.realise(n, c), o[c])).join("")}${caseObj(faitScore, o.score_total)}
+      <td class="barre-col"><span class="ob-barre petite ${o.score_total && faitScore >= o.score_total ? "atteint" : ""}"><i style="width:${Math.round(p * 100)}%;${fondBarre(n)}"></i></span>
+        <span class="doux petit">${o.score_total ? obPct(faitScore / o.score_total) : "—"}</span></td></tr>`;
+  }).join("") : `<tr class="vide-ligne"><td colspan="9">Personne à répartir pour l'instant.</td></tr>`;
+  $("#ob-pied").innerHTML = k.noms.length ? `<tr><td>Magasin</td><td class="nombre">${plDuree(k.totalMinutes)}</td><td class="nombre">100 %</td>
+    ${[...OB_INDICATEURS, "score_total"].map((c) => `<td class="nombre"><strong>${totalRealise(c)}</strong><span class="doux"> / ${k.obj[c]}</span></td>`).join("")}<td></td></tr>` : "";
+
+  // jour par jour
+  const c = valeurChoix("ob-indicateur");
+  const jours = r.jours.map((_, j) => j).filter((j) => (r.reglages_planning?.horaires?.[j]) || k.noms.some((n) => k.temps[n][j] || k.realise(n, c, j)));
+  const aujourdhui = r.jours.indexOf(r.aujourd_hui);
+  $("#ob-entete-jours").innerHTML = `<tr><th>Conseiller</th>${jours.map((j) => `<th class="nombre ${j === aujourdhui ? "er-aujourdhui" : ""}">${PL_JOURS_COURTS[j]} ${plTexteDate(plDateJour(r.semaine, j))}</th>`).join("")}<th class="nombre">Semaine</th></tr>`;
+  $("#ob-lignes-jours").innerHTML = k.noms.length ? k.noms.map((n) => {
+    const cellules = jours.map((j) => {
+      const m = k.temps[n][j], partJour = k.totalMinutes ? m / k.totalMinutes : 0;
+      const vise = k.obj[c] * partJour, fait = k.realise(n, c, j);
+      const passe = r.jours[j] < r.aujourd_hui;   // la journée en cours n'est pas encore « en retard »
+      const etat = !m && !fait ? "vide" : vise && fait >= vise - 1e-9 ? "ob-ok" : passe && vise ? "ob-retard" : "";
+      if (!m && !fait) return `<td class="nombre ob-jour vide"><span class="doux">—</span></td>`;
+      return `<td class="nombre ob-jour ${etat} ${j === aujourdhui ? "er-aujourdhui" : ""}" title="${echapper(n)} · ${PL_JOURS[j]} : ${plDuree(m)} de caisse = ${obPct(partJour)} de l'objectif de la semaine">
+        <span class="ob-pct">${obPct(partJour)}</span><span class="ob-vise">${fait} / ${obDec(vise)}</span><span class="ob-temps">${m ? plDuree(m) : "hors caisse"}</span></td>`;
+    }).join("");
+    return `<tr><td class="nom">${pastille(n)}${echapper(n)}</td>${cellules}<td class="nombre"><strong>${obPct(k.part[n])}</strong><div class="doux petit">${k.realise(n, c)} / ${k.objNom[n][c]}</div></td></tr>`;
+  }).join("") : `<tr class="vide-ligne"><td colspan="${jours.length + 2}">—</td></tr>`;
+  $("#ob-pied-jours").innerHTML = k.noms.length ? `<tr><td>Magasin</td>${jours.map((j) => {
+    const m = k.noms.reduce((s, n) => s + k.temps[n][j], 0), partJour = k.totalMinutes ? m / k.totalMinutes : 0;
+    const fait = k.noms.reduce((s, n) => s + k.realise(n, c, j), 0);
+    return `<td class="nombre"><span class="ob-pct">${obPct(partJour)}</span><span class="ob-vise">${fait} / ${obDec(k.obj[c] * partJour)}</span></td>`;
+  }).join("")}<td class="nombre"><strong>100 %</strong><div class="doux petit">${totalRealise(c)} / ${k.obj[c]}</div></td></tr>` : "";
+}
+
+async function obEnregistrer() {
+  if (!OB) return;
+  if (OB.manquante) return notifier("Lance d'abord le script installation_objectifs.sql dans Supabase.", true);
+  const r = await api().objectifs_enregistrer(OB.semaine, obLireSaisie());
+  if (r.erreur) return notifier(r.erreur, true);
+  notifier(r.ok);
+  await obCharger(OB.semaine);
+}
+
+async function obAller(semaine) {
+  if (OB_MODIFIE && OB?.objectifs) {
+    const { ok } = await demander({ titre: "Objectifs non enregistrés", bouton: "Continuer sans enregistrer", danger: true,
+      texte: "Les objectifs de cette semaine ont été modifiés mais pas enregistrés." });
+    if (!ok) return;
+  }
+  await obCharger(semaine);
+}
+
+// ------------------------------------------------------------ branchement
+function obBrancher() {
+  const afficherAvant = afficher;
+  afficher = async function (page) {
+    await afficherAvant(page);
+    if (page === "eresa") { await rafraichirEtat(); await erCharger(ER?.semaine || plSemaineDe(ETAT.aujourd_hui)); }
+    if (page === "objectifs") { await rafraichirEtat(); await obCharger(OB?.semaine || plSemaineDe(ETAT.aujourd_hui)); }
+  };
+  Object.defineProperty(afficher, "page", { get: () => afficherAvant.page, set: (v) => { afficherAvant.page = v; } });
+
+  obBrancherNav("er", (s) => erCharger(s));
+  obBrancherNav("ob", (s) => obAller(s));
+  $("#er-formulaire").addEventListener("submit", erAjouter);
+  $("#er-feuille").addEventListener("click", erFeuillePdf);
+  $("#er-lignes").addEventListener("click", (e) => { if (e.target.closest("[data-supprimer-eresa]")) erSupprimer(e.target.closest("tr")); });
+  $("#ob-saisie").addEventListener("input", () => { OB_MODIFIE = true; obAfficher(); });
+  $("#ob-saisie").addEventListener("keydown", (e) => { if (e.key === "Enter") obEnregistrer(); });
+  $("#ob-enregistrer").addEventListener("click", obEnregistrer);
+  brancherChoix("ob-indicateur", () => OB && obAfficher());
+
+  // actualisation : ce que les autres saisissent apparaît (toutes les 30 s, si on n'est pas en train d'écrire)
+  setInterval(async () => {
+    if (document.hidden || !$("#dialogue").hidden || document.activeElement?.matches("input, select, textarea")) return;
+    try {
+      if (afficher.page === "eresa" && ER) await erCharger(ER.semaine);
+      if (afficher.page === "objectifs" && OB && !OB_MODIFIE) await obCharger(OB.semaine);
+    } catch (e) { /* déjà signalé */ }
+  }, 30000);
+}
+
+window.addEventListener("pywebviewready", () => {
+  if (typeof window.pywebview?.api?.objectifs_lire !== "function") return;   // logiciel installé : pas de ces pages
+  $("#lien-eresa").hidden = false;
+  $("#lien-objectifs").hidden = false;
+  dessinerIcones($("#navigation"));
+  obBrancher();
+});
+
+window.__objectifs = { obTempsPlanning, obArrondirParts, obCalculs: () => obCalculs() };
 
 </script>
 </body>
