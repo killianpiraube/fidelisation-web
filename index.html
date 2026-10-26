@@ -1195,6 +1195,25 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
   html[data-appareil="tablette"] .categories { width: 170px; }
 }
 
+/* ===================== RAPPORT ===================== */
+.rp-chiffres .chiffre { position: relative; }
+.rp-ecart { display: inline-block; font-size: 12px; font-weight: 600; color: var(--doux); white-space: nowrap; }
+.rp-chiffres .rp-ecart { display: block; margin-top: 4px; white-space: normal; }
+.rp-ecart.haut { color: var(--statut-bon); }
+.rp-ecart.bas { color: var(--statut-critique); }
+.rp-faits { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
+.rp-faits li { position: relative; padding: 8px 12px 8px 30px; background: var(--fond-doux, rgba(127,127,127,.06)); border-radius: 8px; }
+.rp-faits li::before { content: ""; position: absolute; left: 12px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--doux); }
+.rp-faits li.haut::before { background: var(--statut-bon); }
+.rp-faits li.bas::before { background: var(--statut-critique); }
+.rp-defile { overflow-x: auto; }
+.rp-tableau { width: 100%; }
+.rp-tableau .barre-col { width: 22%; min-width: 90px; }
+.rp-tableau tfoot td { font-weight: 700; border-top: 2px solid var(--trait, rgba(127,127,127,.3)); }
+.rp-barre { display: block; height: 12px; min-width: 2px; border-radius: 3px; background: var(--accent, #040037); }
+html[data-appareil="telephone"] .rp-tableau .barre-col { display: none; }
+html[data-appareil="telephone"] #page-rapport .chiffres.compacts { grid-template-columns: 1fr 1fr; }
+
 </style>
   <script>
 // =====================================================================
@@ -1391,10 +1410,10 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
         <button class="lien" data-page="eresa" id="lien-eresa" hidden><span class="icone" data-icone="eresa"></span><span class="libelle">E-résa</span></button>
         <button class="lien" data-page="objectifs" id="lien-objectifs" hidden><span class="icone" data-icone="objectif"></span><span class="libelle">Objectifs</span></button>
         <button class="lien" data-page="equipe"><span class="icone" data-icone="equipe"></span><span class="libelle">Équipe</span></button>
-        <button class="lien" data-page="planning" id="lien-planning" hidden><span class="icone" data-icone="planning"></span><span class="libelle">Planning</span></button>
         <button class="lien" data-page="classement"><span class="icone" data-icone="podium"></span><span class="libelle">Classement</span></button>
         <button class="lien" data-page="stabilite"><span class="icone" data-icone="stabilite"></span><span class="libelle">Stabilité</span></button>
         <button class="lien" data-page="evolution"><span class="icone" data-icone="graphique"></span><span class="libelle">Évolution</span></button>
+        <button class="lien" data-page="rapport" id="lien-rapport" hidden><span class="icone" data-icone="rapport"></span><span class="libelle">Rapport</span></button>
       </div>
       <div class="liens bas">
         <div id="utilisateur" class="utilisateur" hidden>
@@ -1713,6 +1732,35 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
       </section>
 
       <!-- ===================== OBJECTIFS DE LA SEMAINE ===================== -->
+      <!-- ===================== RAPPORT ===================== -->
+      <section id="page-rapport" class="page page-outil" hidden>
+        <div class="ruban">
+          <div class="groupe">
+            <div class="commandes"><span class="choix" data-choix="periode-rapport">
+              <button data-valeur="semaine" class="actif">Semaine</button><button data-valeur="mois">Mois</button><button data-valeur="trimestre">Trimestre</button><button data-valeur="semestre">Semestre</button><button data-valeur="annee">Année</button>
+            </span></div>
+            <span class="legende">Type de période</span>
+          </div>
+          <div class="groupe">
+            <div class="commandes"><select id="code-rapport"></select></div>
+            <span class="legende">Période</span>
+          </div>
+          <div class="groupe">
+            <div class="commandes">
+              <button id="rp-pdf" class="gros principal"><span class="icone" data-icone="rapport"></span>Télécharger le PDF</button>
+            </div>
+            <span class="legende">Export</span>
+          </div>
+          <div class="ruban-info doux">Bilan de la période : chiffres du magasin, faits marquants,<br>classement, évolution, objectifs et régularité.</div>
+        </div>
+        <div class="feuille-defilante">
+          <div class="feuille">
+            <h2 id="rp-titre">Rapport</h2>
+            <div id="rp-contenu"><p class="attente">Chargement…</p></div>
+          </div>
+        </div>
+      </section>
+
       <section id="page-objectifs" class="page page-outil" hidden>
         <div class="ruban">
           <div class="groupe">
@@ -1735,7 +1783,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
             </div>
             <span class="legende">Semaine</span>
           </div>
-          <div class="ruban-info doux">Chaque conseiller reçoit une part de l'objectif égale à sa part<br>du temps de caisse de la semaine (planning de caisse).</div>
+          <div class="ruban-info doux">Chaque conseiller reçoit une part de l'objectif égale à sa part<br>du temps de caisse saisi (page Saisie).</div>
         </div>
         <div class="feuille-defilante">
           <div class="feuille">
@@ -1768,119 +1816,8 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
                 <button data-valeur="score_total" class="actif">Score</button><button data-valeur="comptes">Comptes</button><button data-valeur="famille_plus">Famille+</button><button data-valeur="e_reservations">E-résa</button><button data-valeur="livret_bebe">Livret bébé</button>
               </span>
             </div>
-            <p class="doux petit">Pour chaque jour : la part de l'objectif de la semaine que la personne doit faire ce jour-là (son temps de caisse du jour ÷ le temps de caisse de toute la semaine), l'objectif correspondant, et ce qui a été fait.</p>
+            <p class="doux petit">Pour chaque jour : la part de l'objectif de la semaine qui revient à la personne ce jour-là (son temps de caisse saisi ce jour ÷ le temps de caisse de la semaine), l'objectif correspondant, et ce qui a été fait.</p>
             <div class="defilement-horizontal"><table class="tableau-office compact ob-jours"><thead id="ob-entete-jours"></thead><tbody id="ob-lignes-jours"></tbody><tfoot id="ob-pied-jours"></tfoot></table></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================== PLANNING (présences + caisse) ===================== -->
-      <section id="page-planning" class="page page-outil" hidden>
-        <div class="ruban">
-          <div class="groupe">
-            <div class="commandes">
-              <button id="pl-enregistrer" class="gros principal"><span class="icone" data-icone="enregistrer"></span>Enregistrer</button>
-            </div>
-            <span class="legende">Planning</span>
-          </div>
-          <div class="groupe">
-            <div class="commandes colonne">
-              <div class="pl-navigation">
-                <button id="pl-precedente" class="bouton carre" title="Semaine précédente">‹</button>
-                <strong id="pl-titre-semaine">Semaine</strong>
-                <button id="pl-suivante" class="bouton carre" title="Semaine suivante">›</button>
-              </div>
-              <div class="pl-navigation">
-                <input id="pl-date" type="date" title="Aller à la semaine de cette date">
-                <button id="pl-cette-semaine" class="bouton petit-bouton">Cette semaine</button>
-              </div>
-            </div>
-            <span class="legende">Semaine</span>
-          </div>
-          <div class="groupe">
-            <div class="commandes"><span class="choix" data-choix="vue-planning">
-              <button data-valeur="caisse" class="actif">Planning de caisse</button><button data-valeur="reglages">Réglages</button>
-            </span></div>
-            <span class="legende">Affichage</span>
-          </div>
-          <div class="groupe pl-outils" data-pour="caisse">
-            <div class="commandes">
-              <button class="gros principal-doux pl-importer-pdf"><span class="icone" data-icone="importer"></span>Importer le planning PDF</button>
-              <button id="pl-generer" class="gros"><span class="icone" data-icone="generer"></span>Créer le planning de caisse</button>
-              <button id="pl-autre" class="gros"><span class="icone" data-icone="melanger"></span>Autre proposition</button>
-              <button class="gros pl-pdf"><span class="icone" data-icone="pdf"></span>Exporter en PDF</button>
-            </div>
-            <span class="legende">Planning de caisse</span>
-          </div>
-          <input type="file" id="pl-fichier-pdf" accept="application/pdf,.pdf" hidden>
-          <div class="ruban-info doux" id="pl-info">Importe le planning de la semaine (PDF) :<br>le planning de caisse se crée tout seul.</div>
-        </div>
-
-        <div class="feuille-defilante">
-          <!-- Caisse -->
-          <div class="feuille pl-vue" data-vue="caisse">
-            <h2 id="pl-titre-caisse">Planning de caisse</h2>
-            <p class="doux explication" id="pl-explication-caisse"></p>
-            <p id="pl-etat-enregistrement" class="doux petit"></p>
-            <div id="pl-depot" class="pl-zone-import" hidden>
-              <span class="icone" data-icone="importer"></span>
-              <strong>Importe le planning de la semaine</strong>
-              <span class="doux">Le PDF exporté depuis Excel, avec les noms et les horaires de chacun. Clique ici ou glisse le fichier sur la page.</span>
-            </div>
-            <div id="pl-contenu-caisse">
-            <div id="pl-chiffres" class="chiffres compacts"></div>
-            <div id="pl-alertes"></div>
-            <div class="pl-legende">
-              <span><i class="pl-cle-rush"></i>Créneau de rush</span>
-              <span><i class="pl-cle-manque"></i>Pas assez de monde présent</span>
-              <span><i class="pl-cle-hors"></i>Personne absente à ce moment-là</span>
-              <span><i class="pl-cle-change"></i>Mis à jour d'après le planning</span>
-              <span><i class="pl-cle-maintenant"></i>En ce moment</span>
-            </div>
-            <div class="pl-jours-mobile" id="pl-jours-mobile" role="tablist" aria-label="Jour affiché"></div>
-            <div class="defilement-horizontal">
-              <table class="tableau-office pl-caisse">
-                <thead id="pl-entete-caisse"></thead>
-                <tbody id="pl-lignes-caisse"></tbody>
-              </table>
-            </div>
-            <h3 class="espace-haut">Équité de la semaine</h3>
-            <p class="doux petit">La cible de chacun est calculée d'après le temps où il peut tenir la caisse (présent pendant l'ouverture, hors pause, sans exception ce jour-là). L'écart se lit en heures. « Max / jour » : sa plus longue journée de caisse.</p>
-            <table class="tableau-office compact pl-equite">
-              <thead><tr><th>Conseiller</th><th class="nombre">Planifié</th><th class="nombre">Temps caisse</th><th class="nombre">Cible</th><th class="nombre">Écart</th><th class="barre-col">Part de son temps</th><th class="nombre">Rush</th><th class="nombre">Cible rush</th><th class="nombre">Max / jour</th></tr></thead>
-              <tbody id="pl-lignes-equite"></tbody>
-            </table>
-            </div>
-          </div>
-
-          <!-- Réglages -->
-          <div class="feuille pl-vue" data-vue="reglages" hidden>
-            <h2>Réglages du planning de caisse</h2>
-            <p class="doux explication">Ces réglages sont communs à toute l'équipe. Ils servent à chaque fois que tu crées un planning de caisse.</p>
-            <div class="pl-reglages-haut">
-              <label>Personnes en caisse en même temps<input id="pl-nb-caisses" type="number" min="1" max="6" step="1"></label>
-              <label>Durée d'un passage en caisse<select id="pl-duree">
-                <option value="1">1 heure</option><option value="1.5">1 h 30</option><option value="2">2 heures</option>
-                <option value="2.5">2 h 30</option><option value="3">3 heures</option><option value="4">4 heures</option></select></label>
-              <label>Maximum de caisse par personne et par jour<select id="pl-max-jour">
-                <option value="0">Pas de limite</option><option value="2">2 heures</option><option value="3">3 heures</option>
-                <option value="4">4 heures</option><option value="5">5 heures</option><option value="6">6 heures</option></select></label>
-            </div>
-            <p class="doux petit">La limite n'est dépassée que s'il n'y a personne d'autre pour tenir la caisse ; le dépassement est alors signalé.</p>
-            <h3 class="espace-haut">Horaires d'ouverture</h3>
-            <p class="doux petit">La caisse n'est tenue que pendant ces heures, même si l'équipe arrive plus tôt pour la mise en rayon. Les créneaux commencent à l'ouverture. Décoche un jour pour le marquer fermé.</p>
-            <table class="tableau-office compact pl-horaires"><tbody id="pl-lignes-horaires"></tbody></table>
-            <h3 class="espace-haut">Créneaux de rush</h3>
-            <p class="doux petit">Clique sur un créneau pour le marquer (ou non) comme rush : les rushs sont partagés entre tout le monde, pas toujours aux mêmes.</p>
-            <div class="defilement-horizontal"><table class="tableau-office compact pl-rush"><tbody id="pl-grille-rush"></tbody></table></div>
-            <h3 class="espace-haut">Exceptions par conseiller</h3>
-            <p class="doux petit">Décoche les jours où un conseiller ne fait <strong>pas</strong> de caisse. Tout décocher = jamais en caisse.</p>
-            <table class="tableau-office compact pl-exceptions">
-              <thead id="pl-entete-exceptions"></thead>
-              <tbody id="pl-lignes-exceptions"></tbody>
-            </table>
-            <div class="boutons espace-haut"><button id="pl-enregistrer-reglages" class="bouton principal">Enregistrer les réglages</button>
-              <span id="pl-reglages-modifies" class="doux petit"></span></div>
           </div>
         </div>
       </section>
@@ -2358,6 +2295,10 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
       const r = await this.requete("GET", "objectifs", { select: "*", semaine: `eq.${semaine}` });
       return r && r.length ? r[0] : null;
     },
+    async lireObjectifsListe(semaines) {
+      if (!semaines.length) return [];
+      return (await this.requete("GET", "objectifs", { select: "*", semaine: `in.(${semaines.join(",")})` })) || [];
+    },
     async objectifsPrecedents(semaine) {
       const r = await this.requete("GET", "objectifs", { select: "*", semaine: `lt.${semaine}`, order: "semaine.desc", limit: 1 });
       return r && r.length ? r[0] : null;
@@ -2786,6 +2727,116 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
     return resultat;
   }
 
+  // ------------------------------------------------------------ rapport d'une période
+  const SOUS_PERIODE = { semaine: "jour", mois: "semaine", trimestre: "mois", semestre: "mois", annee: "mois" };
+  function bilanLignes(lignes) {
+    const r = Object.fromEntries(COLONNES.map((c) => [c, somme(lignes.map((l) => l[c]))]));
+    r.e_resa_caisse = somme(lignes.map((l) => l.e_reservations_caisse || 0));
+    r.e_resa_hc = somme(lignes.map((l) => l.e_resa_hc || 0));
+    const ah = lignes.filter(avecHeures), heures = somme(ah.map((l) => l[HEURES]));
+    r.heures = heures || null; r.heures_texte = texteHeures(heures || null);
+    r.score_h = heures ? ratio(somme(ah.map((l) => l.score_total)), heures) : null;
+    r.jours = new Set(lignes.filter((l) => !l.seulement_hc).map((l) => l.date)).size;
+    r.conseillers = new Set(lignes.map((l) => l.conseiller)).size;
+    return r;
+  }
+
+  async function rapport(df, type, code) {
+    const lignes = df.filter((l) => l[type] === code);
+    const codes = trier(df.map((l) => l[type]));
+    const position = codes.indexOf(code);
+    const precedente = position > 0 ? codes[position - 1] : null;
+    const avant = precedente ? df.filter((l) => l[type] === precedente) : [];
+    const resultat = {
+      type, code, libelle: libellePeriode(type, code), en_cours: code === codePeriode(type, aujourdhui()),
+      precedente: precedente ? { code: precedente, libelle: libellePeriode(type, precedente) } : null,
+      genere_le: versIso(aujourdhui()), indicateurs: INDICATEURS, libelles: LIBELLES,
+      magasin: bilanLignes(lignes), magasin_precedent: precedente ? bilanLignes(avant) : null,
+      premiere: null, derniere: null, conseillers: [], evolution: null, objectifs: [], stabilite: [], faits: [],
+    };
+    if (!lignes.length) return resultat;
+    const dates = trier(lignes.map((l) => l.date));
+    resultat.premiere = dates[0]; resultat.derniere = dates[dates.length - 1];
+
+    // par conseiller (classement + e-résa caisse / hors caisse + écart avec la période précédente)
+    const cl = classement(df, type, code);
+    const scoreMagasin = resultat.magasin.score_total || 0;
+    resultat.conseillers = cl.lignes.map((l) => {
+      const siennes = lignes.filter((x) => x.conseiller === l.conseiller);
+      const precedentes = avant.filter((x) => x.conseiller === l.conseiller);
+      return {
+        ...l, e_resa_caisse: somme(siennes.map((x) => x.e_reservations_caisse || 0)), e_resa_hc: somme(siennes.map((x) => x.e_resa_hc || 0)),
+        jours: new Set(siennes.filter((x) => !x.seulement_hc).map((x) => x.date)).size,
+        part: scoreMagasin ? l.score_total / scoreMagasin : 0,
+        score_precedent: precedentes.length ? somme(precedentes.map((x) => x.score_total)) : null,
+      };
+    });
+
+    // évolution à l'intérieur de la période (jours, semaines ou mois)
+    const sous = SOUS_PERIODE[type];
+    let pas;
+    if (sous === "jour") pas = joursSemaine(code).map((j, i) => ({ code: j, court: `${JOURS[i].slice(0, 3)}. ${Number(j.slice(8))}`, libelle: `${majuscule(JOURS[i])} ${dateTexte(j)}` }));
+    else pas = trier(lignes.map((l) => l[sous])).map((c) => ({ code: c, court: libelleCourt(sous, c), libelle: libellePeriode(sous, c) }));
+    const cleSous = sous === "jour" ? "date" : sous;
+    resultat.evolution = {
+      sous, pas: pas.map((p) => {
+        const b = bilanLignes(lignes.filter((l) => l[cleSous] === p.code));
+        return { ...p, ...Object.fromEntries(COLONNES.map((c) => [c, b[c]])), heures: b.heures, score_h: b.score_h };
+      }),
+    };
+
+    // objectifs des semaines de la période (réalisé = la semaine entière)
+    const semaines = trier(lignes.map((l) => l.semaine));
+    let objectifs = [];
+    try { objectifs = await base.lireObjectifsListe(semaines); }
+    catch (e) { if (e instanceof SessionRequise) throw e; resultat.objectifs_manquants = true; }
+    const parSemaine = new Map(objectifs.map((o) => [o.semaine, o]));
+    resultat.objectifs = semaines.filter((s) => parSemaine.has(s)).map((s) => {
+      const o = parSemaine.get(s), b = bilanLignes(df.filter((l) => l.semaine === s));
+      return {
+        semaine: s, libelle: libellePeriode("semaine", s),
+        ...Object.fromEntries(INDICATEURS.map((c) => [c, { objectif: Number(o[c]) || 0, realise: b[c] }])),
+      };
+    });
+
+    // régularité des conseillers d'une semaine à l'autre (période de plusieurs semaines)
+    if (type !== "semaine") {
+      const st = await stabilite(lignes, "semaine", "score_total", true);
+      resultat.stabilite = st.lignes.map((l) => ({ conseiller: l.conseiller, nb_periodes: l.nb_periodes, moyenne: l.moyenne, cv: l.cv, niveau: l.niveau, texte: l.texte, minimum: l.minimum, maximum: l.maximum }));
+    }
+
+    // faits marquants
+    const faits = resultat.faits, m = resultat.magasin, mp = resultat.magasin_precedent;
+    const nomPrec = precedente ? libellePeriode(type, precedente).split(" · ")[0].toLowerCase() : "";
+    if (mp && mp.score_total) {
+      const ev = (m.score_total - mp.score_total) / mp.score_total;
+      faits.push({ sens: ev >= 0 ? "haut" : "bas", texte: `Score du magasin ${ev >= 0 ? "en hausse" : "en baisse"} de ${Math.abs(Math.round(ev * 100))} % par rapport à ${nomPrec} (${m.score_total} contre ${mp.score_total}).` });
+      const variations = INDICATEURS.filter((c) => mp[c] > 0).map((c) => [c, (m[c] - mp[c]) / mp[c]]).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+      if (variations.length && Math.abs(variations[0][1]) >= 0.1) {
+        const [c, v] = variations[0];
+        faits.push({ sens: v >= 0 ? "haut" : "bas", texte: `${LIBELLES[c]} : ${v >= 0 ? "+" : "−"}${Math.abs(Math.round(v * 100))} % (${m[c]} contre ${mp[c]}), la plus forte variation.` });
+      }
+    }
+    const premier = resultat.conseillers[0];
+    if (premier) faits.push({ sens: "haut", texte: `${premier.conseiller} en tête avec un score de ${premier.score_total} (${Math.round(premier.part * 100)} % du magasin).` });
+    const efficaces = resultat.conseillers.filter((c) => c.heures >= 2 && c.score_total_h !== null).sort((a, b) => b.score_total_h - a.score_total_h);
+    if (efficaces.length > 1) faits.push({ sens: "haut", texte: `Meilleur score par heure de caisse : ${efficaces[0].conseiller} (${String(efficaces[0].score_total_h).replace(".", ",")} / h).` });
+    const progres = resultat.conseillers.filter((c) => c.score_precedent !== null).map((c) => [c, c.score_total - c.score_precedent]).sort((a, b) => b[1] - a[1]);
+    if (progres.length && progres[0][1] > 0) faits.push({ sens: "haut", texte: `Plus forte progression : ${progres[0][0].conseiller} (+${progres[0][1]} par rapport à ${nomPrec}).` });
+    const meilleurPas = [...resultat.evolution.pas].sort((a, b) => b.score_total - a.score_total)[0];
+    if (meilleurPas && meilleurPas.score_total > 0 && resultat.evolution.pas.length > 1)
+      faits.push({ sens: "neutre", texte: `${sous === "jour" ? "Meilleur jour" : sous === "semaine" ? "Meilleure semaine" : "Meilleur mois"} : ${meilleurPas.libelle.split(" · ")[0]} (score ${meilleurPas.score_total}).` });
+    if (m.e_reservations > 0 && m.e_resa_hc > 0) faits.push({ sens: "neutre", texte: `${Math.round(m.e_resa_hc / m.e_reservations * 100)} % des e-résa ont été faites hors caisse (${m.e_resa_hc} sur ${m.e_reservations}).` });
+    if (resultat.objectifs.length) {
+      let atteints = 0, total = 0;
+      resultat.objectifs.forEach((s) => INDICATEURS.forEach((c) => { if (s[c].objectif > 0) { total++; if (s[c].realise >= s[c].objectif) atteints++; } }));
+      if (total) faits.push({ sens: atteints * 2 >= total ? "haut" : "bas", texte: `Objectifs atteints : ${atteints} sur ${total} (${resultat.objectifs.length} semaine${resultat.objectifs.length > 1 ? "s" : ""} avec objectifs).` });
+    }
+    const sansTemps = resultat.conseillers.filter((c) => c.heures === null).map((c) => c.conseiller);
+    if (sansTemps.length) faits.push({ sens: "bas", texte: `Temps de caisse non saisi pour : ${sansTemps.join(", ")}.` });
+    return resultat;
+  }
+
   // ------------------------------------------------------------ l'« Api » appelée par app.js
   // Erreur de connexion -> {__erreur__, session} (comme le décorateur « protege » en Python)
   const protege = (fonction) => async (...args) => {
@@ -2871,6 +2922,7 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
     classement: protege(async (type, code) => classement(await charger(), type, code)),
     stabilite: protege(async (type, indicateur, inclure = false) => stabilite(await charger(), type, indicateur, !!inclure)),
     evolution: protege(async (type, indicateur) => evolution(await charger(), type, indicateur)),
+    rapport: protege(async (type, code) => rapport(await charger(), type, code)),
 
     // --- saisie
     historique: protege(async () => historique(await charger())),
@@ -3019,11 +3071,17 @@ html[data-appareil="tablette"] #menu-affichage button { padding: 12px 14px; }
         COLONNES.forEach((c) => { realise[l.conseiller][c][j] += l[c]; });
         if (estNombre(l[HEURES])) { tempsSaisi[l.conseiller] = tempsSaisi[l.conseiller] || Array(7).fill(0); tempsSaisi[l.conseiller][j] += l[HEURES] * 60; }
       }
+      // temps de caisse saisi la semaine précédente (sert tant que rien n'est saisi cette semaine)
+      const joursAvant = joursSemaine(codePeriode("semaine", new Date(versDate(jours[0]).getTime() - 7 * 86400000)));
+      const tempsPrecedent = {};
+      for (const l of df.filter((x) => joursAvant.includes(x.date) && estNombre(x[HEURES]))) {
+        tempsPrecedent[l.conseiller] = (tempsPrecedent[l.conseiller] || 0) + l[HEURES] * 60;
+      }
       const garder = (o) => (o ? Object.fromEntries(INDICATEURS.map((c) => [c, Number(o[c]) || 0])) : null);
       return {
         semaine, libelle: libellePeriode("semaine", semaine), jours, conseillers,
         objectifs: garder(objectifs), precedents: precedents ? { semaine: precedents.semaine, ...garder(precedents) } : null,
-        modifie_par: (objectifs?.saisi_par || "").split("@")[0], realise, tempsSaisi,
+        modifie_par: (objectifs?.saisi_par || "").split("@")[0], realise, tempsSaisi, tempsPrecedent,
         planning: planning ? { presences: planning.presences || {}, caisse: planning.caisse || null } : null,
         reglages_planning: reglages.planning, manquante, en_cours: semaine === codePeriode("semaine", aujourdhui()),
         aujourd_hui: versIso(aujourdhui()),
@@ -5480,11 +5538,8 @@ async function plActualiser() {
   if (plVue() === "caisse" && plMaintenant()) plAfficherCaisse();   // fait avancer le créneau « Maintenant »
 }
 
-window.addEventListener("pywebviewready", () => {
-  if (!plDisponible()) return;   // logiciel installé : pas de planning
-  $("#lien-planning").hidden = false;
-  plBrancher();
-});
+// L'onglet Planning a été retiré : ce fichier ne sert plus que de boîte à outils
+// (semaines, dates, export PDF) pour les onglets E-résa, Objectifs et Rapport.
 
 // pour les tests
 window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneaux, plPlaces, plTexteNormalise, plAnalyserPagePdf, plTexteCase, plTrouverNom };
@@ -5498,7 +5553,7 @@ window.__planning = { plLirePlages, plGenerer, plMettreAJour, plBilan, plCreneau
 //    celles de la caisse pour chaque conseiller (classement, objectifs…).
 //  - Objectifs : comptes, Famille+, e-résa et livrets bébé pour la semaine,
 //    répartis entre les conseillers selon leur part du temps de caisse
-//    (planning de caisse de la semaine), pour la semaine et jour par jour.
+//    (temps de caisse saisi), pour la semaine et jour par jour.
 //  S'appuie sur planning.js (semaines, créneaux, export PDF).
 // =====================================================================
 
@@ -5711,19 +5766,25 @@ async function obCharger(semaine) {
 function obCalculs() {
   const r = OB, obj = obLireSaisie();
   obj.score_total = OB_INDICATEURS.reduce((s, c) => s + obj[c], 0);
-  // base de la répartition : le planning de caisse, sinon le temps de caisse saisi avec les résultats
-  let temps = obTempsPlanning(r.planning, r.reglages_planning), source = "planning";
-  if (!Object.values(temps).some((j) => j.some(Boolean))) {
-    temps = Object.fromEntries(Object.entries(r.tempsSaisi || {}).map(([n, j]) => [n, j.map((m) => Math.round(m))]));
-    source = Object.values(temps).some((j) => j.some(Boolean)) ? "saisie" : null;
+  // base de la répartition : le temps de caisse saisi cette semaine (page Saisie),
+  // sinon celui de la semaine précédente (les parts sont reprises, sans détail par jour)
+  let temps = Object.fromEntries(Object.entries(r.tempsSaisi || {}).map(([n, j]) => [n, j.map((m) => Math.round(m))]));
+  let source = Object.values(temps).some((j) => j.some(Boolean)) ? "saisie" : null;
+  let partsPrecedentes = null;
+  if (!source && Object.values(r.tempsPrecedent || {}).some(Boolean)) {
+    source = "precedente";
+    partsPrecedentes = r.tempsPrecedent;
+    temps = Object.fromEntries(Object.keys(partsPrecedentes).map((n) => [n, Array(7).fill(0)]));
   }
+  const totalPrecedent = partsPrecedentes ? Object.values(partsPrecedentes).reduce((a, b) => a + b, 0) : 0;
   const totalMinutes = Object.values(temps).reduce((s, j) => s + j.reduce((a, b) => a + b, 0), 0);
   const ordre = (n) => { const i = r.conseillers.findIndex((c) => c.nom === n); return i < 0 ? 999 : i; };
   const noms = [...new Set([...Object.keys(temps), ...Object.keys(r.realise)])]
     .filter((n) => (temps[n] || []).some(Boolean) || (r.realise[n] && Object.values(r.realise[n]).some((j) => j.some(Boolean))))
     .sort((a, b) => ordre(a) - ordre(b));
   const minutes = Object.fromEntries(noms.map((n) => [n, temps[n] || Array(7).fill(0)]));
-  const part = Object.fromEntries(noms.map((n) => [n, totalMinutes ? minutes[n].reduce((a, b) => a + b, 0) / totalMinutes : 0]));
+  const part = Object.fromEntries(noms.map((n) => [n, partsPrecedentes ? (partsPrecedentes[n] || 0) / totalPrecedent
+    : totalMinutes ? minutes[n].reduce((a, b) => a + b, 0) / totalMinutes : 0]));
   // objectifs entiers de chacun (la somme fait l'objectif du magasin)
   const objNom = Object.fromEntries(noms.map((n) => [n, {}]));
   for (const c of OB_INDICATEURS) obArrondirParts(obj[c], noms.map((n) => part[n])).forEach((v, i) => { objNom[noms[i]][c] = v; });
@@ -5733,7 +5794,7 @@ function obCalculs() {
     return j === null ? serie.reduce((a, b) => a + b, 0) : serie[j];
   };
   const ouverture = (r.reglages_planning?.horaires || []).reduce((s, h) => s + (h ? plMinutes(h[1]) - plMinutes(h[0]) : 0), 0);
-  return { obj, temps: minutes, totalMinutes, part, noms, objNom, realise, source, ouverture };
+  return { obj, temps: minutes, totalMinutes, part, noms, objNom, realise, source, ouverture, partsPrecedentes, totalPrecedent };
 }
 
 function obAfficher() {
@@ -5761,19 +5822,19 @@ function obAfficher() {
   }).join("");
 
   // base de la répartition
-  const caisses = r.reglages_planning?.caisses || 1;
-  $("#ob-base").innerHTML = k.source === "planning"
-    ? `D'après le <strong>planning de caisse</strong> de la semaine : ${plDuree(k.totalMinutes)} de caisse tenue${k.ouverture ? ` pour ${plDuree(k.ouverture)} d'ouverture du magasin` : ""}${caisses > 1 ? ` (${caisses} caisses)` : ""}. La part de chacun = son temps de caisse ÷ ${plDuree(k.totalMinutes)}.`
-    : k.source === "saisie"
-      ? `Pas de planning de caisse pour cette semaine : répartition d'après le <strong>temps de caisse saisi</strong> avec les résultats (${plDuree(k.totalMinutes)}). Importe le planning dans l'onglet Planning pour une répartition prévue à l'avance.`
-      : `<strong>Pas encore de temps de caisse pour cette semaine.</strong> Importe le planning de la semaine dans l'onglet <strong>Planning</strong> : les objectifs de chacun se calculeront tout seuls.`;
+  const caisses = 1;
+  $("#ob-base").innerHTML = k.source === "saisie"
+    ? `D'après le <strong>temps de caisse saisi</strong> cette semaine (page Saisie) : ${plDuree(k.totalMinutes)} au total. La part de chacun = son temps de caisse ÷ ${plDuree(k.totalMinutes)} ; elle s'ajuste à chaque nouvelle saisie.`
+    : k.source === "precedente"
+      ? `Rien n'est encore saisi cette semaine : les parts reprennent le <strong>temps de caisse de la semaine précédente</strong> (${plDuree(Math.round(k.totalPrecedent))}). Elles s'ajusteront dès les premières saisies.`
+      : `<strong>Pas encore de temps de caisse.</strong> Saisis les résultats avec le temps en caisse (page Saisie) : les objectifs de chacun se calculeront tout seuls.`;
 
   const caseObj = (fait, vise) => {
     const classe = vise && fait >= vise ? "ob-ok" : "";
     return `<td class="nombre ${classe}"><strong>${fait}</strong><span class="doux"> / ${vise}</span></td>`;
   };
   $("#ob-lignes").innerHTML = k.noms.length ? k.noms.map((n) => {
-    const m = k.temps[n].reduce((a, b) => a + b, 0), o = k.objNom[n];
+    const m = k.partsPrecedentes ? Math.round(k.partsPrecedentes[n] || 0) : k.temps[n].reduce((a, b) => a + b, 0), o = k.objNom[n];
     const faitScore = k.realise(n, "score_total");
     const p = o.score_total ? Math.min(1, faitScore / o.score_total) : 0;
     return `<tr><td class="nom">${pastille(n)}${echapper(n)}</td><td class="nombre">${plDuree(m)}</td>
@@ -5782,7 +5843,7 @@ function obAfficher() {
       <td class="barre-col"><span class="ob-barre petite ${o.score_total && faitScore >= o.score_total ? "atteint" : ""}"><i style="width:${Math.round(p * 100)}%;${fondBarre(n)}"></i></span>
         <span class="doux petit">${o.score_total ? obPct(faitScore / o.score_total) : "—"}</span></td></tr>`;
   }).join("") : `<tr class="vide-ligne"><td colspan="9">Personne à répartir pour l'instant.</td></tr>`;
-  $("#ob-pied").innerHTML = k.noms.length ? `<tr><td>Magasin</td><td class="nombre">${plDuree(k.totalMinutes)}</td><td class="nombre">100 %</td>
+  $("#ob-pied").innerHTML = k.noms.length ? `<tr><td>Magasin</td><td class="nombre">${plDuree(k.partsPrecedentes ? Math.round(k.totalPrecedent) : k.totalMinutes)}</td><td class="nombre">100 %</td>
     ${[...OB_INDICATEURS, "score_total"].map((c) => `<td class="nombre"><strong>${totalRealise(c)}</strong><span class="doux"> / ${k.obj[c]}</span></td>`).join("")}<td></td></tr>` : "";
 
   // jour par jour
@@ -5866,6 +5927,359 @@ window.addEventListener("pywebviewready", () => {
 });
 
 window.__objectifs = { obTempsPlanning, obArrondirParts, obCalculs: () => obCalculs() };
+
+</script>
+  <script>
+// =====================================================================
+//  RAPPORT (version web)
+//  Bilan d'une période (semaine, mois, trimestre, semestre, année) :
+//  chiffres du magasin et écart avec la période précédente, faits marquants,
+//  classement des conseillers, évolution dans la période, objectifs,
+//  régularité. Affiché à l'écran et exportable en PDF (A4 portrait).
+//  S'appuie sur planning.js (chargement de jsPDF) et objectifs.js (icônes).
+// =====================================================================
+
+ICONES.rapport = '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 17v-3M12 17v-6M15 17v-4"/>';
+
+const RP_COLONNES = ["comptes", "famille_plus", "e_reservations", "livret_bebe", "score_total"];
+const RP_COURTS = { comptes: "Comptes", famille_plus: "Famille+", e_reservations: "E-résa", livret_bebe: "Livret bébé", score_total: "Score" };
+let RP = null;
+
+const rpDec = (v) => (v === null || v === undefined ? "—" : String(v).replace(".", ","));
+const rpDate = (iso) => (iso ? iso.split("-").reverse().join("/") : "");
+const rpPct = (x) => `${Math.round(x * 100)} %`;
+function rpEcart(actuel, avant) {
+  if (avant === null || avant === undefined) return null;
+  const d = actuel - avant;
+  return { d, texte: `${d > 0 ? "+" : d < 0 ? "−" : ""}${Math.abs(d)}`, pct: avant ? Math.round(d / avant * 100) : null, sens: d > 0 ? "haut" : d < 0 ? "bas" : "egal" };
+}
+
+// ------------------------------------------------------------ chargement
+async function rpChargerPeriodes() {
+  await rafraichirEtat();
+  const type = valeurChoix("periode-rapport");
+  const periodes = await api().periodes(type);
+  const select = $("#code-rapport");
+  const avant = select.dataset.type === type ? select.value : null;
+  select.dataset.type = type;
+  select.innerHTML = periodes.map((p) => `<option value="${p.code}">${echapper(p.libelle)}</option>`).join("") || `<option value="">Aucune donnée</option>`;
+  const codes = periodes.map((p) => p.code);
+  select.value = codes.includes(avant) ? avant : (codes.includes(ETAT.periodes_en_cours[type]) ? ETAT.periodes_en_cours[type] : (codes[0] || ""));
+  await rpCharger();
+}
+
+async function rpCharger() {
+  const type = valeurChoix("periode-rapport"), code = $("#code-rapport").value;
+  if (!code) {
+    RP = null;
+    $("#rp-contenu").innerHTML = `<p class="attente">Aucun résultat saisi pour l'instant : le rapport se remplira avec les saisies.</p>`;
+    $("#rp-titre").textContent = "Rapport";
+    return;
+  }
+  const r = await api().rapport(type, code);
+  if (!r || r.erreur) return notifier(r?.erreur || "Rapport impossible.", true);
+  RP = r;
+  rpAfficher();
+}
+
+// ------------------------------------------------------------ à l'écran
+function rpAfficher() {
+  const r = RP, m = r.magasin, mp = r.magasin_precedent;
+  const nomPrec = r.precedente ? r.precedente.libelle.split(" · ")[0] : "";
+  $("#rp-titre").textContent = `Rapport · ${r.libelle}`;
+  const parties = [];
+
+  parties.push(`<p class="doux petit">${r.premiere ? `Données du ${rpDate(r.premiere)} au ${rpDate(r.derniere)} · ${m.jours} jour${m.jours > 1 ? "s" : ""} saisi${m.jours > 1 ? "s" : ""} · ${m.conseillers} conseiller${m.conseillers > 1 ? "s" : ""}` : "Aucune donnée"}
+    ${r.en_cours ? ` · <strong>période en cours</strong> : chiffres provisoires` : ""}${r.precedente ? ` · comparé à ${echapper(nomPrec.toLowerCase())}` : ""}</p>`);
+
+  // chiffres clés
+  const carte = (etiquette, valeur, ecart) => `<div class="chiffre"><span class="etiquette">${etiquette}</span><strong>${valeur}</strong>${ecart
+    ? `<span class="rp-ecart ${ecart.sens}">${ecart.texte}${ecart.pct !== null ? ` (${ecart.pct > 0 ? "+" : ""}${ecart.pct} %)` : ""}</span>` : ""}</div>`;
+  parties.push(`<h3 class="espace-haut">Chiffres du magasin</h3><div class="chiffres compacts rp-chiffres">
+    ${RP_COLONNES.map((c) => carte(r.libelles[c], nombre(m[c]), mp ? rpEcart(m[c], mp[c]) : null)).join("")}
+    ${carte("Temps en caisse", m.heures_texte || "—", null)}
+    ${carte("Score par heure de caisse", rpDec(m.score_h), null)}
+  </div>
+  ${m.e_reservations ? `<p class="doux petit">E-résa : ${m.e_resa_caisse} en caisse + ${m.e_resa_hc} hors caisse.</p>` : ""}`);
+
+  // faits marquants
+  if (r.faits.length) parties.push(`<h3 class="espace-haut">Faits marquants</h3><ul class="rp-faits">${r.faits.map((f) => `<li class="${f.sens}">${echapper(f.texte)}</li>`).join("")}</ul>`);
+
+  // classement
+  if (r.conseillers.length) {
+    const max = Math.max(1, ...r.conseillers.map((c) => c.score_total));
+    parties.push(`<h3 class="espace-haut">Classement des conseillers</h3>
+    <div class="rp-defile"><table class="tableau-office rp-tableau">
+      <thead><tr><th class="rang">#</th><th>Conseiller</th>${["comptes", "famille_plus", "e_reservations", "livret_bebe"].map((c) => `<th class="nombre">${RP_COURTS[c]}</th>`).join("")}
+        <th class="nombre">Score</th><th class="nombre">Part</th><th class="nombre">Temps</th><th class="nombre">Score / h</th><th class="barre-col"></th>${r.precedente ? `<th class="nombre">vs préc.</th>` : ""}</tr></thead>
+      <tbody>${r.conseillers.map((c) => {
+        const e = rpEcart(c.score_total, c.score_precedent);
+        return `<tr><td class="rang">${c.rang}</td><td><strong>${echapper(c.conseiller)}</strong></td>
+          <td class="nombre">${c.comptes}</td><td class="nombre">${c.famille_plus}</td>
+          <td class="nombre">${c.e_reservations}${c.e_resa_hc ? `<div class="doux petit">dont ${c.e_resa_hc} hors caisse</div>` : ""}</td>
+          <td class="nombre">${c.livret_bebe}</td><td class="nombre"><strong>${c.score_total}</strong></td><td class="nombre">${rpPct(c.part)}</td>
+          <td class="nombre">${c.heures_texte || "—"}</td><td class="nombre">${rpDec(c.score_total_h)}</td>
+          <td class="barre-col"><span class="rp-barre" style="width:${Math.round(c.score_total / max * 100)}%"></span></td>
+          ${r.precedente ? `<td class="nombre"><span class="rp-ecart ${e ? e.sens : ""}">${e ? e.texte : "—"}</span></td>` : ""}</tr>`;
+      }).join("")}</tbody>
+      <tfoot><tr><td></td><td>Magasin</td>${["comptes", "famille_plus", "e_reservations", "livret_bebe", "score_total"].map((c) => `<td class="nombre">${m[c]}</td>`).join("")}
+        <td class="nombre">100 %</td><td class="nombre">${m.heures_texte || "—"}</td><td class="nombre">${rpDec(m.score_h)}</td><td></td>${r.precedente ? `<td></td>` : ""}</tr></tfoot>
+    </table></div>`);
+  }
+
+  // évolution dans la période
+  const pas = r.evolution?.pas || [];
+  if (pas.length) {
+    const titre = { jour: "Jour par jour", semaine: "Semaine par semaine", mois: "Mois par mois" }[r.evolution.sous];
+    const max = Math.max(1, ...pas.map((p) => p.score_total));
+    parties.push(`<h3 class="espace-haut">${titre}</h3>
+    <div class="rp-defile"><table class="tableau-office rp-tableau">
+      <thead><tr><th>${r.evolution.sous === "jour" ? "Jour" : r.evolution.sous === "semaine" ? "Semaine" : "Mois"}</th>${RP_COLONNES.map((c) => `<th class="nombre">${RP_COURTS[c]}</th>`).join("")}<th class="nombre">Score / h</th><th class="barre-col"></th></tr></thead>
+      <tbody>${pas.map((p) => `<tr><td>${echapper(p.libelle.split(" · ")[0])}</td>${RP_COLONNES.map((c) => `<td class="nombre">${c === "score_total" ? `<strong>${p[c]}</strong>` : p[c]}</td>`).join("")}
+        <td class="nombre">${rpDec(p.score_h)}</td><td class="barre-col"><span class="rp-barre" style="width:${Math.round(p.score_total / max * 100)}%"></span></td></tr>`).join("")}</tbody>
+    </table></div>`);
+  }
+
+  // objectifs
+  if (r.objectifs.length) {
+    parties.push(`<h3 class="espace-haut">Objectifs de la semaine</h3>
+    <div class="rp-defile"><table class="tableau-office rp-tableau">
+      <thead><tr><th>Semaine</th>${["comptes", "famille_plus", "e_reservations", "livret_bebe"].map((c) => `<th class="nombre">${RP_COURTS[c]}</th>`).join("")}</tr></thead>
+      <tbody>${r.objectifs.map((s) => `<tr><td>${echapper(s.libelle.split(" · ")[0])}</td>${["comptes", "famille_plus", "e_reservations", "livret_bebe"].map((c) => {
+        const o = s[c]; if (!o.objectif) return `<td class="nombre doux">${o.realise} <span class="petit">(pas d'objectif)</span></td>`;
+        const ok = o.realise >= o.objectif;
+        return `<td class="nombre"><strong>${o.realise}</strong> / ${o.objectif} <span class="rp-ecart ${ok ? "haut" : "bas"}">${Math.round(o.realise / o.objectif * 100)} %</span></td>`;
+      }).join("")}</tr>`).join("")}</tbody>
+    </table></div>
+    <p class="doux petit">Réalisé sur la semaine entière (lundi au dimanche), e-résa hors caisse comprises.</p>`);
+  } else if (r.premiere) {
+    parties.push(`<p class="doux petit espace-haut">Pas d'objectifs enregistrés pour les semaines de cette période (onglet Objectifs).</p>`);
+  }
+
+  // régularité
+  if (r.stabilite.length) {
+    parties.push(`<h3 class="espace-haut">Régularité d'une semaine à l'autre</h3>
+    <div class="rp-defile"><table class="tableau-office rp-tableau">
+      <thead><tr><th>Conseiller</th><th class="nombre">Semaines</th><th class="nombre">Score moyen</th><th class="nombre">Mini – maxi</th><th>Régularité</th></tr></thead>
+      <tbody>${r.stabilite.map((s) => `<tr><td>${echapper(s.conseiller)}</td><td class="nombre">${s.nb_periodes}</td><td class="nombre">${rpDec(s.moyenne)}</td>
+        <td class="nombre">${rpDec(s.minimum)} – ${rpDec(s.maximum)}</td><td><span class="badge ${s.niveau}"><i></i>${echapper(s.texte)}</span></td></tr>`).join("")}</tbody>
+    </table></div>`);
+  }
+
+  $("#rp-contenu").innerHTML = parties.join("");
+}
+
+// ------------------------------------------------------------ PDF
+const rpTxt = (t) => String(t ?? "").replace(/[−–—]/g, "-").replace(/[  ]/g, " ").replace(/[’]/g, "'");
+
+async function rpPdf() {
+  if (!RP) return notifier("Choisis d'abord une période qui contient des résultats.", true);
+  const bouton = $("#rp-pdf");
+  bouton.disabled = true;
+  let jsPDF;
+  try { jsPDF = await plJsPdf(); }
+  catch (e) { bouton.disabled = false; return notifier("Impossible de charger l'outil PDF (connexion internet ?). Réessaie dans un instant.", true); }
+  try {
+    const r = RP, m = r.magasin, mp = r.magasin_precedent;
+    const nomPrec = r.precedente ? r.precedente.libelle.split(" · ")[0].toLowerCase() : "";
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const L = 210, H = 297, M = 14;
+    const accent = plRvb(ETAT?.reglages?.couleur || "#040037");
+    const gris = [96, 94, 92], noir = [32, 31, 30], trait = [214, 211, 208], vert = [19, 130, 90], rouge = [196, 56, 46];
+    const logo = ETAT?.logos?.complet ? await plImage(ETAT.logos.complet) : null;
+    const couleurs = { comptes: [42, 120, 214], famille_plus: [226, 98, 27], e_reservations: [19, 151, 106], livret_bebe: [210, 79, 134], score_total: accent };
+
+    // en-tête
+    doc.setFillColor(...accent); doc.rect(0, 0, L, 30, "F");
+    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(19);
+    doc.text("Rapport fidélisation", M, 14);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(11.5);
+    doc.text(rpTxt(r.libelle), M, 22);
+    if (logo) {
+      const w = 38, h = w * logo.height / logo.width;
+      doc.setFillColor(255, 255, 255); doc.roundedRect(L - M - w - 4, 15 - h / 2 - 3, w + 8, h + 6, 2, 2, "F");
+      doc.addImage(logo, "PNG", L - M - w, 15 - h / 2, w, h);
+    }
+    let y = 37;
+    doc.setTextColor(...gris); doc.setFontSize(9);
+    const infos = [r.premiere ? `Données du ${rpDate(r.premiere)} au ${rpDate(r.derniere)}` : "Aucune donnée",
+      `${m.jours} jour${m.jours > 1 ? "s" : ""} saisi${m.jours > 1 ? "s" : ""}`, `${m.conseillers} conseiller${m.conseillers > 1 ? "s" : ""}`,
+      r.precedente ? `comparé à ${nomPrec}` : null, `édité le ${rpDate(r.genere_le)}`].filter(Boolean).join("  ·  ");
+    doc.text(rpTxt(infos), M, y);
+    if (r.en_cours) { y += 5; doc.setTextColor(...rouge); doc.text("Période en cours : chiffres provisoires.", M, y); }
+    y += 10;
+
+    // chiffres clés : 5 cartes + temps / score par heure
+    const titre = (texte) => {
+      if (y > H - 40) { doc.addPage(); y = 18; }
+      doc.setFont("helvetica", "bold"); doc.setFontSize(12.5); doc.setTextColor(...noir); doc.text(texte, M, y);
+      doc.setDrawColor(...accent); doc.setLineWidth(0.6); doc.line(M, y + 1.8, M + 14, y + 1.8);
+      y += 6;
+    };
+    titre("Chiffres du magasin");
+    const lc = (L - 2 * M - 4 * 3) / 5;
+    RP_COLONNES.forEach((c, i) => {
+      const x = M + i * (lc + 3), coul = couleurs[c];
+      doc.setFillColor(248, 247, 245); doc.roundedRect(x, y, lc, 25, 2, 2, "F");
+      doc.setFillColor(...coul); doc.rect(x, y, 1.4, 25, "F");
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...gris); doc.text(rpTxt(r.libelles[c]), x + 4, y + 6);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(19); doc.setTextColor(...noir); doc.text(String(m[c]), x + 4, y + 15.5);
+      const e = mp ? rpEcart(m[c], mp[c]) : null;
+      if (e) {
+        doc.setFont("helvetica", "bold"); doc.setFontSize(8.5);
+        doc.setTextColor(...(e.sens === "haut" ? vert : e.sens === "bas" ? rouge : gris));
+        doc.text(rpTxt(`${e.texte}${e.pct !== null ? ` (${e.pct > 0 ? "+" : ""}${e.pct} %)` : ""}`), x + 4, y + 21.5);
+      }
+    });
+    y += 30;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...noir);
+    doc.text(rpTxt(`Temps en caisse : ${m.heures_texte || "non saisi"}   ·   Score par heure de caisse : ${rpDec(m.score_h)}`
+      + (m.e_reservations ? `   ·   E-résa : ${m.e_resa_caisse} en caisse + ${m.e_resa_hc} hors caisse` : "")), M, y);
+    y += 9;
+
+    // faits marquants
+    if (r.faits.length) {
+      titre("Faits marquants");
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
+      for (const f of r.faits) {
+        const lignes = doc.splitTextToSize(rpTxt(f.texte), L - 2 * M - 7);
+        if (y + lignes.length * 4.6 > H - 18) { doc.addPage(); y = 18; }
+        doc.setFillColor(...(f.sens === "haut" ? vert : f.sens === "bas" ? rouge : gris)); doc.circle(M + 1.6, y - 1.2, 1.2, "F");
+        doc.setTextColor(...noir); doc.text(lignes, M + 6, y);
+        y += lignes.length * 4.6 + 1;
+      }
+      y += 4;
+    }
+
+    const tableau = (options) => {
+      doc.autoTable({
+        startY: y, margin: { left: M, right: M, bottom: 16, top: 16 }, theme: "plain",
+        styles: { font: "helvetica", fontSize: 8.8, cellPadding: { top: 1.8, bottom: 1.8, left: 1.6, right: 1.6 }, textColor: noir, lineColor: trait, valign: "middle" },
+        headStyles: { fillColor: [244, 243, 241], textColor: gris, fontStyle: "bold", fontSize: 8 },
+        footStyles: { fillColor: [236, 235, 243], textColor: accent, fontStyle: "bold" },
+        bodyStyles: { lineWidth: { bottom: 0.15 } },
+        ...options,
+        didParseCell: (d) => {
+          if (d.section !== "body") { const h = options.columnStyles?.[d.column.dataKey]?.halign; if (h) d.cell.styles.halign = h; }
+          options.didParseCell?.(d);
+        },
+      });
+      y = doc.lastAutoTable.finalY + 9;
+    };
+    const barre = (couleur, maxi, cle) => (d) => {
+      if (d.section !== "body" || d.column.dataKey !== "barre") return;
+      const v = d.row.raw[cle]; if (!v) return;
+      doc.setFillColor(...couleur); doc.roundedRect(d.cell.x + 1, d.cell.y + d.cell.height / 2 - 1.6, (d.cell.width - 2) * v / maxi, 3.2, 1, 1, "F");
+    };
+
+    // classement
+    if (r.conseillers.length) {
+      titre("Classement des conseillers");
+      const max = Math.max(1, ...r.conseillers.map((c) => c.score_total));
+      const colonnes = [{ header: "#", dataKey: "rang" }, { header: "Conseiller", dataKey: "nom" }, { header: "Comptes", dataKey: "comptes" },
+        { header: "Famille+", dataKey: "famille_plus" }, { header: "E-résa", dataKey: "e_reservations" }, { header: "Livret", dataKey: "livret_bebe" },
+        { header: "Score", dataKey: "score_total" }, { header: "Part", dataKey: "part" }, { header: "Temps", dataKey: "temps" },
+        { header: "Score/h", dataKey: "score_h" }, { header: "", dataKey: "barre" }];
+      if (r.precedente) colonnes.push({ header: "vs préc.", dataKey: "ecart" });
+      tableau({
+        columns: colonnes,
+        body: r.conseillers.map((c) => {
+          const e = rpEcart(c.score_total, c.score_precedent);
+          return { rang: c.rang, nom: c.conseiller, comptes: c.comptes, famille_plus: c.famille_plus,
+            e_reservations: c.e_resa_hc ? `${c.e_reservations} (${c.e_resa_hc} hc)` : c.e_reservations, livret_bebe: c.livret_bebe,
+            score_total: c.score_total, part: rpPct(c.part), temps: c.heures_texte || "-", score_h: rpTxt(rpDec(c.score_total_h)).replace("—", "-"),
+            barre: "", ecart: e ? rpTxt(e.texte) || "0" : "-", _score: c.score_total, _sens: e?.sens };
+        }),
+        foot: [{ rang: "", nom: "Magasin", comptes: m.comptes, famille_plus: m.famille_plus, e_reservations: m.e_reservations, livret_bebe: m.livret_bebe,
+          score_total: m.score_total, part: "100 %", temps: m.heures_texte || "-", score_h: rpTxt(rpDec(m.score_h)).replace("—", "-"), barre: "", ecart: "" }],
+        columnStyles: { rang: { cellWidth: 7, textColor: gris }, nom: { fontStyle: "bold" }, comptes: { halign: "right" }, famille_plus: { halign: "right" },
+          e_reservations: { halign: "right" }, livret_bebe: { halign: "right" }, score_total: { halign: "right", fontStyle: "bold" },
+          part: { halign: "right" }, temps: { halign: "right" }, score_h: { halign: "right" }, barre: { cellWidth: 22 }, ecart: { halign: "right" } },
+        didParseCell: (d) => { if (d.section === "body" && d.column.dataKey === "ecart") d.cell.styles.textColor = d.row.raw._sens === "haut" ? vert : d.row.raw._sens === "bas" ? rouge : gris; },
+        didDrawCell: barre(accent, max, "_score"),
+      });
+    }
+
+    // évolution
+    const pas = r.evolution?.pas || [];
+    if (pas.length) {
+      titre({ jour: "Jour par jour", semaine: "Semaine par semaine", mois: "Mois par mois" }[r.evolution.sous]);
+      const max = Math.max(1, ...pas.map((p) => p.score_total));
+      tableau({
+        columns: [{ header: r.evolution.sous === "jour" ? "Jour" : r.evolution.sous === "semaine" ? "Semaine" : "Mois", dataKey: "nom" },
+          ...RP_COLONNES.map((c) => ({ header: RP_COURTS[c], dataKey: c })), { header: "Score/h", dataKey: "score_h" }, { header: "", dataKey: "barre" }],
+        body: pas.map((p) => ({ nom: rpTxt(p.libelle.split(" · ")[0]), ...Object.fromEntries(RP_COLONNES.map((c) => [c, p[c]])), score_h: rpDec(p.score_h).replace("—", "-"), barre: "", _score: p.score_total })),
+        columnStyles: { ...Object.fromEntries(RP_COLONNES.map((c) => [c, { halign: "right" }])), score_total: { halign: "right", fontStyle: "bold" }, score_h: { halign: "right" }, barre: { cellWidth: 40 } },
+        didDrawCell: barre(accent, max, "_score"),
+      });
+    }
+
+    // objectifs
+    if (r.objectifs.length) {
+      titre("Objectifs de la semaine");
+      const ind = ["comptes", "famille_plus", "e_reservations", "livret_bebe"];
+      tableau({
+        columns: [{ header: "Semaine", dataKey: "nom" }, ...ind.map((c) => ({ header: `${RP_COURTS[c]} (réalisé / objectif)`, dataKey: c }))],
+        body: r.objectifs.map((s) => ({ nom: rpTxt(s.libelle.split(" · ")[0]), ...Object.fromEntries(ind.map((c) => [c, s[c].objectif
+          ? `${s[c].realise} / ${s[c].objectif}  (${Math.round(s[c].realise / s[c].objectif * 100)} %)` : `${s[c].realise}  (sans objectif)`])), _s: s })),
+        columnStyles: Object.fromEntries(ind.map((c) => [c, { halign: "right" }])),
+        didParseCell: (d) => {
+          if (d.section !== "body" || !ind.includes(d.column.dataKey)) return;
+          const o = d.row.raw._s[d.column.dataKey];
+          d.cell.styles.textColor = !o.objectif ? gris : o.realise >= o.objectif ? vert : rouge;
+          d.cell.styles.fontStyle = o.objectif ? "bold" : "normal";
+        },
+      });
+    }
+
+    // régularité
+    if (r.stabilite.length) {
+      titre("Régularité d'une semaine à l'autre");
+      tableau({
+        columns: [{ header: "Conseiller", dataKey: "nom" }, { header: "Semaines", dataKey: "n" }, { header: "Score moyen", dataKey: "moy" }, { header: "Mini - maxi", dataKey: "mm" }, { header: "Régularité", dataKey: "texte" }],
+        body: r.stabilite.map((s) => ({ nom: s.conseiller, n: s.nb_periodes, moy: rpDec(s.moyenne), mm: `${rpDec(s.minimum)} - ${rpDec(s.maximum)}`, texte: s.texte })),
+        columnStyles: { n: { halign: "right" }, moy: { halign: "right" }, mm: { halign: "right" } },
+      });
+    }
+
+    // pied de page
+    const nb = doc.getNumberOfPages();
+    for (let i = 1; i <= nb; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(150, 148, 146);
+      doc.text(rpTxt(`Suivi fidélisation · ${r.libelle}`), M, H - 8);
+      doc.text(`Page ${i} / ${nb}`, L - M, H - 8, { align: "right" });
+    }
+    const nomFichier = rpTxt(r.libelle.split(" · ")[0]).replace(/[\\/:*?"<>|]/g, "-");
+    doc.save(`Rapport fidelisation - ${nomFichier}${r.type === "semaine" ? ` ${r.code.slice(0, 4)}` : ""}.pdf`);
+    notifier("Rapport exporté en PDF : il est dans tes téléchargements.");
+  } catch (e) {
+    console.error(e);
+    notifier("Le PDF n'a pas pu être créé.", true);
+  } finally {
+    bouton.disabled = false;
+  }
+}
+
+// ------------------------------------------------------------ branchement
+function rpBrancher() {
+  const afficherAvant = afficher;
+  afficher = async function (page) {
+    await afficherAvant(page);
+    if (page === "rapport") await rpChargerPeriodes();
+  };
+  Object.defineProperty(afficher, "page", { get: () => afficherAvant.page, set: (v) => { afficherAvant.page = v; } });
+  brancherChoix("periode-rapport", rpChargerPeriodes);
+  $("#code-rapport").addEventListener("change", rpCharger);
+  $("#rp-pdf").addEventListener("click", rpPdf);
+}
+
+window.addEventListener("pywebviewready", () => {
+  if (typeof window.pywebview?.api?.rapport !== "function") return;   // logiciel installé : pas de rapport
+  $("#lien-rapport").hidden = false;
+  dessinerIcones($("#navigation"));
+  rpBrancher();
+});
 
 </script>
 </body>
