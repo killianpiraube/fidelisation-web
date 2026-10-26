@@ -251,6 +251,8 @@ input[type=checkbox], input[type=radio] { width: 15px; height: 15px; accent-colo
 .badge.variable i { background: var(--statut-attention); }
 .badge.irregulier i { background: var(--statut-critique); }
 .badge.insuffisant { color: var(--doux); font-weight: 400; }
+.badge.sans_caisse i { background: var(--statut-critique); }
+.badge.sans_caisse { color: var(--statut-critique); }
 .badge.insuffisant i { background: transparent; border: 1px dashed var(--bord-fort); }
 .mini-courbe { width: 150px; height: 30px; display: block; }
 .mini-courbe polyline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
@@ -1628,12 +1630,13 @@ html[data-appareil="telephone"] #page-rapport .chiffres.compacts { grid-template
         <div class="feuille-defilante">
           <div class="feuille">
             <h2 id="titre-stabilite">Stabilité</h2>
-            <p class="doux explication">Le <strong>CV%</strong> (coefficient de variation) mesure à quel point les résultats changent d'une période à l'autre.
-              Plus il est bas, plus le conseiller est constant. Deux conseillers avec la même moyenne peuvent avoir un CV très différent :
-              l'un régulier, l'autre qui fonctionne par pics.</p>
+            <p class="doux explication">L'<strong>écart %</strong> mesure à quel point les résultats s'éloignent de ce qu'on attend pour le temps passé en caisse.
+              Chaque période est comparée au rendement habituel du conseiller multiplié par ses heures de caisse : plus il a d'heures, plus l'écart toléré est grand, en proportion.
+              Les périodes sont pondérées par leurs heures, et une période <strong>sans heure de caisse</strong> compte comme un écart de 100 % : impossible d'être régulier sans passer en caisse.
+              Plus l'écart est bas, plus le conseiller est constant.</p>
             <p id="exclue" class="doux petit"></p>
             <table class="tableau-office stabilite">
-              <thead><tr><th>Conseiller</th><th>Régularité</th><th class="nombre">CV%</th><th class="nombre">Moyenne</th><th class="nombre">Écart-type</th><th class="nombre">Min – Max</th><th class="nombre">Périodes</th><th>Tendance</th></tr></thead>
+              <thead><tr><th>Conseiller</th><th>Régularité</th><th class="nombre">Écart %</th><th class="nombre">Moyenne</th><th class="nombre">Écart-type</th><th class="nombre">Min – Max</th><th class="nombre">Périodes</th><th>Tendance</th></tr></thead>
               <tbody id="lignes-stabilite"></tbody>
             </table>
           </div>
@@ -1845,7 +1848,7 @@ html[data-appareil="telephone"] #page-rapport .chiffres.compacts { grid-template
           <div class="panneau large" id="formulaires">
             <div class="categorie" data-categorie="regularite">
               <h3>Seuils de régularité</h3>
-              <p class="doux">C'est toi qui décides ce qui est « régulier » pour ton magasin. Les seuils portent sur le CV%.</p>
+              <p class="doux">C'est toi qui décides ce qui est « régulier » pour ton magasin. Les seuils portent sur l'écart % de la page Stabilité.</p>
               <div class="formulaire">
                 <label>Très régulier en dessous de (%)<input id="seuil-1" type="number" min="1" step="1"></label>
                 <label>Régulier en dessous de (%)<input id="seuil-2" type="number" min="1" step="1"></label>
@@ -2636,37 +2639,73 @@ html[data-appareil="telephone"] #page-rapport .chiffres.compacts { grid-template
     return { periodes, noms, valeur };
   }
 
+  // Régularité « équitable » :
+  //  - chaque période est comparée à ce qu'on attend pour le temps passé en caisse
+  //    (attendu = rendement moyen du conseiller × heures de la période) : plus il y a
+  //    d'heures, plus l'écart toléré est grand, en proportion des heures ;
+  //  - les périodes sont pondérées par leurs heures (une période de 2 h pèse moins qu'une de 20 h) ;
+  //  - une période à 0 h de caisse (ou sans aucune saisie) entre la première et la dernière
+  //    période du conseiller compte comme un écart de 100 % : on ne peut pas être régulier sans caisse ;
+  //  - un conseiller sans aucune heure de caisse n'est jamais classé régulier.
   async function stabilite(df, type, indicateur, inclureEnCours) {
     if (!df.length) return { lignes: [], periode_exclue: null };
     const reglages = await lireReglages();
-    const tableau = tableauPeriodes(df, type, indicateur);
     const enCours = codePeriode(type, aujourdhui());
-    let periodes = tableau.periodes, periodeExclue = null;
+    let periodes = trier(df.map((l) => l[type])), periodeExclue = null;
     if (!inclureEnCours && periodes.includes(enCours)) {
       periodes = periodes.filter((p) => p !== enCours);
       periodeExclue = libellePeriode(type, enCours);
     }
     const parHeure = indicateur in RATIOS, decimales = parHeure ? 2 : 1;
+    const base_ = RATIOS[indicateur] || indicateur;
+    const noms = trier(df.map((l) => l.conseiller));
     const lignes = [];
-    for (const nom of tableau.noms) {
-      const brutes = periodes.map((p) => tableau.valeur(p, nom));
-      const premier = brutes.findIndex((v) => v !== null);
-      if (premier < 0) continue;
-      const dernier = brutes.length - 1 - [...brutes].reverse().findIndex((v) => v !== null);
-      let serie = brutes.slice(premier, dernier + 1);
-      // par heure : une période sans temps de caisse connu est ignorée ; sinon, une période sans résultat compte pour 0
-      serie = parHeure ? serie.filter((v) => v !== null) : serie.map((v) => v ?? 0);
-      const moyenne = somme(serie) / serie.length;
-      const ecart = Math.sqrt(somme(serie.map((v) => (v - moyenne) ** 2)) / serie.length);
-      const cv = moyenne > 0 ? arrondi(ecart / moyenne * 100, 1) : null;
-      const [niveau, texte] = niveauRegularite(cv, serie.length, reglages);
+    for (const nom of noms) {
+      const siennes = df.filter((l) => l.conseiller === nom && periodes.includes(l[type]));
+      if (!siennes.length) continue;
+      // par période : résultat, heures connues, heures inconnues ?
+      const parPeriode = periodes.map((p) => {
+        const ls = siennes.filter((l) => l[type] === p && !l.seulement_hc);
+        const hc = siennes.filter((l) => l[type] === p).reduce((s, l) => s + (l.seulement_hc ? l[base_] : 0), 0);
+        const resultat = somme(ls.map((l) => l[base_])) + hc;
+        const connues = ls.filter((l) => estNombre(l[HEURES]));
+        const heures = somme(connues.map((l) => l[HEURES]));
+        const inconnu = ls.length > 0 && connues.length < ls.length && heures === 0;   // résultats saisis sans le temps de caisse
+        return { resultat, heures, inconnu, present: ls.length > 0 || hc > 0 };
+      });
+      const premier = parPeriode.findIndex((x) => x.present);
+      const dernier = parPeriode.length - 1 - [...parPeriode].reverse().findIndex((x) => x.present);
+      const fenetre = parPeriode.slice(premier, dernier + 1);
+      const enCaisse = fenetre.filter((x) => x.heures > 0);
+      const sansCaisse = fenetre.filter((x) => x.heures === 0 && !x.inconnu);
+      const comptees = fenetre.filter((x) => x.heures > 0 || !x.inconnu);
+      // valeurs affichées (résultat ou par heure)
+      const valeurs = parHeure ? comptees.map((x) => (x.heures > 0 ? x.resultat / x.heures : 0)) : fenetre.map((x) => x.resultat);
+      const moyenne = valeurs.length ? somme(valeurs) / valeurs.length : 0;
+      const ecart = valeurs.length ? Math.sqrt(somme(valeurs.map((v) => (v - moyenne) ** 2)) / valeurs.length) : 0;
+      const heuresTotales = somme(enCaisse.map((x) => x.heures));
+      const rendement = heuresTotales ? somme(enCaisse.map((x) => x.resultat)) / heuresTotales : 0;
+      let cv = null, niveau, texte;
+      if (!enCaisse.length) {
+        [niveau, texte] = fenetre.every((x) => x.inconnu) ? ["insuffisant", "Temps de caisse non saisi"] : ["sans_caisse", "Aucune heure de caisse"];
+      } else if (rendement <= 0) {
+        [niveau, texte] = ["insuffisant", "Pas de résultats"];
+      } else {
+        const heuresMoyennes = heuresTotales / enCaisse.length;
+        let poids = 0, total = 0;
+        for (const x of enCaisse) { const attendu = rendement * x.heures, d = (x.resultat - attendu) / attendu; poids += x.heures; total += x.heures * d * d; }
+        for (const _ of sansCaisse) { poids += heuresMoyennes; total += heuresMoyennes; }   // écart de 100 %
+        cv = arrondi(Math.sqrt(total / poids) * 100, 1);
+        [niveau, texte] = niveauRegularite(cv, comptees.length, reglages);
+      }
       lignes.push({
-        conseiller: nom, nb_periodes: serie.length, moyenne: arrondi(moyenne, decimales), ecart_type: arrondi(ecart, decimales),
-        cv, minimum: arrondi(Math.min(...serie), decimales), maximum: arrondi(Math.max(...serie), decimales),
-        niveau, texte, valeurs: serie.map((v) => arrondi(v, decimales)),
+        conseiller: nom, nb_periodes: comptees.length, sans_caisse: sansCaisse.length, heures: arrondi(heuresTotales, 2),
+        moyenne: arrondi(moyenne, decimales), ecart_type: arrondi(ecart, decimales), cv,
+        minimum: arrondi(valeurs.length ? Math.min(...valeurs) : 0, decimales), maximum: arrondi(valeurs.length ? Math.max(...valeurs) : 0, decimales),
+        niveau, texte, valeurs: valeurs.map((v) => arrondi(v, decimales)),
       });
     }
-    const ordre = { tres_regulier: 0, regulier: 1, variable: 2, irregulier: 3, insuffisant: 4 };
+    const ordre = { tres_regulier: 0, regulier: 1, variable: 2, irregulier: 3, sans_caisse: 4, insuffisant: 5 };
     lignes.sort((a, b) => ordre[a.niveau] - ordre[b.niveau] || (a.cv ?? 999) - (b.cv ?? 999));
     return { lignes, periode_exclue: periodeExclue, seuils: reglages.seuils, par_heure: parHeure };
   }
@@ -2802,7 +2841,7 @@ html[data-appareil="telephone"] #page-rapport .chiffres.compacts { grid-template
     // régularité des conseillers d'une semaine à l'autre (période de plusieurs semaines)
     if (type !== "semaine") {
       const st = await stabilite(lignes, "semaine", "score_total", true);
-      resultat.stabilite = st.lignes.map((l) => ({ conseiller: l.conseiller, nb_periodes: l.nb_periodes, moyenne: l.moyenne, cv: l.cv, niveau: l.niveau, texte: l.texte, minimum: l.minimum, maximum: l.maximum }));
+      resultat.stabilite = st.lignes.map((l) => ({ conseiller: l.conseiller, nb_periodes: l.nb_periodes, sans_caisse: l.sans_caisse, moyenne: l.moyenne, cv: l.cv, niveau: l.niveau, texte: l.texte, minimum: l.minimum, maximum: l.maximum }));
     }
 
     // faits marquants
@@ -3529,7 +3568,7 @@ async function remplirAccueil() {
   $("#encart-regulier").innerHTML = r.plus_regulier
     ? `<span class="etiquette">Le plus régulier (score, semaine par semaine)</span>
        <strong>${pastille(r.plus_regulier.nom)}${echapper(r.plus_regulier.nom)}</strong>
-       <span class="doux">CV de ${nombre(r.plus_regulier.cv, 1)} % · ${echapper(r.plus_regulier.texte)}</span>`
+       <span class="doux">écart de ${nombre(r.plus_regulier.cv, 1)} % · ${echapper(r.plus_regulier.texte)}</span>`
     : `<span class="etiquette">Le plus régulier</span><strong>—</strong><span class="doux">Il faut au moins ${ETAT.reglages.periodes_minimum} semaines de données.</span>`;
 
   const lignes = HISTORIQUE.slice(0, 8);
@@ -3712,11 +3751,11 @@ async function chargerStabilite() {
   const indicateur = valeurChoix("indicateur-stabilite") + (valeurChoix("mesure-stabilite") === "heure" ? "_h" : "");
   const resultat = await api().stabilite(type, indicateur, $("#inclure-en-cours").checked);
   const [s1, s2, s3] = ETAT.reglages.seuils;
-  $("#info-seuils").innerHTML = `Seuils CV% : ${s1} · ${s2} · ${s3}<br>(Paramètres › Régularité)`;
+  $("#info-seuils").innerHTML = `Seuils écart % : ${s1} · ${s2} · ${s3}<br>(Paramètres › Régularité)`;
   $("#titre-stabilite").textContent = `Stabilité · ${ETAT.libelles[indicateur]} d'une ${LIBELLES_PERIODE[type].toLowerCase()} à l'autre`;
   $("#exclue").textContent = (resultat.periode_exclue
     ? `La période en cours (${resultat.periode_exclue}) n'est pas comptée car elle n'est pas terminée. ` : "")
-    + (resultat.par_heure ? "Par heure de caisse : seules les périodes où le temps en caisse a été saisi sont comptées." : "");
+    + "Les périodes où les résultats ont été saisis sans le temps de caisse ne sont pas comptées.";
   const d = resultat.par_heure ? 2 : 1;
 
   $("#lignes-stabilite").innerHTML = resultat.lignes.length ? resultat.lignes.map((l) => `
@@ -3727,7 +3766,7 @@ async function chargerStabilite() {
       <td class="nombre">${nombre(l.moyenne, d)}</td>
       <td class="nombre">${nombre(l.ecart_type, d)}</td>
       <td class="nombre">${nombre(l.minimum, d === 2 ? 2 : 0)} – ${nombre(l.maximum, d === 2 ? 2 : 0)}</td>
-      <td class="nombre">${l.nb_periodes}</td>
+      <td class="nombre">${l.nb_periodes}${l.sans_caisse ? `<div class="doux petit">dont ${l.sans_caisse} sans caisse</div>` : ""}</td>
       <td>${miniCourbe(l.valeurs, l.moyenne, couleur(l.conseiller), secondaire(l.conseiller))}</td>
     </tr>`).join("") : `<tr class="vide-ligne"><td colspan="8">Aucune donnée.</td></tr>`;
 }
@@ -6061,7 +6100,7 @@ function rpAfficher() {
     parties.push(`<h3 class="espace-haut">Régularité d'une semaine à l'autre</h3>
     <div class="rp-defile"><table class="tableau-office rp-tableau">
       <thead><tr><th>Conseiller</th><th class="nombre">Semaines</th><th class="nombre">Score moyen</th><th class="nombre">Mini – maxi</th><th>Régularité</th></tr></thead>
-      <tbody>${r.stabilite.map((s) => `<tr><td>${echapper(s.conseiller)}</td><td class="nombre">${s.nb_periodes}</td><td class="nombre">${rpDec(s.moyenne)}</td>
+      <tbody>${r.stabilite.map((s) => `<tr><td>${echapper(s.conseiller)}</td><td class="nombre">${s.nb_periodes}${s.sans_caisse ? ` <span class="doux petit">(${s.sans_caisse} sans caisse)</span>` : ""}</td><td class="nombre">${rpDec(s.moyenne)}</td>
         <td class="nombre">${rpDec(s.minimum)} – ${rpDec(s.maximum)}</td><td><span class="badge ${s.niveau}"><i></i>${echapper(s.texte)}</span></td></tr>`).join("")}</tbody>
     </table></div>`);
   }
@@ -6237,7 +6276,7 @@ async function rpPdf() {
       titre("Régularité d'une semaine à l'autre");
       tableau({
         columns: [{ header: "Conseiller", dataKey: "nom" }, { header: "Semaines", dataKey: "n" }, { header: "Score moyen", dataKey: "moy" }, { header: "Mini - maxi", dataKey: "mm" }, { header: "Régularité", dataKey: "texte" }],
-        body: r.stabilite.map((s) => ({ nom: s.conseiller, n: s.nb_periodes, moy: rpDec(s.moyenne), mm: `${rpDec(s.minimum)} - ${rpDec(s.maximum)}`, texte: s.texte })),
+        body: r.stabilite.map((s) => ({ nom: s.conseiller, n: s.sans_caisse ? `${s.nb_periodes} (${s.sans_caisse} sans caisse)` : s.nb_periodes, moy: rpDec(s.moyenne), mm: `${rpDec(s.minimum)} - ${rpDec(s.maximum)}`, texte: s.texte })),
         columnStyles: { n: { halign: "right" }, moy: { halign: "right" }, mm: { halign: "right" } },
       });
     }
